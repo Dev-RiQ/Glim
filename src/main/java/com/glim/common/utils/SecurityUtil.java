@@ -5,8 +5,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public abstract class SecurityUtil {
 
-    public static Long getUserId(){
-        return ((SecurityUserDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+    public static String getUsername(){
+        return ((SecurityUserDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
     }
     public static String getUserNickname(){
         return ((SecurityUserDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getNickname();
