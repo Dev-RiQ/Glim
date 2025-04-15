@@ -17,42 +17,70 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
-    @Column(length = 100, nullable = false, unique = true)
-    private String username;
-    @Column(length = 100, nullable = false)
-    private String password;
-    @Column(length = 12, nullable = false)
-    private String name;
-    @Column(length = 12, nullable = false, unique = true)
-    private String nickname;
-    @Column(length = 2, nullable = false)
+    @Column(nullable = false, unique = true)
+    private String username; // 로그인 할때 id
+    @Column(nullable = false)
+    private String password; // 로그인 시 password
+    @Column(nullable = false)
+    private String name; // 유저 이름 (닉네임과 차별됨)
+    @Column(nullable = false, unique = true)
+    private String nickname; // @knk_0611
+    @Column(nullable = false) @Enumerated(EnumType.STRING)
     private String sex;
-    @Column(length = 6, nullable = false)
+    @Column(nullable = false)
     private String birth;
-    @Column(length = 100, nullable = false)
+    @Column(nullable = false)
     private String content;
-    @Column(length = 100, nullable = false)
+    @Column(nullable = false)
     private String img;
-    @Column(length = 13, nullable = false)
+    @Column(nullable = false)
     private String phone;
-    @Column(length = 20, nullable = false)
+    @Column(name = "createdDate", nullable = false)
     private LocalDateTime created_at;
+    @Column(nullable = false)
     private Long followers;
+    @Column(nullable = false)
     private Long followings;
-    private Long read_board_id;
-    @Column(length = 12, nullable = false)
+    @Column(nullable = false) @Enumerated(EnumType.STRING)
     private Role role;
     @Column(nullable = false)
     private String tags;
-    @Column(length = 12, nullable = false)
+    @Column(nullable = false)
     private Integer rate;
+    @Column(name = "read_board_id", nullable = false)
+    private Long readBoardId;
+    @Enumerated(EnumType.STRING)
+    private PlatForm platForm;
 
     @Builder
-    public User(Long id) {
+    public User(Long id, String username, String password, String name, String nickname, String sex, String birth,
+                String content, String img, String phone, LocalDateTime created_at, Long followers,
+                Long followings, Role role, String tags, Integer rate, Long readBoardId, PlatForm platForm) {
         this.id = id;
+        this.username = username != null ? username : "";
+        this.password = password != null && !password.isEmpty()
+                ? /*new UserPasswordEncoder(password).getPassword()*/password
+                : "";
+        this.name = name;
+        this.nickname = nickname != null ? nickname : this.name;
+        this.sex = sex;
+        this.birth = birth != null ? birth : "";
+        this.content = content != null ? content : "";
+        this.img = img != null ? img : "";
+        this.phone = phone != null ? phone : "";
+        this.created_at = created_at != null ? created_at : LocalDateTime.now();
+        this.followers = followers != null ? followers : 0L;
+        this.followings = followings != null ? followings : 0L;
+        this.role = role;
+        this.tags = tags != null ? tags : "";
+        this.rate = rate != null ? rate : 0;
+        this.readBoardId = readBoardId != null ? readBoardId : 0L;
+        this.platForm = platForm;
     }
 
     public void update(UpdateDummyRequest dummy) {
         this.id = dummy.getId();
     }
+
+
 }
