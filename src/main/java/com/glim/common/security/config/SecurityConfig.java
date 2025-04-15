@@ -70,34 +70,34 @@ public class SecurityConfig {
 
 
         //원규
-        http
-                .authorizeHttpRequests((auth) -> {
-                    auth
-                            .requestMatchers("/").permitAll();
-                });
-
-
-
-
-
-
-        //종석
-        http
-                .authorizeHttpRequests((auth) -> {
-                    auth
-                            .requestMatchers("/").permitAll();
-                });
-
-
-
-
-
-        //나경
-        http
-                .authorizeHttpRequests((auth) -> {
-                    auth
-                            .requestMatchers("/").permitAll();
-                });
+//        http
+//                .authorizeHttpRequests((auth) -> {
+//                    auth
+//                            .requestMatchers("/").permitAll();
+//                });
+//
+//
+//
+//
+//
+//
+//        //종석
+//        http
+//                .authorizeHttpRequests((auth) -> {
+//                    auth
+//                            .requestMatchers("/").permitAll();
+//                });
+//
+//
+//
+//
+//
+//        //나경
+//        http
+//                .authorizeHttpRequests((auth) -> {
+//                    auth
+//                            .requestMatchers("/").permitAll();
+//                });
 
         return http.build();
     }

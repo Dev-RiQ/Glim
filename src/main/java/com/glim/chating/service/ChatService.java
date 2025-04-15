@@ -4,6 +4,8 @@ import com.glim.chating.domain.ChatRoom;
 import com.glim.chating.dto.request.AddChatRoomRequest;
 import com.glim.chating.dto.response.PreviewChatMsgResponse;
 import com.glim.chating.repository.ChatMsgRepository;
+import com.glim.chating.repository.ChatRoomRepository;
+import com.glim.chating.repository.ChatUserRepository;
 import com.glim.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,26 +19,28 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatService {
 
     private final ChatMsgRepository chatMsgRepository;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatUserRepository chatUserRepository;
 
-    public PreviewChatMsgResponse findDummyById(Long id) {
-        return new PreviewChatMsgResponse(chatMsgRepository.findById(id).orElseThrow(ErrorCode::throwUserNotFound));
-    }
-
-    @Transactional
-    public void insert(AddChatRoomRequest request) {
-        chatMsgRepository.save(new AddChatRoomRequest().toEntity(request));
-    }
-
-    @Transactional
-    public void update(Long id, UpdateChatMsgRequest request) {
-        ChatRoom chatRoom = chatMsgRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
-        chatRoom.update(request);
-        chatMsgRepository.save(chatRoom);
-    }
-
-    @Transactional
-    public void delete(Long id) {
-        ChatRoom chatRoom = chatMsgRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
-        chatMsgRepository.delete(chatRoom);
-    }
+//    public PreviewChatMsgResponse findDummyById(Long id) {
+//        return new PreviewChatMsgResponse(chatMsgRepository.findById(id).orElseThrow(ErrorCode::throwUserNotFound));
+//    }
+//
+//    @Transactional
+//    public void insert(AddChatRoomRequest request) {
+//        chatMsgRepository.save(new AddChatRoomRequest().toEntity(request));
+//    }
+//
+//    @Transactional
+//    public void update(Long id, UpdateChatMsgRequest request) {
+//        ChatRoom chatRoom = chatMsgRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
+//        chatRoom.update(request);
+//        chatMsgRepository.save(chatRoom);
+//    }
+//
+//    @Transactional
+//    public void delete(Long id) {
+//        ChatRoom chatRoom = chatMsgRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
+//        chatMsgRepository.delete(chatRoom);
+//    }
 }
