@@ -7,7 +7,7 @@ server:
 
 spring:
   application:
-    name: RestIn
+    name: Glim
 
   profiles:
     include: dev, secret
