@@ -5,6 +5,8 @@ import com.glim.chating.domain.ChatUser;
 import jakarta.persistence.Column;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

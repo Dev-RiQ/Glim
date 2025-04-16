@@ -14,18 +14,13 @@ import java.time.LocalDateTime;
 @Document(collection = "chat_msgs")
 @ToString()
 public class ChatMsg {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "msg_id")
-    private Long id;
-    @Column(name = "room_id")
+    @Column(name = "_id")
+    private String id;
+    private Long msgId;
     private Long roomId;
-    @Column(name = "user_id")
     private Long userId;
     private String content;
-    @Column(name = "reply_msg_id")
     private Long replyMsgId;
-    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Builder
@@ -35,9 +30,5 @@ public class ChatMsg {
         this.content = content;
         this.replyMsgId = replyMsgId;
         this.createdAt = LocalDateTime.now();
-    }
-
-    public void update(String content) {
-        this.content = content;
     }
 }
