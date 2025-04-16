@@ -7,15 +7,15 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "board_views")
+@Table(name = "board_tags")
 @ToString()
-public class boardViews {
+public class BoardTags {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "board_view_id", nullable = false)
+    @Column(name = "board_tag_id", nullable = false)
     private Long id;
     @Column(name = "board_id", nullable = false)
     private Long boardId;
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(nullable = false)
+    private String tag;
 }

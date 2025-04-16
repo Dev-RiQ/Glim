@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-public class updateBoardRequest {
+public class UpdateBoardRequest {
 
     private String location;
     private String content;

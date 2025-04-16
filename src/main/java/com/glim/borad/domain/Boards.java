@@ -1,8 +1,7 @@
 package com.glim.borad.domain;
 
 
-import com.glim.borad.dto.request.addBoardRequest;
-import com.glim.borad.dto.request.updateBoardRequest;
+import com.glim.borad.dto.request.UpdateBoardRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "boards")
 @ToString()
-public class boards {
+public class Boards {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id", nullable = false)
@@ -53,7 +52,7 @@ public class boards {
     private Option commentable;
 
     @Builder
-    public boards(Long userId, String location, String content, String tagUserIds, String createdAt, String updatedAt, Integer bgmId, Boolean boardType, Boolean viewLikes, Boolean viewShares, Boolean commentable){
+    public Boards(Long userId, String location, String content, String tagUserIds, String createdAt, String updatedAt, Integer bgmId, Boolean boardType, Boolean viewLikes, Boolean viewShares, Boolean commentable){
         this.userId = userId;
         this.location = location;
         this.content = content;
@@ -67,7 +66,7 @@ public class boards {
         this.commentable = commentable ? Option.TRUE : Option.FALSE;
     }
 
-    public void update(updateBoardRequest request) {
+    public void update(UpdateBoardRequest request) {
         this.location = request.getLocation();
         this.content = request.getContent();
         this.tagUserIds = request.getTagId();

@@ -1,12 +1,12 @@
 package com.glim.borad.dto.response;
 
-import com.glim.borad.domain.boards;
+import com.glim.borad.domain.Boards;
 import lombok.Getter;
 import lombok.ToString;
 
 @Getter
 @ToString
-public class viewBoardResponse {
+public class ViewBoardResponse {
 
     private Long id;
     private String location;
@@ -20,7 +20,7 @@ public class viewBoardResponse {
     private String updatedAt;
     private Integer bgmId;
 
-    public viewBoardResponse(boards board) {
+    public ViewBoardResponse(Boards board) {
         this.id = board.getId();
         this.location = board.getLocation();
         this.content = board.getContent();

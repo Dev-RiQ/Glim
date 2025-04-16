@@ -7,25 +7,18 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "board_comments")
+@Table(name = "board_likes")
 @ToString()
-public class boardComments {
+public class BoardLikes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_id", nullable = false)
+    @Column(name = "board_like_id", nullable = false)
     private Long id;
     @Column(name = "board_id", nullable = false)
     private Long boardId;
     @Column(name = "user_id", nullable = false)
     private Long userId;
-    @Column(nullable = false)
-    private String content;
-    @Column(nullable = false)
-    private Integer likes;
     @Column(name = "created_at", nullable = false)
     private String createdAt;
-    @Column(name = "update_at", nullable = false)
-    private String updateAt;
-    @Column(name = "reply_comment_id", nullable = false)
-    private Long replyCommentId;
+
 }
