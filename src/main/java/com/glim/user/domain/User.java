@@ -1,6 +1,5 @@
 package com.glim.user.domain;
 
-import com.glim.user.dto.request.UpdateDummyRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -76,10 +75,6 @@ public class User {
         this.rate = rate != null ? rate : 0;
         this.readBoardId = readBoardId != null ? readBoardId : 0L;
         this.platForm = platForm;
-    }
-
-    public void update(UpdateDummyRequest dummy) {
-        this.id = dummy.getId();
     }
 
 

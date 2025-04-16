@@ -1,6 +1,5 @@
 package com.glim.user.repository;
 
-import com.glim.user.domain.Dummy;
 import com.glim.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
