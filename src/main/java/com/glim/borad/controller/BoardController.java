@@ -1,9 +1,9 @@
 package com.glim.borad.controller;
 
-import com.glim.borad.dto.request.addBoardRequest;
-import com.glim.borad.dto.request.updateBoardRequest;
-import com.glim.borad.dto.response.viewBoardResponse;
-import com.glim.borad.service.boardService;
+import com.glim.borad.dto.request.AddBoardRequest;
+import com.glim.borad.dto.request.UpdateBoardRequest;
+import com.glim.borad.dto.response.ViewBoardResponse;
+import com.glim.borad.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,24 +17,24 @@ import java.util.List;
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/board")
-public class boardController {
+public class BoardController {
 
-    private final boardService boardService;
+    private final BoardService boardService;
 
      @GetMapping({"","/{id}"})
-    public List<viewBoardResponse> list(@PathVariable(required = false) Long id) {
-        List<viewBoardResponse> dummy = boardService.list(id);
+    public List<ViewBoardResponse> list(@PathVariable(required = false) Long id) {
+        List<ViewBoardResponse> dummy = boardService.list(id);
         return ResponseEntity.ok(dummy).getBody();
     }
 
     @PostMapping({"","/"})
-    public ResponseEntity<HttpStatus> add(addBoardRequest request) {
+    public ResponseEntity<HttpStatus> add(AddBoardRequest request) {
         boardService.insert(request);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
      @PutMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable Long id, updateBoardRequest request) {
+    public ResponseEntity<HttpStatus> update(@PathVariable Long id, UpdateBoardRequest request) {
         boardService.update(id, request);
         return ResponseEntity.ok(HttpStatus.OK);
     }

@@ -7,18 +7,15 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "board_files")
+@Table(name = "board_views")
 @ToString()
-public class boardFiles {
+public class BoardViews {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "board_file_id", nullable = false)
-    private Long boardFileId;
+    @Column(name = "board_view_id", nullable = false)
+    private Long id;
     @Column(name = "board_id", nullable = false)
     private Long boardId;
-    @Column(nullable = false)
-    private String fileName;
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private FileType fileType;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 }

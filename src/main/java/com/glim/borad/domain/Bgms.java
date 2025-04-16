@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "bgms")
 @ToString()
-public class bgms {
+public class Bgms {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bgm_id", nullable = false)

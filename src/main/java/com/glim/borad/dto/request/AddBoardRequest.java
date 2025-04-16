@@ -1,6 +1,6 @@
 package com.glim.borad.dto.request;
 
-import com.glim.borad.domain.boards;
+import com.glim.borad.domain.Boards;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-public class addBoardRequest {
+public class AddBoardRequest {
     private Long userId;
     private String location;
     private String content;
@@ -23,8 +23,8 @@ public class addBoardRequest {
     private Boolean viewShares;
     private Boolean commentable;
 
-    public boards toEntity(addBoardRequest addBoardRequest) {
-        return boards.builder()
+    public Boards toEntity(AddBoardRequest addBoardRequest) {
+        return Boards.builder()
                 .userId(addBoardRequest.getUserId())
                 .location(addBoardRequest.getLocation())
                 .content(addBoardRequest.getContent())
