@@ -1,12 +1,10 @@
 package com.glim.chating.service;
 
-import com.glim.chating.domain.ChatRoom;
-import com.glim.chating.dto.request.AddChatRoomRequest;
-import com.glim.chating.dto.response.PreviewChatMsgResponse;
 import com.glim.chating.repository.ChatMsgRepository;
 import com.glim.chating.repository.ChatRoomRepository;
 import com.glim.chating.repository.ChatUserRepository;
-import com.glim.common.exception.ErrorCode;
+import com.glim.common.kafka.dto.Message;
+import com.glim.common.kafka.service.SendMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +19,12 @@ public class ChatService {
     private final ChatMsgRepository chatMsgRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatUserRepository chatUserRepository;
+    private final SendMessage sender;
+
+    public void sendMessage(Message message) {
+        log.info("send message : {}", message);
+        sender.publishMessage(message);
+    }
 
 //    public PreviewChatMsgResponse findDummyById(Long id) {
 //        return new PreviewChatMsgResponse(chatMsgRepository.findById(id).orElseThrow(ErrorCode::throwUserNotFound));

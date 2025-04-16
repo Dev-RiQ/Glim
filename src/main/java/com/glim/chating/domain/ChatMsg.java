@@ -2,14 +2,16 @@ package com.glim.chating.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-@Entity
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "chat_rooms")
+@AllArgsConstructor
+@Builder
+@Document(collection = "chat_msgs")
 @ToString()
 public class ChatMsg {
     @Id
