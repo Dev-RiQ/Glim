@@ -2,15 +2,42 @@ package com.glim.common.security.dto;
 
 import com.glim.user.domain.Role;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
 @ToString
 @AllArgsConstructor
 @Builder
-public class SecurityUserDto {
-    private String username;
+public class SecurityUserDto implements UserDetails {
+    private Long id;
     private String nickname;
     private String img;
-    private Role role;
+    private String role;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role));
+    }
+
+    @Override
+    public String getUsername() {
+        return nickname;
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override public boolean isAccountNonExpired() { return true; }
+    @Override public boolean isAccountNonLocked() { return true; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled() { return true; }
 }
+

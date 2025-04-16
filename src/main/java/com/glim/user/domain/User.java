@@ -26,7 +26,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String nickname; // @knk_0611
     @Column(nullable = false) @Enumerated(EnumType.STRING)
-    private String sex;
+    private Sex sex;
     @Column(nullable = false)
     private String birth;
     @Column(nullable = false)
@@ -53,7 +53,7 @@ public class User {
     private PlatForm platForm;
 
     @Builder
-    public User(Long id, String username, String password, String name, String nickname, String sex, String birth,
+    public User(Long id, String username, String password, String name, String nickname, Sex sex, String birth,
                 String content, String img, String phone, LocalDateTime created_at, Long followers,
                 Long followings, Role role, String tags, Integer rate, Long readBoardId, PlatForm platForm) {
         this.id = id;

@@ -1,5 +1,6 @@
 package com.glim.common.security.config;
 
+import com.glim.common.security.service.CustomUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +20,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-//    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomUserService customUserService ;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -53,15 +54,15 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .oauth2Login((oauth2) -> oauth2
                         .loginPage("/login")
-//                        .userInfoEndpoint((userInfoEndpointConfig) ->
-//                                userInfoEndpointConfig.userService(customOAuth2UserService))
+                        .userInfoEndpoint((userInfoEndpointConfig) ->
+                                userInfoEndpointConfig.userService(customUserService))
                 )
                 .logout((logoutConfig) -> logoutConfig.logoutSuccessUrl("/"));
 
         http
                 .authorizeHttpRequests((auth) -> {
                     auth
-                            .requestMatchers("/","/oauth","/oauth2/**", "/login","/login?error", "/sign-up", "/dummy", "/dummy/*").permitAll()
+                            .requestMatchers("/","/oauth","/oauth2/**", "/login","/login?error", "/sign-up", "/dummy", "/dummy/*","/user/me" ).permitAll()
                             .requestMatchers("/").permitAll()
                             .anyRequest().authenticated();
                 });
