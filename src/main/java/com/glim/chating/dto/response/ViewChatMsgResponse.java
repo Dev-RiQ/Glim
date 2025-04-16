@@ -13,6 +13,7 @@ import java.time.LocalTime;
 @ToString
 public class ViewChatMsgResponse {
     private Long id;
+    private Long roomId;
     private Long userId;
     private String content;
     private Long replyMsgId;
@@ -20,6 +21,7 @@ public class ViewChatMsgResponse {
 
     public ViewChatMsgResponse(ChatMsg chatMsg) {
         this.id = chatMsg.getId();
+        this.roomId = chatMsg.getRoomId();
         this.userId = chatMsg.getUserId();
         this.content = chatMsg.getContent();
         this.replyMsgId = chatMsg.getReplyMsgId();

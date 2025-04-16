@@ -63,42 +63,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> {
                     auth
                             .requestMatchers("/","/oauth","/oauth2/**", "/login","/login?error", "/sign-up", "/dummy", "/dummy/*","/user/me" ).permitAll()
-                            .requestMatchers("/").permitAll()
+                            .requestMatchers("/chat","/chat/**","/pub","/pub/**","/sub","/sub/**").permitAll()
                             .anyRequest().authenticated();
                 });
-
-
-
-
-//        //원규
-//        http
-//                .authorizeHttpRequests((auth) -> {
-//                    auth
-//                            .requestMatchers("/").permitAll();
-//                });
-//
-//
-//
-//
-//
-//
-//        //종석
-//        http
-//                .authorizeHttpRequests((auth) -> {
-//                    auth
-//                            .requestMatchers("/").permitAll();
-//                });
-//
-//
-//
-//
-//
-//        //나경
-//        http
-//                .authorizeHttpRequests((auth) -> {
-//                    auth
-//                            .requestMatchers("/").permitAll();
-//                });
 
         return http.build();
     }
