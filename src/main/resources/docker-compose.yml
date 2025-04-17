@@ -1,0 +1,55 @@
+# compose 파일 버전
+version: '3'
+services:
+  # 서비스 명
+  zookeeper:
+    # 사용할 이미지
+    image: wurstmeister/zookeeper
+    # 컨테이너명 설정
+    container_name: zookeeper
+    # 접근 포트 설정 (컨테이너 외부:컨테이너 내부)
+    ports:
+      - "2181:2181"
+  # 서비스 명
+  kafka:
+    # 사용할 이미지
+    image: wurstmeister/kafka
+    # 컨테이너명 설정
+    container_name: kafka
+    # 접근 포트 설정 (컨테이너 외부:컨테이너 내부)
+    ports:
+      - "9092:9092"
+    # 환경 변수 설정
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_CREATE_TOPICS: "Topic:1:1"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    # 볼륨 설정
+    volumes:
+      - /var/run/docker.sock
+    # 의존 관계 설정
+    depends_on:
+      - zookeeper
+
+#   $ docker-compose up -d
+#
+#   Zookeeper Bash
+#   $ docker exec -i -t zookeeper bash
+#   $ bash bin/zkServer.sh start /opt/zookeeper-3.4.13/conf/zoo.cfg -demon //서버실행
+#   # netstat -l | grep 2181 //2181포트 Listen 상태 변경 확인
+#
+#   Kafka Bash
+#   $ docker exec -i -t kafka bash
+#   $ kafka-server-start.sh -daemon //서버실행
+#   $ kafka-topics.sh --create --zookeeper zookeeper:2181 --topic { Topic 이름 } --partitions 1 --replication-factor 1 // 토픽 생성
+#   $ kafka-topics.sh --list --zookeeper zookeeper // 생성 확인
+#
+#   MongoDB
+#   $ docker pull mongo
+#   $ docker run --name mongodb-container -v ~/data:/data/db -d -p 27017:27017 mongo
+#
+#   application-secret.yml 안에 아래 내용 추가 (연결 전 mongodb 스키마로 use chatdb 실행)
+#   spring:
+#     data:
+#       mongodb:
+#         uri: mongodb://localhost:27017/chatdb

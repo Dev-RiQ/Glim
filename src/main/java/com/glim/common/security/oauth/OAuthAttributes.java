@@ -59,12 +59,11 @@ public class OAuthAttributes {
 
     public User toEntity(String registrationId) {
         return User.builder()
-                .username(email)
-                .name(name != null ? name : "")
+                .username(username)
+                .name(name)
                 .img(img != null ? img : "")
-                .platForm(PlatForm.valueOf(registrationId.toUpperCase()))
                 .role(Role.ROLE_USER)
+                .platForm(PlatForm.valueOf(registrationId.toUpperCase())) // 실제 registrationId로 바꿔서 처리해도 됨
                 .build();
     }
-
 }

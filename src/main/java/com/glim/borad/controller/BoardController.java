@@ -15,7 +15,7 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-@Controller
+/*@Controller*/
 @RequestMapping("/board")
 public class BoardController {
 

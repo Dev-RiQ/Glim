@@ -3,6 +3,7 @@ package com.glim.user.domain;
 import com.glim.user.dto.request.UpdateDummyRequest;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 
@@ -30,7 +31,7 @@ public class User {
     @Column(nullable = false)
     private String birth;
     @Column(nullable = false)
-    private String content;
+    private String content;     // 인스타 프로필 밑에 쓰는 유튜브 링크나 다른 계정넣어놓거나 ,, 뭐그런
     @Column(nullable = false)
     private String img;
     @Column(nullable = false)
@@ -52,6 +53,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private PlatForm platForm;
 
+
     @Builder
     public User(Long id, String username, String password, String name, String nickname, Sex sex, String birth,
                 String content, String img, String phone, LocalDateTime created_at, Long followers,
@@ -63,7 +65,7 @@ public class User {
                 : "";
         this.name = name;
         this.nickname = nickname != null ? nickname : this.name;
-        this.sex = sex;
+        this.sex = sex != null ? sex : Sex.UNKNOWN;
         this.birth = birth != null ? birth : "";
         this.content = content != null ? content : "";
         this.img = img != null ? img : "";
@@ -81,6 +83,12 @@ public class User {
     public void update(UpdateDummyRequest dummy) {
         this.id = dummy.getId();
     }
+
+    public void encodePassword(PasswordEncoder encoder) {
+        this.password = encoder.encode(this.password);
+    }
+
+
 
 
 }

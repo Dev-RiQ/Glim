@@ -33,4 +33,6 @@ public class GlobalCatcher {
         return ResponseEntity.status(errorCode.getHttpStatus()).body(ErrorResponse.toErrorResponse(errorCode));
     }
 
+
+
 }

@@ -6,6 +6,7 @@ import com.glim.user.dto.request.AddDummyRequest;
 import com.glim.user.dto.request.UpdateDummyRequest;
 import com.glim.user.dto.response.ViewDummyResponse;
 import com.glim.user.service.DummyService;
+import com.glim.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,8 @@ public class UserController {
         return SecurityUtil.getUser();
     }
 
-    
+
+
+
 
 }

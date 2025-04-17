@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Slf4j
-@Service
+/*@Service*/
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BoardService {
@@ -33,6 +33,7 @@ public class BoardService {
     }
 
     public List<ViewBoardResponse> list(Long id) {
-        return (List<ViewBoardResponse>) boardRepository.findAllById(id).stream();
+      /*  return (List<ViewBoardResponse>) boardRepository.findAllById(id).stream();*/
+        return null;
     }
 }

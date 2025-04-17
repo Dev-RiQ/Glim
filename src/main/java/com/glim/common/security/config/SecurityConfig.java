@@ -1,4 +1,9 @@
+
 package com.glim.common.security.config;
+
+import com.glim.common.jwt.JwtAuthenticationFilter; // ✅ [추가] JWT 필터 import
+import com.glim.common.jwt.JwtTokenProvider;
+import com.glim.common.security.handler.OAuth2SuccessHandler;
 
 import com.glim.common.security.service.CustomUserService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +18,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @EnableWebSecurity
@@ -20,7 +26,10 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomUserService customUserService ;
+    private final CustomUserService customUserService;
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter; // ✅ [추가] 필터 주입
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -33,7 +42,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public WebSecurityCustomizer configure() { // 스프링 시큐리티 기능 비활성화
+    public WebSecurityCustomizer configure() {
         return (web) -> web.ignoring()
                 .requestMatchers(
                         new AntPathRequestMatcher("/static/**"),
@@ -45,29 +54,29 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .sessionManagement((auth) -> auth
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
-                .oauth2Login((oauth2) -> oauth2
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2Login(oauth -> oauth
                         .loginPage("/login")
-                        .userInfoEndpoint((userInfoEndpointConfig) ->
-                                userInfoEndpointConfig.userService(customUserService))
+                        .userInfoEndpoint(user -> user.userService(customUserService))
+                         // ✅ 반드시 있어야 함
+                        .successHandler(oAuth2SuccessHandler)
                 )
-                .logout((logoutConfig) -> logoutConfig.logoutSuccessUrl("/"));
+
+                .logout(logout -> logout.logoutSuccessUrl("/"));
 
         http
-                .authorizeHttpRequests((auth) -> {
-                    auth
-                            .requestMatchers("/","/oauth","/oauth2/**", "/login","/login?error", "/sign-up", "/dummy", "/dummy/*","/user/me" ).permitAll()
-                            .requestMatchers("/").permitAll()
-                            .anyRequest().authenticated();
-                });
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/oauth", "/oauth2/**", "/login", "/login?error", "/sign-up", "/dummy", "/dummy/*", "/user/me").permitAll()
+                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/**").permitAll()
+                        .anyRequest().authenticated()
+                );
 
-
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 
 //        //원규
