@@ -2,7 +2,6 @@ package com.glim.common.statusResponse;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;

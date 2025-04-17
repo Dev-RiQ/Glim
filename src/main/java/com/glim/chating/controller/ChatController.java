@@ -1,24 +1,19 @@
 package com.glim.chating.controller;
 
-import com.glim.chating.domain.ChatMsg;
 import com.glim.chating.dto.request.AddChatMsgRequest;
-import com.glim.chating.dto.request.AddChatRoomRequest;
 import com.glim.chating.dto.response.ViewChatMsgResponse;
 import com.glim.chating.dto.response.ViewChatRoomResponse;
 import com.glim.chating.dto.response.ViewChatUserResponse;
-import com.glim.chating.service.ChatService;
-import com.glim.common.kafka.dto.Message;
+import com.glim.chating.service.ChatMsgService;
+import com.glim.chating.service.ChatRoomService;
+import com.glim.chating.service.ChatUserService;
 import com.glim.common.statusResponse.StatusResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.hibernate.annotations.Fetch;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -26,50 +21,49 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ChatController {
 
-    private final ChatService chatService;
-
-    private List<ChatMsg> dummy(){
-        List<ChatMsg> testList = new ArrayList<>();
-        testList.add(new ChatMsg(1L, 1L, "test", 0L));
-        testList.add(new ChatMsg(2L, 2L, "test", 0L));
-        testList.add(new ChatMsg(3L, 3L, "test", 0L));
-        testList.add(new ChatMsg(4L, 4L, "test", 0L));
-        return testList;
-    }
+    private final ChatMsgService chatMsgService;
+    private final ChatRoomService chatRoomService;
+    private final ChatUserService chatUserService;
 
     @GetMapping("")
     public StatusResponseDTO getUserChatRoomList() {
-        List<ViewChatRoomResponse> userChatRoomList = chatService.findChatRoomListByUserId();
-        return StatusResponseDTO.ok(dummy());
+        List<ViewChatRoomResponse> userChatRoomList = chatRoomService.findChatRoomListByUserId();
+        return StatusResponseDTO.ok(userChatRoomList);
     }
 
-    @GetMapping({"/{roomId}","/{roomId}-{offset}"})
+    @GetMapping({"/{roomId}","/{roomId}/{offset}"})
     public StatusResponseDTO getRoomChatMsgList(@PathVariable Long roomId, @PathVariable(required = false) Long offset) {
-        List<ViewChatMsgResponse> roomChatMsgList = chatService.findChatMsgListByRoomId(roomId, offset);
+        List<ViewChatMsgResponse> roomChatMsgList = chatMsgService.findChatMsgListByRoomId(roomId, offset);
         return StatusResponseDTO.ok(roomChatMsgList);
     }
 
     @GetMapping("/users/{roomId}")
-    public StatusResponseDTO getChatRoomUserList(@PathVariable Long roomId) {
-        List<ViewChatUserResponse> chatRoomUserList = chatService.findUserListByRoomId(roomId);
-        return StatusResponseDTO.ok(chatRoomUserList);
+    public StatusResponseDTO getChatRoomUser(@PathVariable Long roomId) {
+        ViewChatUserResponse chatRoomUser = chatUserService.findByRoomId(roomId);
+        return StatusResponseDTO.ok(chatRoomUser);
     }
 
-    @PostMapping("/room")
-    public StatusResponseDTO createChatRoom(@RequestBody AddChatRoomRequest addChatRoomRequest) {
-        ViewChatRoomResponse chatRoom = chatService.createChatRoom(addChatRoomRequest);
+    @PostMapping("/room/{joinUserId}")
+    public StatusResponseDTO createChatRoom(@PathVariable Long joinUserId) {
+        ViewChatRoomResponse chatRoom = chatRoomService.createChatRoom(joinUserId);
         return StatusResponseDTO.ok(chatRoom);
     }
 
     @PostMapping("/sendMsg")
     public StatusResponseDTO sendMessage(@RequestBody AddChatMsgRequest addChatMsgRequest) {
-        chatService.sendMessage(addChatMsgRequest);
+        chatMsgService.sendMessage(addChatMsgRequest);
         return StatusResponseDTO.ok();
     }
 
-    @DeleteMapping("/{roomId}")
-    public StatusResponseDTO deleteChatRoom(@PathVariable String roomId) {
-        chatService.deleteChatRoom(roomId);
+    @PutMapping("/user/{roomId}")
+    public StatusResponseDTO readMsg(@PathVariable Long roomId) {
+        chatUserService.updateChatUserReadMsg(roomId);
+        return StatusResponseDTO.ok();
+    }
+
+    @PutMapping("/exit/{roomId}")
+    public StatusResponseDTO escapeChatRoom(@PathVariable Long roomId) {
+        chatUserService.escapeChatRoom(roomId);
         return StatusResponseDTO.ok();
     }
 

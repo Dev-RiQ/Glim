@@ -17,6 +17,12 @@ public class AddChatUserRequest {
     private Long userId;
     private Long readMsgId;
 
+    public AddChatUserRequest(Long roomId, Long userId){
+        this.roomId = roomId;
+        this.userId = userId;
+        this.readMsgId = 0L;
+    }
+
     public ChatUser toEntity(AddChatUserRequest addChatRoomRequest) {
         return ChatUser.builder()
                 .roomId(addChatRoomRequest.getRoomId())
