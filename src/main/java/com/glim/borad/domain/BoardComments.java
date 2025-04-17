@@ -1,7 +1,10 @@
 package com.glim.borad.domain;
 
+import com.glim.borad.dto.request.UpdateCommentsRequest;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -23,9 +26,25 @@ public class BoardComments {
     @Column(nullable = false)
     private Integer likes;
     @Column(name = "created_at", nullable = false)
-    private String createdAt;
+    private LocalDateTime createdAt;
     @Column(name = "update_at", nullable = false)
-    private String updateAt;
+    private LocalDateTime updateAt;
     @Column(name = "reply_comment_id", nullable = false)
     private Long replyCommentId;
+
+    @Builder
+    public BoardComments(Long boardId, Long userId, String content, Integer likes, Long replyId) {
+        this.boardId = boardId;
+        this.userId = userId;
+        this.content = content;
+        this.likes = likes;
+        this.createdAt = LocalDateTime.now();
+        this.updateAt = LocalDateTime.now();
+        this.replyCommentId = replyId;
+    }
+
+    public void update(UpdateCommentsRequest request) {
+        this.content = request.getContent();
+        this.updateAt = LocalDateTime.now();
+    }
 }

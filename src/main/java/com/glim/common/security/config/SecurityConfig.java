@@ -71,8 +71,9 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> {
                     auth
-                            .requestMatchers("/","/oauth","/oauth2/**", "/login","/login?error", "/sign-up", "/dummy", "/dummy/*","/user/me" ).permitAll()
+                            .requestMatchers("/","/oauth","/oauth2/**", "/login","/login?error", "/sign-up", "/dummy", "/dummy/*","/user/me", "/board/**", "/board" ).permitAll()
                             .requestMatchers("/chat","/chat/**","/pub","/pub/**","/sub","/sub/**").permitAll()
+                            .requestMatchers("/**").permitAll()
                             .anyRequest().authenticated();
                 });
 

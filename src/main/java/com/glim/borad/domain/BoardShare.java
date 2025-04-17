@@ -7,12 +7,12 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "board_views")
+@Table(name = "board_share")
 @ToString()
-public class BoardViews {
+public class BoardShare {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "board_view_id", nullable = false)
+    @Column(name = "board_share_id", nullable = false)
     private Long id;
     @Column(name = "board_id", nullable = false)
     private Long boardId;
@@ -20,7 +20,7 @@ public class BoardViews {
     private Long userId;
 
     @Builder
-    public BoardViews(Long boardId, Long userId) {
+    public BoardShare(Long boardId, Long userId) {
         this.boardId = boardId;
         this.userId = userId;
     }

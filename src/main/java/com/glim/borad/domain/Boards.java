@@ -5,6 +5,8 @@ import com.glim.borad.dto.request.UpdateBoardRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -33,9 +35,9 @@ public class Boards {
     @Column(name = "tag_user_ids", nullable = false)
     private String tagUserIds;
     @Column(name = "created_at", nullable = false)
-    private String createdAt;
+    private LocalDateTime createdAt;
     @Column(name = "updated_at", nullable = false)
-    private String updatedAt;
+    private LocalDateTime updatedAt;
     @Column(name = "bgm_id", nullable = false)
     private Integer bgmId;
     @Column(name = "board_type", nullable = false)
@@ -52,13 +54,17 @@ public class Boards {
     private Option commentable;
 
     @Builder
-    public Boards(Long userId, String location, String content, String tagUserIds, String createdAt, String updatedAt, Integer bgmId, Boolean boardType, Boolean viewLikes, Boolean viewShares, Boolean commentable){
+    public Boards(Long userId, String location, String content, String tagUserIds, Integer bgmId, Boolean boardType, Boolean viewLikes, Boolean viewShares, Boolean commentable){
         this.userId = userId;
         this.location = location;
         this.content = content;
         this.tagUserIds = tagUserIds;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+        this.likes = 0;
+        this.comments = 0;
+        this.shares = 0;
+        this.views = 0;
         this.bgmId = bgmId;
         this.boardType = boardType ? BoardType.BASIC : BoardType.SHORTS;
         this.viewLikes = viewLikes ? Option.TRUE : Option.FALSE;
@@ -70,9 +76,9 @@ public class Boards {
         this.location = request.getLocation();
         this.content = request.getContent();
         this.tagUserIds = request.getTagId();
-        this.updatedAt = request.getUpdatedAt();
-        this.viewLikes = request.getViewLike() ? Option.TRUE : Option.FALSE;
-        this.viewShares = request.getViewShare() ? Option.TRUE : Option.FALSE;
+        this.updatedAt = LocalDateTime.now();
+        this.viewLikes = request.getViewLikes() ? Option.TRUE : Option.FALSE;
+        this.viewShares = request.getViewShares() ? Option.TRUE : Option.FALSE;
         this.commentable = request.getCommentable() ? Option.TRUE : Option.FALSE;
     }
 
