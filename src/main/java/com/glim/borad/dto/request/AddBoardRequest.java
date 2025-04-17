@@ -14,12 +14,12 @@ public class AddBoardRequest {
     private Long userId;
     private String location;
     private String content;
-    private String tagUserId;
-    private LocalDateTime createdAt = LocalDateTime.now();
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private String tagUserIds;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private Integer bgmId;
     private Boolean boardType;
-    private Boolean viewLike;
+    private Boolean viewLikes;
     private Boolean viewShares;
     private Boolean commentable;
 
@@ -28,12 +28,10 @@ public class AddBoardRequest {
                 .userId(addBoardRequest.getUserId())
                 .location(addBoardRequest.getLocation())
                 .content(addBoardRequest.getContent())
-                .tagUserIds(addBoardRequest.getTagUserId())
-                .createdAt(String.valueOf(addBoardRequest.getCreatedAt()))
-                .updatedAt(String.valueOf(addBoardRequest.getUpdatedAt()))
+                .tagUserIds(addBoardRequest.getTagUserIds())
                 .bgmId(addBoardRequest.getBgmId())
                 .boardType(addBoardRequest.getBoardType())
-                .viewLikes(addBoardRequest.getViewLike())
+                .viewLikes(addBoardRequest.getViewLikes())
                 .viewShares(addBoardRequest.getViewShares())
                 .commentable(addBoardRequest.getCommentable())
                 .build();

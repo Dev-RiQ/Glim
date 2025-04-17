@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Board List</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-center mb-6">Board List</h1>
+
+        <!-- 게시물 리스트 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div th:each="board : ${boards}"
+                 class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+                <h2 class="text-xl font-semibold mb-2">
+                    Board #<span th:text="${board.id}"></span>
+                </h2>
+                <p class="text-gray-600 mb-1">
+                    <strong>User ID:</strong> <span th:text="${board.userId}"></span>
+                </p>
+                <p class="text-gray-600 mb-1">
+                    <strong>Location:</strong> <span th:text="${board.location}"></span>
+                </p>
+                <p class="text-gray-600 mb-1">
+                    <strong>Content:</strong> <span th:text="${board.content}"></span>
+                </p>
+                <p class="text-gray-600 mb-1">
+                    <strong>Views:</strong> <span th:text="${board.views}"></span>
+                </p>
+                <p class="text-gray-600 mb-1">
+                    <strong>Likes:</strong> <span th:text="${board.likes}"></span>
+                </p>
+                <p class="text-gray-600 mb-1">
+                    <strong>Created At:</strong> <span th:text="${board.createdAt}"></span>
+                </p>
+                <p class="text-gray-600 mb-4">
+                    <strong>Type:</strong> <span th:text="${board.boardType}"></span>
+                </p>
+                <a th:href="@{/boards/{id}(id=${board.id})}"
+                   class="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    View Details
+                </a>
+            </div>
+
+            <!-- 게시물이 없을 경우 -->
+            <div th:if="${boards.isEmpty()}"
+                 class="col-span-full text-center text-gray-500 py-10">
+                <p>No boards found.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

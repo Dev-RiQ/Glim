@@ -9,25 +9,25 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "board_saves")
+@Table(name = "comment_likes")
 @ToString()
-public class BoardSaves {
+public class CommentLikes {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "board_save_id", nullable = false)
+    @Column(name = "comment_like_id", nullable = false)
     private Long id;
+    @Column(name = "comment_id", nullable = false)
+    private Long commentId;
     @Column(name = "user_id", nullable = false)
     private Long userId;
-    @Column(name = "board_id", nullable = false)
-    private Long boardId;
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @Builder
-    public BoardSaves(Long userId, Long boardId, LocalDateTime createdAt) {
+    public CommentLikes(Long commentId, Long userId, LocalDateTime createdAt) {
+        this.commentId = commentId;
         this.userId = userId;
-        this.boardId = boardId;
         this.createdAt = createdAt;
     }
-
 }

@@ -3,6 +3,8 @@ package com.glim.borad.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -19,6 +21,13 @@ public class BoardLikes {
     @Column(name = "user_id", nullable = false)
     private Long userId;
     @Column(name = "created_at", nullable = false)
-    private String createdAt;
+    private LocalDateTime createdAt;
+
+    @Builder
+    public BoardLikes(Long boardId, Long userId, LocalDateTime createdAt) {
+        this.boardId = boardId;
+        this.userId = userId;
+        this.createdAt = createdAt;
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.glim.borad.domain;
 
+import com.glim.borad.dto.request.UpdateBoardTagRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,4 +19,14 @@ public class BoardTags {
     private Long boardId;
     @Column(nullable = false)
     private String tag;
+
+    @Builder
+    public BoardTags(Long boardId, String tag) {
+        this.boardId = boardId;
+        this.tag = tag;
+    }
+
+    public void update(UpdateBoardTagRequest request) {
+        this.tag = request.getTag();
+    }
 }

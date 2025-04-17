@@ -3,6 +3,8 @@ package com.glim.borad.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -19,5 +21,12 @@ public class Bgms {
     @Column(nullable = false)
     private String title;
     @Column(name = "created_at", nullable = false)
-    private String createdAt;
+    private LocalDateTime createdAt;
+
+    @Builder
+    public Bgms(String artist, String title, LocalDateTime createdAt) {
+        this.artist = artist;
+        this.title = title;
+        this.createdAt = createdAt;
+    }
 }

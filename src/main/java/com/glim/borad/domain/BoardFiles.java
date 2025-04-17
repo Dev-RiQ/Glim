@@ -1,7 +1,10 @@
 package com.glim.borad.domain;
 
+import com.glim.borad.dto.request.UpdateBoardFileRequest;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -21,4 +24,16 @@ public class BoardFiles {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private FileType fileType;
+
+    @Builder
+    public BoardFiles(Long boardId, String fileName, Boolean fileType) {
+        this.boardId = boardId;
+        this.fileName = fileName;
+        this.fileType = fileType ? FileType.IMAGE : FileType.VIDEO;
+    }
+
+    public void update(UpdateBoardFileRequest request) {
+        this.fileName = request.getFileName();
+        this.fileType = request.getFileType() ? FileType.IMAGE : FileType.VIDEO;
+    }
 }

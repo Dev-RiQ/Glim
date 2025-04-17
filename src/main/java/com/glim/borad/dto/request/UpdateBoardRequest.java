@@ -14,9 +14,9 @@ public class UpdateBoardRequest {
     private String location;
     private String content;
     private String tagId;
-    private String updatedAt = String.valueOf(LocalDateTime.now());
-    private Boolean viewLike;
-    private Boolean viewShare;
+    private LocalDateTime updatedAt = LocalDateTime.now();
+    private Boolean viewLikes;
+    private Boolean viewShares;
     private Boolean commentable;
 
 }
