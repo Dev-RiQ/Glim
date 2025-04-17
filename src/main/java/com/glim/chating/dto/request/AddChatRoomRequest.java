@@ -7,9 +7,11 @@ import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @Getter
+
 @Setter
 @ToString
 public class AddChatRoomRequest {
+
     public ChatRoom toEntity() {
         return ChatRoom.builder()
                 .now(LocalDateTime.now())

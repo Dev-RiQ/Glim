@@ -5,6 +5,8 @@ import com.glim.chating.domain.ChatUser;
 import jakarta.persistence.Column;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -14,6 +16,12 @@ public class AddChatUserRequest {
     private Long roomId;
     private Long userId;
     private Long readMsgId;
+
+    public AddChatUserRequest(Long roomId, Long userId){
+        this.roomId = roomId;
+        this.userId = userId;
+        this.readMsgId = 0L;
+    }
 
     public ChatUser toEntity(AddChatUserRequest addChatRoomRequest) {
         return ChatUser.builder()

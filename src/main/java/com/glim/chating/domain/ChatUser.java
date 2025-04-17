@@ -36,7 +36,8 @@ public class ChatUser {
     public void update(Long readMsgId) {
         this.readMsgId = readMsgId;
     }
-    public void userOut() {
+
+    public void escape() {
         this.valid = ChatUserValid.OUT;
     }
 }

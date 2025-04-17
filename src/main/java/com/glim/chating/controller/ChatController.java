@@ -1,19 +1,19 @@
 package com.glim.chating.controller;
 
-import com.glim.chating.dto.request.AddChatRoomRequest;
-import com.glim.chating.dto.response.PreviewChatMsgResponse;
-import com.glim.chating.service.ChatService;
-import com.glim.common.kafka.dto.Message;
+import com.glim.chating.dto.request.AddChatMsgRequest;
+import com.glim.chating.dto.response.ViewChatMsgResponse;
+import com.glim.chating.dto.response.ViewChatRoomResponse;
+import com.glim.chating.dto.response.ViewChatUserResponse;
+import com.glim.chating.service.ChatMsgService;
+import com.glim.chating.service.ChatRoomService;
+import com.glim.chating.service.ChatUserService;
+import com.glim.common.statusResponse.StatusResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.hibernate.annotations.Fetch;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.socket.WebSocketSession;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -21,18 +21,50 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ChatController {
 
-    private final ChatService chatService;
-    
-    @PostMapping("/chat")
-    public void sendMessage(Message message) {
-        message = new Message();
-        message.setId(1L);
-        message.setRoomId(1L);
-        message.setUserId(1L);
-        message.setReplyMsgId(0L);
-        message.setCreatedAt(LocalDateTime.now());
-        message.setContent("test");
-        chatService.sendMessage(message);
+    private final ChatMsgService chatMsgService;
+    private final ChatRoomService chatRoomService;
+    private final ChatUserService chatUserService;
+
+    @GetMapping("")
+    public StatusResponseDTO getUserChatRoomList() {
+        List<ViewChatRoomResponse> userChatRoomList = chatRoomService.findChatRoomListByUserId();
+        return StatusResponseDTO.ok(userChatRoomList);
+    }
+
+    @GetMapping({"/{roomId}","/{roomId}/{offset}"})
+    public StatusResponseDTO getRoomChatMsgList(@PathVariable Long roomId, @PathVariable(required = false) Long offset) {
+        List<ViewChatMsgResponse> roomChatMsgList = chatMsgService.findChatMsgListByRoomId(roomId, offset);
+        return StatusResponseDTO.ok(roomChatMsgList);
+    }
+
+    @GetMapping("/users/{roomId}")
+    public StatusResponseDTO getChatRoomUser(@PathVariable Long roomId) {
+        ViewChatUserResponse chatRoomUser = chatUserService.findByRoomId(roomId);
+        return StatusResponseDTO.ok(chatRoomUser);
+    }
+
+    @PostMapping("/room/{joinUserId}")
+    public StatusResponseDTO createChatRoom(@PathVariable Long joinUserId) {
+        ViewChatRoomResponse chatRoom = chatRoomService.createChatRoom(joinUserId);
+        return StatusResponseDTO.ok(chatRoom);
+    }
+
+    @PostMapping("/sendMsg")
+    public StatusResponseDTO sendMessage(@RequestBody AddChatMsgRequest addChatMsgRequest) {
+        chatMsgService.sendMessage(addChatMsgRequest);
+        return StatusResponseDTO.ok();
+    }
+
+    @PutMapping("/user/{roomId}")
+    public StatusResponseDTO readMsg(@PathVariable Long roomId) {
+        chatUserService.updateChatUserReadMsg(roomId);
+        return StatusResponseDTO.ok();
+    }
+
+    @PutMapping("/exit/{roomId}")
+    public StatusResponseDTO escapeChatRoom(@PathVariable Long roomId) {
+        chatUserService.escapeChatRoom(roomId);
+        return StatusResponseDTO.ok();
     }
 
 }
