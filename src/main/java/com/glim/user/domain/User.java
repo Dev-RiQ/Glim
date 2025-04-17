@@ -79,9 +79,6 @@ public class User {
         this.platForm = platForm;
     }
 
-    public void update(UpdateDummyRequest dummy) {
-        this.id = dummy.getId();
-    }
 
     public void encodePassword(PasswordEncoder encoder) {
         this.password = encoder.encode(this.password);

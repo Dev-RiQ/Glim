@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-/*@Service*/
+@Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BoardService {
@@ -34,8 +34,9 @@ public class BoardService {
     }
 
     public List<ViewBoardResponse> list(Long id) {
-      /*  return (List<ViewBoardResponse>) boardRepository.findAllById(id).stream();*/
+        /*  return (List<ViewBoardResponse>) boardRepository.findAllById(id).stream();*/
         return null;
+    }
     public List<ViewBoardResponse> list() {
         return boardRepository.findAll().stream().map(board -> new ViewBoardResponse(board)).collect(Collectors.toList());
     }
