@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,12 +24,12 @@ public class User {
     private String password; // 로그인 시 password
     @Column(nullable = false)
     private String name; // 유저 이름 (닉네임과 차별됨)
-    @Column(nullable = false, unique = true)
+    @Column(nullable = true, unique = true)
     private String nickname; // @knk_0611
     @Column(nullable = false) @Enumerated(EnumType.STRING)
     private Sex sex;
     @Column(nullable = false)
-    private String birth;
+    private LocalDate birth;
     @Column(nullable = false)
     private String content;     // 인스타 프로필 밑에 쓰는 유튜브 링크나 다른 계정넣어놓거나 ,, 뭐그런
     @Column(nullable = false)
@@ -54,7 +55,7 @@ public class User {
 
 
     @Builder
-    public User(Long id, String username, String password, String name, String nickname, Sex sex, String birth,
+    public User(Long id, String username, String password, String name, String nickname, Sex sex, LocalDate birth,
                 String content, String img, String phone, LocalDateTime created_at, Long followers,
                 Long followings, Role role, String tags, Integer rate, Long readBoardId, PlatForm platForm) {
         this.id = id;
@@ -63,9 +64,9 @@ public class User {
                 ? /*new UserPasswordEncoder(password).getPassword()*/password
                 : "";
         this.name = name;
-        this.nickname = nickname != null ? nickname : this.name;
+        this.nickname = nickname;
         this.sex = sex != null ? sex : Sex.UNKNOWN;
-        this.birth = birth != null ? birth : "";
+        this.birth = birth != null ? birth : LocalDate.of(0000, 01, 01);
         this.content = content != null ? content : "";
         this.img = img != null ? img : "";
         this.phone = phone != null ? phone : "";

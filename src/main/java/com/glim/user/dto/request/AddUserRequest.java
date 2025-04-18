@@ -6,6 +6,7 @@ import com.glim.user.domain.Sex;
 import com.glim.user.domain.User;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -20,7 +21,7 @@ public class AddUserRequest {
     private String name;
     private String nickname;
     private Sex sex;
-    private String birth;
+    private LocalDate birth;
     private String img;
     private String phone;
 
@@ -32,7 +33,7 @@ public class AddUserRequest {
                 .name(name)
                 .nickname(nickname != null ? nickname : name)
                 .sex(sex)
-                .birth(birth != null ? birth : "")
+                .birth(birth != null ? birth : LocalDate.of(0000, 00, 00))
                 .img(img != null ? img : "")
                 .phone(phone != null ? phone : "")
                 .created_at(LocalDateTime.now())
