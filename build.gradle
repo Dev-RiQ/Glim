@@ -24,29 +24,72 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // Validation (Front-end 에서 유효성 처리)
+//    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // Redis (MongoDB로 대체)
 //    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // Spring Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-    compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    implementation 'p6spy:p6spy:3.9.1'
-    implementation 'com.github.gavlyukovskiy:datasource-decorator-spring-boot-autoconfigure:1.9.0'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Spring JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // Spring AOP
     implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    // mysql
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // Test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Devtools
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // JWT token
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // JSON 파싱용
-//    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // mysql log
+    implementation 'p6spy:p6spy:3.9.1'
+    implementation 'com.github.gavlyukovskiy:datasource-decorator-spring-boot-autoconfigure:1.9.0'
+
+    // mongo db
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    // websocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // kafka
     implementation 'org.springframework.kafka:spring-kafka'
+
+    // AWS S3
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.1.RELEASE'
+    implementation 'javax.xml.bind:jaxb-api:2.3.0'
+
+    // Image webp Convert
+    implementation "com.sksamuel.scrimage:scrimage-core:4.0.32"
+    implementation "com.sksamuel.scrimage:scrimage-webp:4.0.32"
+
+    // Image Resizing
+    implementation group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
+
+    // ffmpeg (영상 및 오디오 인코딩)
+    implementation("net.bramp.ffmpeg:ffmpeg:0.7.0")
 }
 
 tasks.named('test') {
