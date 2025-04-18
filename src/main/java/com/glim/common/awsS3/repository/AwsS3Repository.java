@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.glim.common.awsS3.domain.AwsS3;
+import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.domain.FileType;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.fileEncoder.controller.FileEncoderController;
@@ -41,7 +42,7 @@ public class AwsS3Repository {
         removeNewFile(fileType); // 로컬에 생성된 File 삭제 (MultipartFile -> File 전환 하며 로컬에 파일 생성됨)
         for(String s : awsS3Util.getSaveFilenames(uploadUrl)){
             System.out.println("s = " + s);
-            System.out.println("awsS3Util.getURL(s) = " + awsS3Util.getURL(s, 512, FileType.IMAGE));
+            System.out.println("awsS3Util.getURL(s) = " + awsS3Util.getURL(s, FileSize.IMAGE_256));
         }
         return awsS3Util.getSaveFilenames(uploadUrl); // 업로드된 파일의 S3 URL 주소 반환
     }

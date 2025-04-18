@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/storyLike")
+@RequestMapping("/storyView")
 public class StoryViewController {
 
     private final BoardViewService boardViewService;
