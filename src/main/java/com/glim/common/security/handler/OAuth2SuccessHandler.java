@@ -37,7 +37,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler
 
         Map<String, Object> result = new HashMap<>();
         result.put("token", token);
-        result.put("nickname", user.getNickname());
+        result.put("name",  user.getName());
         result.put("id", user.getId());
 
         response.setContentType("application/json;charset=UTF-8");

@@ -37,39 +37,35 @@ public class CustomUserService implements UserDetailsService, OAuth2UserService<
     }
 
     // 소셜 로그인 처리
-//    @Override
-//    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-//        OAuth2User oAuth2User = new DefaultOAuth2UserService().loadUser(userRequest);
-//
-//        String registrationId = userRequest.getClientRegistration().getRegistrationId(); // google, naver
-//        String userNameAttribute = userRequest.getClientRegistration().getProviderDetails()
-//                .getUserInfoEndpoint().getUserNameAttributeName();
-//
-//        OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttribute, oAuth2User.getAttributes());
-//        User user = saveOrUpdate(attributes, registrationId);
-//
-////        return new DefaultOAuth2User(
-////                Collections.singleton(new SimpleGrantedAuthority(user.getRole().name())),
-////                attributes.getAttributes(),
-////                attributes.getNameAttributeKey()
-////        );
-//         return new SecurityOAuth2User(dto, attributes);
-//    }
-        @Override
-        public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-            OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
-            OAuth2User oAuth2User = delegate.loadUser(userRequest);
-            String registrationId = userRequest.getClientRegistration().getRegistrationId();
-            String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
+    @Override
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        // Spring 기본 OAuth2 유저 서비스 이용
+        OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
 
-            Map<String, Object> attributes = oAuth2User.getAttributes();
-            OAuthAttributes authAttributes = OAuthAttributes.of(registrationId, userNameAttributeName, attributes);
+        // 구글 & 네이버 에서 유저 정보 받아오기
+        OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
-            User user = saveOrUpdate(authAttributes, registrationId);
+        // 어떤 플랫폼인지 확인 ( naver, google)
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
 
-            SecurityUserDto dto = SecurityUserDto.of(user);
-            return new SecurityOAuth2User(dto, attributes);
-        }
+        // 유저를 식별할 키 받기
+        String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
+
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+
+        // 확인작업
+        System.out.println("=================================================");
+        System.out.println("🌈 registrationId: " + registrationId);
+        System.out.println("🔥 attributes: " + attributes);
+        System.out.println("=================================================");
+
+        OAuthAttributes authAttributes = OAuthAttributes.of(registrationId, userNameAttributeName, attributes);
+
+        User user = saveOrUpdate(authAttributes, registrationId);
+
+        SecurityUserDto dto = SecurityUserDto.of(user);
+        return new SecurityOAuth2User(dto, attributes);
+    }
 
     // 사용자 저장 or 업데이트
     private User saveOrUpdate(OAuthAttributes attributes, String registrationId) {

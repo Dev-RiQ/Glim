@@ -1,11 +1,14 @@
 package com.glim.user.controller;
 
+import com.glim.common.jwt.JwtTokenProvider;
+import com.glim.user.domain.User;
 import com.glim.user.dto.request.AddUserRequest;
 import com.glim.user.dto.request.ChangePasswordRequest;
 import com.glim.user.dto.request.LoginRequest;
 import com.glim.user.dto.request.UpdateUserRequest;
+import com.glim.user.dto.response.LoginResponse;
+import com.glim.user.dto.response.UserResponse;
 import com.glim.user.service.UserService;
-import com.glim.common.security.dto.SecurityUserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +19,20 @@ import org.springframework.web.bind.annotation.*;
 public class AuthRestController {
 
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
+    //    @PostMapping("/login")
+//    public ResponseEntity<SecurityUserDto> login(@RequestBody LoginRequest request) {
+//        System.out.println("login api 호출완료");
+//        SecurityUserDto user = userService.login(request);
+//        return ResponseEntity.ok(user);
+//    }
     @PostMapping("/login")
-    public ResponseEntity<SecurityUserDto> login(@RequestBody LoginRequest request) {
-        System.out.println("login api 호출완료");
-        SecurityUserDto user = userService.login(request);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        User user = userService.login(request);
+        String token = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
+        UserResponse userResponse = UserResponse.from(user);
+        return ResponseEntity.ok(new LoginResponse(token, userResponse));
     }
 
     @PostMapping("/sign-up")
