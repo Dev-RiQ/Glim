@@ -1,8 +1,10 @@
 package com.glim.borad.controller;
 
+import com.glim.borad.domain.Boards;
 import com.glim.borad.dto.request.AddBoardLikeRequest;
 import com.glim.borad.service.BoardService;
 import com.glim.borad.service.BoardLikeService;
+import com.glim.common.statusResponse.StatusResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,10 +21,10 @@ public class BoardLikeController {
     private final BoardService boardService;
 
     @PostMapping({"","/"})
-    public ResponseEntity<HttpStatus> add(@RequestBody AddBoardLikeRequest request) {
+    public StatusResponseDTO add(@RequestBody AddBoardLikeRequest request) {
         boardLikeService.insert(request);
-        boardService.updateLike(request.getBoardId(), 1);
-        return ResponseEntity.ok(HttpStatus.OK);
+        Boards board = boardService.updateLike(request.getBoardId(), 1);
+        return StatusResponseDTO.ok(board);
     }
 
     @DeleteMapping("/{id}")

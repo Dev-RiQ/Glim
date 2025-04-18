@@ -1,8 +1,10 @@
 package com.glim.borad.controller;
 
+import com.glim.borad.domain.BoardFiles;
 import com.glim.borad.dto.request.AddBoardFileRequest;
 import com.glim.borad.dto.request.UpdateBoardFileRequest;
 import com.glim.borad.service.BoardFileSevice;
+import com.glim.common.statusResponse.StatusResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,15 +20,15 @@ public class BoardFileController {
     private final BoardFileSevice boardFileSevice;
 
     @PostMapping({"","/"})
-    public ResponseEntity<HttpStatus> add(@RequestBody AddBoardFileRequest request) {
+    public StatusResponseDTO add(@RequestBody AddBoardFileRequest request) {
         boardFileSevice.insert(request);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return StatusResponseDTO.ok();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable Long id, @RequestBody UpdateBoardFileRequest request) {
+    public StatusResponseDTO update(@PathVariable Long id, @RequestBody UpdateBoardFileRequest request) {
         boardFileSevice.update(id, request);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return StatusResponseDTO.ok();
     }
 
     @DeleteMapping("/{id}")

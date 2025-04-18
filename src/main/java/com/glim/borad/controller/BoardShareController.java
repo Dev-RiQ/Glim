@@ -3,6 +3,7 @@ package com.glim.borad.controller;
 import com.glim.borad.dto.request.AddBoardShareRequest;
 import com.glim.borad.service.BoardService;
 import com.glim.borad.service.BoardShareService;
+import com.glim.common.statusResponse.StatusResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,16 +20,16 @@ public class BoardShareController {
     private final BoardService boardService;
 
     @PostMapping({"","/"})
-    public ResponseEntity<HttpStatus> add(@RequestBody AddBoardShareRequest request) {
+    public StatusResponseDTO add(@RequestBody AddBoardShareRequest request) {
         boardShareService.insert(request);
         boardService.updateShare(request.getBoardId(), 1);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return StatusResponseDTO.ok();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@RequestBody AddBoardShareRequest request, @PathVariable Long id) {
+    public StatusResponseDTO delete(@RequestBody AddBoardShareRequest request, @PathVariable Long id) {
         boardShareService.delete(id);
         boardService.updateShare(request.getBoardId(), -1);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return StatusResponseDTO.ok();
     }
 }

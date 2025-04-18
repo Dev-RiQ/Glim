@@ -1,14 +1,14 @@
 package com.glim.borad.controller;
 
+import com.glim.borad.domain.Boards;
 import com.glim.borad.dto.request.AddCommentsRequest;
 import com.glim.borad.dto.request.UpdateCommentsRequest;
 import com.glim.borad.dto.response.ViewCommentsResponse;
 import com.glim.borad.service.BoardService;
 import com.glim.borad.service.CommentService;
+import com.glim.common.statusResponse.StatusResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,29 +22,35 @@ public class CommentsController {
     private final CommentService commentService;
     private final BoardService boardService;
 
-    @GetMapping({"","/{id}"})
-    public List<ViewCommentsResponse> list() {
-        List<ViewCommentsResponse> board = commentService.list();
-        return ResponseEntity.ok(board).getBody();
+    @GetMapping({"/{boardId}","/{boardId}/{offset}"})
+    public StatusResponseDTO list(@PathVariable Long boardId, @PathVariable(required = false) Long offset) {
+        List<ViewCommentsResponse> board = commentService.list(boardId, offset);
+        return StatusResponseDTO.ok(board);
+    }
+
+    @GetMapping({"/reply/{replyCommentId}","/reply/{replyCommentId}/{offset}"})
+    public StatusResponseDTO replyList(@PathVariable Long replyCommentId, @PathVariable(required = false) Long offset) {
+        List<ViewCommentsResponse> board = commentService.replyList(replyCommentId, offset);
+        return StatusResponseDTO.ok(board);
     }
 
     @PostMapping({"","/"})
-    public ResponseEntity<HttpStatus> add(@RequestBody AddCommentsRequest request) {
+    public StatusResponseDTO add(@RequestBody AddCommentsRequest request) {
         commentService.insert(request);
         boardService.updateComment(request.getBoardId(), 1);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return StatusResponseDTO.ok();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable Long id, @RequestBody UpdateCommentsRequest request) {
+    public StatusResponseDTO update(@PathVariable Long id, @RequestBody UpdateCommentsRequest request) {
         commentService.update(id, request);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return StatusResponseDTO.ok();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@RequestBody AddCommentsRequest request, @PathVariable Long id) {
+    public StatusResponseDTO delete(@RequestBody AddCommentsRequest request, @PathVariable Long id) {
         commentService.delete(id);
-        boardService.updateComment(request.getBoardId(), -1);
-        return ResponseEntity.ok(HttpStatus.OK);
+        Boards board = boardService.updateComment(request.getBoardId(), -1);
+        return StatusResponseDTO.ok(board);
     }
 }

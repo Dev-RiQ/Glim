@@ -2,6 +2,7 @@ package com.glim.borad.controller;
 
 import com.glim.borad.dto.request.AddBoardSaveRequest;
 import com.glim.borad.service.BoardSaveService;
+import com.glim.common.statusResponse.StatusResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,14 +18,14 @@ public class BoardSaveController {
     private final BoardSaveService boardSaveService;
 
     @PostMapping({"","/"})
-    public ResponseEntity<HttpStatus> add(@RequestBody AddBoardSaveRequest request) {
+    public StatusResponseDTO add(@RequestBody AddBoardSaveRequest request) {
         boardSaveService.insert(request);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return StatusResponseDTO.ok();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable Long id) {
+    public StatusResponseDTO delete(@PathVariable Long id) {
         boardSaveService.delete(id);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return StatusResponseDTO.ok();
     }
 }

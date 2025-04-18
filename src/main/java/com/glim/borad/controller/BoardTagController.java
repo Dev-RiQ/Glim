@@ -1,8 +1,10 @@
 package com.glim.borad.controller;
 
+import com.glim.borad.domain.BoardTags;
 import com.glim.borad.dto.request.AddBoardTagRequest;
 import com.glim.borad.dto.request.UpdateBoardTagRequest;
 import com.glim.borad.service.BoardTagService;
+import com.glim.common.statusResponse.StatusResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,21 +20,21 @@ public class BoardTagController {
     private final BoardTagService boardTagService;
 
     @PostMapping({"","/"})
-    public ResponseEntity<HttpStatus> add(@RequestBody AddBoardTagRequest request) {
+    public StatusResponseDTO add(@RequestBody AddBoardTagRequest request) {
         boardTagService.insert(request);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return StatusResponseDTO.ok();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable Long id, @RequestBody UpdateBoardTagRequest request) {
-        boardTagService.update(id, request);
-        return ResponseEntity.ok(HttpStatus.OK);
+    public StatusResponseDTO update(@PathVariable Long id, @RequestBody UpdateBoardTagRequest request) {
+        BoardTags tag = boardTagService.update(id, request);
+        return StatusResponseDTO.ok(tag);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable Long id) {
+    public StatusResponseDTO delete(@PathVariable Long id) {
         boardTagService.delete(id);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return StatusResponseDTO.ok();
     }
 
 }

@@ -19,15 +19,16 @@ public class BoardFileSevice {
     private final BoardFileRepository boardFileRepository;
 
     @Transactional
-    public void insert(AddBoardFileRequest request) {
-        boardFileRepository.save(new AddBoardFileRequest().toEntity(request));
+    public BoardFiles insert(AddBoardFileRequest request) {
+        return boardFileRepository.save(new AddBoardFileRequest().toEntity(request));
     }
 
     @Transactional
-    public void update(Long id, UpdateBoardFileRequest request) {
+    public BoardFiles update(Long id, UpdateBoardFileRequest request) {
         BoardFiles boardFiles = boardFileRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
         boardFiles.update(request);
         boardFileRepository.save(boardFiles);
+        return boardFiles;
     }
 
     @Transactional

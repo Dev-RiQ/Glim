@@ -24,10 +24,11 @@ public class BoardTagService {
     }
 
     @Transactional
-    public void update(Long id, UpdateBoardTagRequest request) {
+    public BoardTags update(Long id, UpdateBoardTagRequest request) {
         BoardTags boardTag = boardTagRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
         boardTag.update(request);
         boardTagRepository.save(boardTag);
+        return boardTag;
     }
 
     @Transactional

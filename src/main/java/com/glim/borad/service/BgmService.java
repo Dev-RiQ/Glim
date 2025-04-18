@@ -2,7 +2,6 @@ package com.glim.borad.service;
 
 import com.glim.borad.dto.request.AddBgmRequest;
 import com.glim.borad.dto.response.ViewBgmResponse;
-import com.glim.borad.dto.response.ViewBoardResponse;
 import com.glim.borad.repository.BgmRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
