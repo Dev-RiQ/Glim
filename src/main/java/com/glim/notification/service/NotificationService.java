@@ -1,9 +1,12 @@
 package com.glim.notification.service;
 
-import com.glim.common.utils.SecurityUtil;
+import com.glim.borad.service.BoardService;
+import com.glim.borad.service.BoardViewService;
 import com.glim.notification.domain.Notification;
+import com.glim.notification.domain.Type;
+import com.glim.notification.dto.response.NotificationResponse;
 import com.glim.notification.repository.NotificationRepository;
-import jakarta.servlet.http.HttpServletRequest;
+import com.glim.user.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -22,15 +26,19 @@ import java.util.concurrent.Executors;
 @Transactional(readOnly = true)
 public class NotificationService {
 
-    private static final Long DEFAULT_TIMEOUT = 60L;
-    private NotificationRepository notificationRepository;
+    private static final Long DEFAULT_TIMEOUT = 3600000L;
+    private final UserService userService;
+    private final BoardService boardService;
+    private final NotificationRepository notificationRepository;
     private final ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
     private SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
+    private Long viewId = 0L;
 
     public SseEmitter getEmitter(final HttpServletResponse response) {
-        List<Notification> notifications = getNewNotification();
+        List<NotificationResponse> notifications = getNewNotification();
         if(!notifications.isEmpty()) {
             emitter = new SseEmitter(DEFAULT_TIMEOUT);
+            viewId = notifications.get(notifications.size() - 1).getId();
         }
         response.setContentType("text/event-stream");
         response.setCharacterEncoding("UTF-8");
@@ -39,11 +47,20 @@ public class NotificationService {
         return emitter;
     }
 
-    private List<Notification> getNewNotification() {
-//        Long userId = SecurityUtil.getUser().getId();
-        List<Notification> notificationList = new ArrayList<>();
-        notificationList.add(new Notification(1L, "test"));
-        // 유저 아이디 알람에서 최신 알람 있는지 검색 (역순 마지막 번호가 보유한 번호보다 큰가?)
+    private List<NotificationResponse> getNewNotification() {
+//        String nickname = SecurityUtil.getUserNickname();
+//        Long userId = userService.findByNickname(nickname).getId();
+        Long userId = 1L;
+        List<NotificationResponse> notificationList = notificationRepository.findAllByUserIdAndIdGreaterThan(userId, viewId)
+                .stream().map(NotificationResponse::new).collect(Collectors.toList());
+        for (NotificationResponse notificationResponse : notificationList) {
+//            String userImg = userService.findById(notificationResponse.getUserId());
+//            notificationResponse.setUserImg(userImg);
+            if (notificationResponse.getLinkId() != null && notificationResponse.getLinkId() != 0L) {
+//                String linkImg = boardService.findById(notificationResponse.getLinkId());
+//                notificationResponse.setLinkImg(linkImg);
+            }
+        }
         return notificationList;
     }
 
@@ -58,10 +75,27 @@ public class NotificationService {
                 log.info("notification sent successfully");
             }catch (Exception e){
                 emitter.completeWithError(e);
-                log.info("notification sent failed");
+                log.error("notification sent failed");
             }
         });
     }
 
+    @Transactional
+    public void send(Long userId, String sendUserNickname, Type type){
+        send(userId, sendUserNickname, type, 0L);
+    }
 
+    @Transactional
+    public void send(Long userId, String sendUserNickname, Type type, Long linkId){
+//        String nickname = SecurityUtil.getUserNickname();
+//        Long sendUserId = userService.findByNickname(nickname).getId();
+        Long sendUserId = 2L;
+        Notification notification = new Notification(userId, sendUserId, sendUserNickname, type, linkId);
+        notificationRepository.save(notification);
+    }
+
+    @Transactional
+    public void delete(long id) {
+        notificationRepository.deleteById(id);
+    }
 }
