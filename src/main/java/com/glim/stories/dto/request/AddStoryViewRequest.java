@@ -4,7 +4,6 @@ import com.glim.stories.domain.StoryViews;
 import lombok.*;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 @ToString
