@@ -69,4 +69,24 @@ public class AwsS3Repository {
         }
     }
 
+    public void delete(String filename, FileType fileType) {
+        String filepath = fileType.getType() + "/" + filename;
+        switch (fileType) {
+            case IMAGE -> deleteImage(filepath);
+            case VIDEO -> deleteVideo(filepath);
+            case AUDIO -> amazonS3Client.deleteObject(bucket, filepath + FileSize.AUDIO.getTypeAndSizeUri());
+        }
+    }
+
+    private void deleteImage(String filename) {
+        amazonS3Client.deleteObject(bucket, filename + FileSize.IMAGE_128.getTypeAndSizeUri());
+        amazonS3Client.deleteObject(bucket, filename + FileSize.IMAGE_256.getTypeAndSizeUri());
+        amazonS3Client.deleteObject(bucket, filename + FileSize.IMAGE_512.getTypeAndSizeUri());
+        amazonS3Client.deleteObject(bucket, filename + FileSize.IMAGE_1024.getTypeAndSizeUri());
+    }
+
+    private void deleteVideo(String filename) {
+        amazonS3Client.deleteObject(bucket, filename + FileSize.VIDEO.getTypeAndSizeUri());
+        amazonS3Client.deleteObject(bucket, filename + FileSize.VIDEO_THUMBNAIL.getTypeAndSizeUri());
+    }
 }

@@ -25,4 +25,5 @@ public class AwsS3Controller {
         list.forEach((file) -> {log.info("save file: {}", file);});
         return StatusResponseDTO.ok();
     }
+
 }
