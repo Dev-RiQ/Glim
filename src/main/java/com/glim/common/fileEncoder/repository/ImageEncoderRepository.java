@@ -42,7 +42,6 @@ public class ImageEncoderRepository {
 
     private File setNewFile(String name, int size){
         int index = name.lastIndexOf(".");
-        System.out.println("name = " + name);
         return new File(name.substring(0, index)+"_"+size+"x"+size + name.substring(index));
     }
 

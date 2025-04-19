@@ -222,5 +222,6 @@ gradle-app.setting
 application-secret.yml
 application-dev.yml
 application-prod.yml
+ffmpeg
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,java,gradle,visualstudiocode

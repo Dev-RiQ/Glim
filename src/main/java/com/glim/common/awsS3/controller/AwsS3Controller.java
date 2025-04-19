@@ -17,7 +17,7 @@ public class AwsS3Controller {
     private final AwsS3Service awsS3Service;
 
     @PostMapping("")
-    public StatusResponseDTO uploadFile(@RequestParam("images") List<MultipartFile> multipartFiles, String fileType) {
+    public StatusResponseDTO uploadFile(@RequestParam("files") List<MultipartFile> multipartFiles, String fileType) {
         FileType type = FileType.valueOf(fileType);
         List<String> list = awsS3Service.saveFile(multipartFiles, type);
         list.forEach(System.out::println);
