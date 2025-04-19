@@ -22,8 +22,7 @@ public class AwsS3Controller {
     public StatusResponseDTO uploadFile(@RequestParam("files") List<MultipartFile> multipartFiles, String fileType) {
         FileType type = FileType.valueOf(fileType);
         List<String> list = awsS3Service.saveFile(multipartFiles, type);
-        list.forEach((file) -> {log.info("save file: {}", file);});
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok(list);
     }
 
 }
