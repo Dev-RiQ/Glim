@@ -50,7 +50,6 @@ public class ImageEncoderRepository {
     }
 
     public File convertToWebp(String filename, File originalFile) {
-        System.out.println("filename = " + filename);
         try {
             return ImmutableImage.loader()// 라이브러리 객체 생성
                     .fromFile(originalFile)
