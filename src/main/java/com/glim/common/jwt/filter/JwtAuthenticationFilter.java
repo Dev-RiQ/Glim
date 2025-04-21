@@ -36,26 +36,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // "Bearer " 이후 자르기
+        // 인증 헤더가 없거나 형식이 잘못되었을 경우 => 그냥 다음 필터로 넘기기 (비인증 요청 가능하도록 login, sign-up.. 등)
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            if (jwtTokenProvider.validateToken(token)) {
-                Long userId = jwtTokenProvider.getUserId(token);
-                User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-                SecurityUserDto securityUserDto = SecurityUserDto.of(user);
+        // 헤더에서 JWT 토큰 추출
+        String token = authHeader.substring(7);
 
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(securityUserDto, null, securityUserDto.getAuthorities());
-
-
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            }
-        }else{
+        // 토큰 검증 실패 시 예외 발생
+        if (!jwtTokenProvider.validateToken(token)) {
             throw new JwtException("Invalid JWT token");
         }
 
-        filterChain.doFilter(request, response);
+        // 토큰이 유효하다면 인증 처리
+        Long userId = jwtTokenProvider.getUserId(token);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        SecurityUserDto securityUserDto = SecurityUserDto.of(user);
+
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(
+                        securityUserDto, null, securityUserDto.getAuthorities());
+
+        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        filterChain.doFilter(request, response); // 다음 필터로 이동
     }
 }

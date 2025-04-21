@@ -1,10 +1,11 @@
-// ✅ AuthRestController.java
+
 package com.glim.user.controller;
 
 import com.glim.common.jwt.provider.JwtTokenProvider;
 import com.glim.common.jwt.refresh.domain.RefreshToken;
 import com.glim.common.jwt.refresh.dto.RefreshTokenRequest;
 import com.glim.common.jwt.refresh.service.RefreshTokenService;
+import com.glim.common.security.util.SecurityUtil;
 import com.glim.user.domain.User;
 import com.glim.user.dto.request.AddUserRequest;
 import com.glim.user.dto.request.ChangePasswordRequest;
@@ -26,6 +27,7 @@ public class AuthRestController {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
 
+    // ✅ 로그인: 사용자 인증 후 accessToken + refreshToken + user 응답
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         User user = userService.login(request);
@@ -35,29 +37,47 @@ public class AuthRestController {
         return ResponseEntity.ok(new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user)));
     }
 
+    // ✅ 회원가입: 신규 사용자 등록
     @PostMapping("/sign-up")
     public ResponseEntity<String> signUp(@RequestBody AddUserRequest request) {
         userService.registerUser(request);
         return ResponseEntity.ok("회원가입 성공!");
     }
 
+    // ✅ 회원정보 수정: 로그인한 사용자만 본인 정보 수정 가능
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest request) {
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+        if (!id.equals(currentUserId)) {
+            return ResponseEntity.status(403).body("본인만 수정할 수 있습니다.");
+        }
         userService.updateUser(id, request);
         return ResponseEntity.ok("회원정보 수정 완료");
     }
 
+    // ✅ 회원 탈퇴: 로그인한 사용자만 본인 탈퇴 가능
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+        if (!id.equals(currentUserId)) {
+            return ResponseEntity.status(403).body("본인만 탈퇴할 수 있습니다.");
+        }
         userService.deleteUser(id);
         return ResponseEntity.ok("회원 탈퇴 완료");
     }
 
+    // ✅ 비밀번호 변경: 로그인한 사용자만 본인 비밀번호 수정 가능
     @PatchMapping("/password/{id}")
     public ResponseEntity<String> changePassword(@PathVariable Long id, @RequestBody ChangePasswordRequest request) {
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+        if (!id.equals(currentUserId)) {
+            return ResponseEntity.status(403).body("본인만 비밀번호를 수정할 수 있습니다.");
+        }
         userService.changePassword(id, request);
         return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
     }
+
+    // ✅ 로그아웃: refreshToken 삭제 (accessToken은 프론트에서 제거)
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestBody RefreshTokenRequest request) {
         refreshTokenService.deleteByToken(request.getRefreshToken());
