@@ -15,7 +15,7 @@ public enum FileSize {
     VIDEO("_encoded.mp4"),
     VIDEO_THUMBNAIL("_thumbnail.webp"),
 
-    AUDIO("_encoded.mp4");
+    AUDIO("_encoded.mp3");
 
     private final String typeAndSizeUri;
 }

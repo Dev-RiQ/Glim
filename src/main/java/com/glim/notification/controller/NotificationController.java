@@ -1,5 +1,7 @@
 package com.glim.notification.controller;
 
+import com.glim.common.awsS3.domain.FileSize;
+import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.statusResponse.StatusResponseDTO;
 import com.glim.notification.domain.Type;
 import com.glim.notification.service.NotificationService;
