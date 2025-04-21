@@ -1,8 +1,7 @@
 
 package com.glim.common.security.config;
 
-import com.glim.common.jwt.JwtAuthenticationFilter; // ✅ [추가] JWT 필터 import
-import com.glim.common.jwt.JwtTokenProvider;
+import com.glim.common.jwt.filter.JwtAuthenticationFilter;
 import com.glim.common.security.handler.OAuth2SuccessHandler;
 
 import com.glim.common.security.service.CustomUserService;
@@ -15,7 +14,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -24,8 +22,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
 
 @EnableWebSecurity
 @Configuration
@@ -81,7 +77,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> {
                     auth
-                            .requestMatchers("/","/oauth","/oauth2/**", "/login","/login?error", "/sign-up", "/dummy", "/dummy/*","/user/me", "/board/**", "/board" ).permitAll()
+                            .requestMatchers("/","/oauth","/oauth2/**", "/login","/login?error", "/sign-up", "/api/v1/auth/**", "/oauth2/**","/user/me", "/board/**", "/board" ).permitAll()
                             .requestMatchers("/chat","/chat/**","/pub","/pub/**","/sub","/sub/**", "/favicon.ico" ,"/error", "/**").permitAll()
                             .anyRequest().authenticated();
                 });

@@ -27,4 +27,8 @@ public class AwsS3Service {
             throw new CustomException(ErrorCode.DUMMY_BAD_REQUEST);
         }
     }
+
+    public void deleteFile(String filename, FileType fileType) {
+        awsS3Repository.delete(filename, fileType);
+    }
 }

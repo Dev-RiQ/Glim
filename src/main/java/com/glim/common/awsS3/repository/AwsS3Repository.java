@@ -37,14 +37,10 @@ public class AwsS3Repository {
     }
 
     private List<String> upload(List<File> uploadFile, String fileType) {
-        List<AwsS3> files = uploadFile.stream().map((file) -> new AwsS3(file, file.getName())).collect(Collectors.toList());
+        List<AwsS3> files = uploadFile.stream().map((file) -> new AwsS3(file, fileType.toLowerCase()+"/"+file.getName())).collect(Collectors.toList());
         List<String> uploadUrl = putS3(files);
         removeNewFile(fileType); // 로컬에 생성된 File 삭제 (MultipartFile -> File 전환 하며 로컬에 파일 생성됨)
-        for(String s : awsS3Util.getSaveFilenames(uploadUrl)){
-            System.out.println("s = " + s);
-            System.out.println("awsS3Util.getURL(s) = " + awsS3Util.getURL(s, FileSize.IMAGE_256));
-        }
-        return awsS3Util.getSaveFilenames(uploadUrl); // 업로드된 파일의 S3 URL 주소 반환
+        return awsS3Util.getSaveFilenames(uploadUrl); // 업로드된 파일의 S3 URL 파일 이름 반환
     }
 
     // 실질적인 s3 업로드 부분
@@ -62,7 +58,9 @@ public class AwsS3Repository {
     }
 
     private void removeNewFile(String fileType) {
-        for(File file : new File(System.getProperty("user.dir") + "/" + fileType).listFiles()) {
+        File[] files = new File(System.getProperty("user.dir") + "/" + fileType).listFiles();
+        if(files == null) return;
+        for(File file : files) {
             if(file.delete()){
                 log.info("파일이 삭제되었습니다.");
             } else {
@@ -71,4 +69,24 @@ public class AwsS3Repository {
         }
     }
 
+    public void delete(String filename, FileType fileType) {
+        String filepath = fileType.getType() + "/" + filename;
+        switch (fileType) {
+            case IMAGE -> deleteImage(filepath);
+            case VIDEO -> deleteVideo(filepath);
+            case AUDIO -> amazonS3Client.deleteObject(bucket, filepath + FileSize.AUDIO.getTypeAndSizeUri());
+        }
+    }
+
+    private void deleteImage(String filename) {
+        amazonS3Client.deleteObject(bucket, filename + FileSize.IMAGE_128.getTypeAndSizeUri());
+        amazonS3Client.deleteObject(bucket, filename + FileSize.IMAGE_256.getTypeAndSizeUri());
+        amazonS3Client.deleteObject(bucket, filename + FileSize.IMAGE_512.getTypeAndSizeUri());
+        amazonS3Client.deleteObject(bucket, filename + FileSize.IMAGE_1024.getTypeAndSizeUri());
+    }
+
+    private void deleteVideo(String filename) {
+        amazonS3Client.deleteObject(bucket, filename + FileSize.VIDEO.getTypeAndSizeUri());
+        amazonS3Client.deleteObject(bucket, filename + FileSize.VIDEO_THUMBNAIL.getTypeAndSizeUri());
+    }
 }

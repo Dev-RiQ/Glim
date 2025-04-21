@@ -1,5 +1,4 @@
 server:
-  port: 8081
   servlet:
     encoding:
       charset: UTF-8
@@ -9,6 +8,10 @@ server:
 spring:
   application:
     name: Glim
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

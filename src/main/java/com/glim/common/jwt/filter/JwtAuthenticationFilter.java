@@ -1,9 +1,9 @@
 
-package com.glim.common.jwt;
+package com.glim.common.jwt.filter;
 
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
-import com.glim.common.jwt.JwtTokenProvider;
+import com.glim.common.jwt.provider.JwtTokenProvider;
 import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.user.domain.User;
 import com.glim.user.repository.UserRepository;
@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -51,6 +52,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
+        }else{
+            throw new JwtException("Invalid JWT token");
         }
 
         filterChain.doFilter(request, response);
