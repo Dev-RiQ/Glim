@@ -90,15 +90,15 @@ public class OAuthAttributes {
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
 
         String email = (String) kakaoAccount.get("email");
-        String gender = (String) kakaoAccount.get("gender");
-        String birthday = (String) kakaoAccount.get("birthday");
+//        String gender = (String) kakaoAccount.get("gender");
+//        String birthday = (String) kakaoAccount.get("birthday");
 
         return OAuthAttributes.builder()
-                .nameAttributeKey(userNameAttributeName)
+                .username((String) kakaoAccount.get("email"))
+                .email((String) kakaoAccount.get("email"))
+                .name("카카오사용자")  // name은 카카오에서 받지 않으므로 임시값
                 .attributes(attributes)
-                .email(email)
-                .sex(gender)
-                .birthday(birthday)
+                .nameAttributeKey(userNameAttributeName)
                 .build();
     }
 

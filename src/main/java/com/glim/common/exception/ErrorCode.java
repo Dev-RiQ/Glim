@@ -14,6 +14,10 @@ public enum ErrorCode {
     /* 400 BAD_REQUEST : 잘못된 요청 */
     DUMMY_BAD_REQUEST(BAD_REQUEST,"잘못된 더미 값이 존재합니다."),
     INVALID_PASSWORD(BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
+    INVALID_REFRESH_TOKEN(BAD_REQUEST, "유효하지 않은 리프레시 토큰입니다."),
+
+    /* 401 UNAUTHORIZED : 인증 실패 */
+    EXPIRED_REFRESH_TOKEN(UNAUTHORIZED, "리프레시 토큰이 만료되었습니다."),
 
     /* 403 FORBIDDEN : 접근 권한 제한 */
     VALID_USER_ID(FORBIDDEN, "해당 정보에 접근 권한이 존재하지 않습니다."),
@@ -34,6 +38,8 @@ public enum ErrorCode {
 
     /* 탈퇴회원 */
     ALREADY_DELETED_USER(CONFLICT, "이미 탈퇴한 회원입니다.");
+
+
 
 
     private final HttpStatus httpStatus;
