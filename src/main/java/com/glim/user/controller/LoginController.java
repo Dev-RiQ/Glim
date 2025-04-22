@@ -12,7 +12,7 @@ public class LoginController {
     }
 
     @GetMapping("/sign-up")
-    public String signupPage() {
+    public String signupPage() { // 아직 구현안함 ~
         return "user/join";
     }
 }

@@ -24,24 +24,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // 로컬 로그인 처리
-//    public SecurityUserDto login(LoginRequest request) {
-//        User user = userRepository.findByUsername(request.getUsername())
-//                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-//
-//        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-//            throw new CustomException(ErrorCode.INVALID_PASSWORD);
-//        }
-//
-//
-//        return SecurityUserDto.builder()
-//                .id(user.getId())
-//                .nickname(user.getNickname())
-//                .img(user.getImg())
-//                .role(user.getRole())
-//                .build();
-//    }
-
     public User login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));

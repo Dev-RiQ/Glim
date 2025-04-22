@@ -2,8 +2,8 @@ package com.glim.user.dto.request;
 
 import lombok.*;
 
-@NoArgsConstructor         // 기본 생성자
-@AllArgsConstructor        // 모든 필드 생성자
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
 @Getter
 @Setter

@@ -31,6 +31,8 @@ public enum ErrorCode {
     DUPLICATE_USERNAME(CONFLICT, "이미 사용 중인 아이디입니다."),
     DUPLICATE_NICKNAME(CONFLICT, "이미 사용 중인 닉네임입니다."),
     DUPLICATE_PHONE(CONFLICT, "이미 등록된 전화번호입니다."),
+    DUPLICATE_FOLLOW(CONFLICT, "이미 팔로우된 계정입니다."),
+
 
     /* 500 : */
     UNSUCCESSFUL_DUMMY_INSERT(INTERNAL_SERVER_ERROR,"더미 업로드에 실패했습니다."),

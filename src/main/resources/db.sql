@@ -1,4 +1,5 @@
 use glimdb;
+drop table follows;
 INSERT INTO users (
      username, password, name, nickname, sex, birth, content, img, phone,
      created_date, followers, followings, role, tags, rate, read_board_id, plat_Form
@@ -7,3 +8,5 @@ INSERT INTO users (
               '자기소개입니다.', 'https://example.com/profile.jpg', '01012345678',
               NOW(), 10, 5, 'ROLE_USER', 'java, spring', 85, 0, 'LOCAL'
           );
+
+

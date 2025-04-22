@@ -6,6 +6,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -38,10 +40,22 @@ public class User {
     private String phone;
     @Column(name = "createdDate", nullable = false)
     private LocalDateTime created_at;
+
+    // 숫자 저장용 (팔로워 수)
     @Column(nullable = false)
     private Long followers;
+
     @Column(nullable = false)
     private Long followings;
+
+//    // ✅ 내가 팔로우한 사람들 (팔로우 요청)
+//    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Set<Follow> followingsList = new HashSet<>();
+//
+//    // ✅ 나를 팔로우한 사람들 (팔로우 당함)
+//    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Set<Follow> followersList = new HashSet<>();
+
     @Column(nullable = false) @Enumerated(EnumType.STRING)
     private Role role;
     @Column(nullable = false)
@@ -61,7 +75,7 @@ public class User {
         this.id = id;
         this.username = username != null ? username : "";
         this.password = password != null && !password.isEmpty()
-                ? /*new UserPasswordEncoder(password).getPassword()*/password
+                ? password
                 : "";
         this.name = name;
         this.nickname = nickname;
@@ -71,6 +85,8 @@ public class User {
         this.img = img != null ? img : "";
         this.phone = phone != null ? phone : "";
         this.created_at = created_at != null ? created_at : LocalDateTime.now();
+//        this.followerCount = followerCount != null ? followers : 0L;
+//        this.followingCount = followingCount != null ? followings : 0L;
         this.followers = followers != null ? followers : 0L;
         this.followings = followings != null ? followings : 0L;
         this.role = role;
