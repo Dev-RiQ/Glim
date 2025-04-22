@@ -91,10 +91,13 @@ dependencies {
     // ffmpeg (영상 및 오디오 인코딩)
     implementation("net.bramp.ffmpeg:ffmpeg:0.7.0")
 
-    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    // 문자인증
     implementation 'net.nurigo:sdk:4.3.0'
 
-
+    // 결제
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
 }
 
 tasks.named('test') {
