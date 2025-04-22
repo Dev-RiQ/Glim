@@ -1,16 +1,13 @@
 package com.glim.verification.util;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Random;
 
-public class SmsGeneratorUtil { // 인증번호 생성 유틸
-
-    public static String generateAuthCode(int length) {
+@Component
+public class SmsGeneratorUtil {
+    public String createCode() {
         Random random = new Random();
-        StringBuilder sb = new StringBuilder();
-
-        for(int i = 0; i < length; i++) {
-            sb.append(random.nextInt(10));
-        }
-        return sb.toString();
+        return String.format("%06d", random.nextInt(999999));
     }
 }
