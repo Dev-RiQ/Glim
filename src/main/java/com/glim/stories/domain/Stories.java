@@ -1,6 +1,5 @@
 package com.glim.stories.domain;
 
-import com.glim.stories.dto.request.UpdateStoryRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,7 +37,4 @@ public class Stories {
         this.createdAt = createdAt;
     }
 
-    public void update(UpdateStoryRequest request) {
-//        this.likes = request.;
-    }
 }
