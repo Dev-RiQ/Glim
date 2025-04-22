@@ -1,4 +1,4 @@
-package com.glim.pay.controller;
+package com.glim.pay.dto.request;
 
 import lombok.Data;
 
