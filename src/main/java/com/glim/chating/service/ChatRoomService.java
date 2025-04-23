@@ -15,7 +15,10 @@ import com.glim.chating.repository.ChatUserRepository;
 import com.glim.common.exception.ErrorCode;
 import com.glim.common.kafka.dto.Message;
 import com.glim.common.kafka.service.SendMessage;
+import com.glim.common.security.dto.SecurityUserDto;
+import com.glim.common.utils.SecurityUtil;
 import com.glim.user.domain.User;
+import com.glim.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Limit;
@@ -38,11 +41,11 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatUserRepository chatUserRepository;
 //    private final UserService userService;
+    private final UserRepository userRepository;
 
     public List<ViewChatRoomResponse> findChatRoomListByUserId() {
-//        Long userId = userService.findByUsername(SecurityUtil.getUsername());
-        Long userId = 1L;
-        List<ChatUser> chatUserList = chatUserRepository.findAllByUserId(userId).orElseThrow(ErrorCode::throwDummyNotFound);
+        SecurityUserDto user = SecurityUtil.getUser();
+        List<ChatUser> chatUserList = chatUserRepository.findAllByUserId(user.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
         if(chatUserList.isEmpty()) {
             ErrorCode.throwDummyNotFound();
         }
@@ -55,7 +58,7 @@ public class ChatRoomService {
         for(ChatUser chatUser : chatUserList) {
             if(chatUser.getValid().toString().equals("OUT")) continue;
             if(user == null) {
-//                user = userService.findById(chatUser.getUserId());
+                user = userRepository.findById(chatUser.getUserId()).orElseThrow(ErrorCode::throwDummyNotFound);
             }
             ChatRoom chatRoom = chatRoomRepository.findById(chatUser.getRoomId()).orElseThrow(ErrorCode::throwDummyNotFound);
             ChatMsg chatMsg = chatMsgRepository.findById(chatUser.getRoomId()).orElseThrow(ErrorCode::throwDummyNotFound);
@@ -73,19 +76,17 @@ public class ChatRoomService {
             saveChatUser(createdRoom.getId(), joinUserId);
             chatRoomRepository.save(createdRoom);
         }
-        User user = null;
-//        User user = userService.findById(addChatRoomRequest.getJoinUserId());
+        User user = userRepository.findById(joinUserId).orElseThrow(ErrorCode::throwDummyNotFound);
         return new ViewChatRoomResponse(chatRoom, user);
     }
 
     private ChatRoom existsChatRoom(Long joinUserId) {
-//        Long userId = userService.findIdByUsername(SecurityUtil.getUsername());
-        Long userId = 1L;
-        List<ChatUser> userChatUserList = chatUserRepository.findAllByUserId(userId)
+        SecurityUserDto user = SecurityUtil.getUser();
+        List<ChatUser> userChatUserList = chatUserRepository.findAllByUserId(user.getId())
                 .orElseThrow(ErrorCode::throwDummyNotFound);
         for(ChatUser chatUser : userChatUserList) {
             Long roomId = chatUser.getRoomId();
-            ChatUser joinUser = chatUserRepository.findByRoomIdAndUserIdNot(roomId,userId).orElse(null);
+            ChatUser joinUser = chatUserRepository.findByRoomIdAndUserIdNot(roomId,user.getId()).orElse(null);
             if(joinUser != null && joinUser.getUserId() == joinUserId) {
                 return chatRoomRepository.findById(roomId).orElseThrow(ErrorCode::throwDummyNotFound);
             }
@@ -94,9 +95,8 @@ public class ChatRoomService {
     }
 
     private void saveChatUser(Long roomId, Long joinUserId) {
-//        Long userId = userService.findIdByUsername(SecurityUtil.getUsername());
-        Long userId = 1L;
-        AddChatUserRequest addChatUserCreate = new AddChatUserRequest(roomId, userId);
+        SecurityUserDto user = SecurityUtil.getUser();
+        AddChatUserRequest addChatUserCreate = new AddChatUserRequest(roomId, user.getId());
         AddChatUserRequest addChatUserJoin = new AddChatUserRequest(roomId, joinUserId);
         chatUserRepository.save(new AddChatUserRequest().toEntity(addChatUserCreate));
         chatUserRepository.save(new AddChatUserRequest().toEntity(addChatUserJoin));
