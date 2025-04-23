@@ -12,6 +12,8 @@ public class UserResponse {
     private String nickname;
     private String img;
     private Role role;
+    private Long followers;
+    private Long followings;
 
     public static UserResponse from(User user) {
         return UserResponse.builder()
@@ -20,6 +22,8 @@ public class UserResponse {
                 .nickname(user.getNickname())
                 .img(user.getImg())
                 .role(user.getRole())
+                .followers(user.getFollowers())
+                .followings(user.getFollowings())
                 .build();
     }
 }
