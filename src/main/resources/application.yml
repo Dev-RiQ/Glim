@@ -4,6 +4,7 @@ server:
       charset: UTF-8
       enabled: true
       force-response: true
+    context-path: /api/v1
 
 spring:
   application:
