@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>결제 테스트</title>
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+</head>
+<body>
+<h1>💳 결제 테스트 페이지</h1>
+
+<!-- 단건 결제 버튼 -->
+<button onclick="requestPay()">일반 결제하기</button>
+
+<!-- 정기결제 카드 등록 -->
+<button onclick="registerBilling()">정기결제용 카드 등록</button>
+
+<!-- 정기결제 실행 -->
+<button onclick="chargeBilling()">정기결제 실행하기</button>
+
+<script>
+    // 포트원 상점 아이디 설정 (본인의 imp_uid 입력)
+    IMP.init("imp77335438");
+
+    // 1. 일반 결제
+    function requestPay() {
+        IMP.request_pay({
+            pg: "tosspay.tosstest", // ✅ 테스트용 PG 코드
+            pay_method: "card",
+            merchant_uid: "order_" + new Date().getTime(),
+            name: "테스트 상품",
+            amount: 100,
+            buyer_email: "test@test.com",
+            buyer_name: "한종석",
+            buyer_tel: "01054079514",
+        }, function (rsp) {
+            if (rsp.success) {
+                fetch("http://localhost:8081/payment/verify", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(rsp)
+                }).then(res => res.json())
+                    .then(data => alert("결제 성공: " + JSON.stringify(data)));
+            } else {
+                alert("결제 실패: " + rsp.error_msg);
+            }
+        });
+    }
+
+    // 2. 카드 등록 (빌링키 발급)
+    function registerBilling() {
+        const customerUid = "user_001"; // 유저 고유값 (DB와 연결 필요)
+
+        IMP.request_pay({
+            pg: "tosspay.tosstest" // ✅ 테스트용 PG 코드
+            ,
+            pay_method: "card",
+            customer_uid: customerUid,
+            name: "정기결제 카드 등록",
+            amount: 0, // 0원 결제
+            buyer_email: "test@test.com",
+            buyer_name: "한종석",
+            buyer_tel: "01054079514"
+        }, function (rsp) {
+            if (rsp.success) {
+                fetch(`/billing/register?impUid=${rsp.imp_uid}&customerUid=${rsp.customer_uid}`, {
+                    method: "POST"
+                }).then(res => res.json())
+                    .then(data => alert("카드 등록 성공: " + JSON.stringify(data)));
+            } else {
+                alert("카드 등록 실패: " + rsp.error_msg);
+            }
+        });
+    }
+
+    // 3. 정기결제 실행
+    function chargeBilling() {
+        const customerUid = "user_001";
+        fetch(`/billing/charge?customerUid=${customerUid}&amount=2000&name=월정기결제`, {
+            method: "POST"
+        }).then(res => res.text())
+            .then(msg => alert(msg));
+    }
+</script>
+</body>
+</html>

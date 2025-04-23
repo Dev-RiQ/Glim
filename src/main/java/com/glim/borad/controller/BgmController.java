@@ -18,9 +18,15 @@ public class BgmController {
 
     private final BgmService bgmService;
 
-    @GetMapping({"","/{id}"})
-    public StatusResponseDTO list() {
-        List<ViewBgmResponse> board = bgmService.list();
+    @GetMapping({"", "/{id}"})
+    public StatusResponseDTO list(@PathVariable Long id, @PathVariable(required = false) Long offset) {
+        List<ViewBgmResponse> board = bgmService.list(id, offset);
+        for (int i = 0; i < 10; i++) {
+            offset = (long) (board.get(i).getId() == null ? -1 : board.get(i).getId());
+            if(offset == -1){
+                break;
+            }
+        }
         return StatusResponseDTO.ok(board);
     }
 

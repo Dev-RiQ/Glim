@@ -4,6 +4,7 @@ import com.glim.borad.dto.request.AddBoardRequest;
 import com.glim.borad.dto.request.UpdateBoardRequest;
 import com.glim.borad.dto.response.ViewBoardResponse;
 import com.glim.borad.service.BoardService;
+import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.statusResponse.StatusResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
+    private final AwsS3Util awsS3Util;
 
     @GetMapping({"/{userId}", "/{userId}/{offset}"})
     public StatusResponseDTO list(@PathVariable Long userId, @PathVariable(required = false) Long offset) {
