@@ -78,7 +78,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> {
                     auth
                             .requestMatchers("/","/oauth","/oauth2/**", "/login","/login?error", "/sign-up", "/api/v1/auth/**", "/oauth2/**","/user/me", "/board/**", "/board" ).permitAll()
-                            .requestMatchers("/chat","/chat/**","/pub","/pub/**","/sub","/sub/**", "/favicon.ico" ,"/error", "/**").permitAll()
+                            .requestMatchers("/chat","/chat/**","/pub","/pub/**","/sub","/sub/**", "/favicon.ico" ,"/error", "/**", "/payment", "/payment/**", // ✅ 여기에 추가
+                                    "/billing/**").permitAll()
                             .anyRequest().authenticated();
                 });
 

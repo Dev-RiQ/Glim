@@ -1,10 +1,12 @@
 package com.glim.borad.service;
 
+import com.glim.borad.domain.Bgms;
 import com.glim.borad.dto.request.AddBgmRequest;
 import com.glim.borad.dto.response.ViewBgmResponse;
 import com.glim.borad.repository.BgmRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,8 @@ public class BgmService {
         bgmRepository.save(new AddBgmRequest().toEntity(request));
     }
 
+
+
     @Transactional
     public void delete(Long id) {
         bgmRepository.deleteById(id);
@@ -31,5 +35,12 @@ public class BgmService {
 
     public List<ViewBgmResponse> list() {
         return bgmRepository.findAll().stream().map(bgm -> new ViewBgmResponse(bgm)).collect(Collectors.toList());
+    }
+
+    public List<ViewBgmResponse> list(Long id, Long offset) {
+        List<Bgms> bgmsList = offset == null ?
+                bgmRepository.findFirst10From(id) :
+                bgmRepository.findFirst10FromOffset(id, offset);
+        return bgmsList.stream().map(ViewBgmResponse::new).collect(Collectors.toList());
     }
 }
