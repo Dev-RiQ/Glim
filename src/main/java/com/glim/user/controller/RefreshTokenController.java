@@ -35,7 +35,13 @@ public class RefreshTokenController {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         String newAccessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
-        return ResponseEntity.ok(new LoginResponse(newAccessToken, refreshToken.getToken(), UserResponse.from(user)));
+
+        boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
+
+        return ResponseEntity.ok(
+                new LoginResponse(newAccessToken, refreshToken.getToken(), UserResponse.from(user), isFirstLogin)
+        );
+//        return ResponseEntity.ok(new LoginResponse(newAccessToken, refreshToken.getToken(), UserResponse.from(user)));
     }
 
 }

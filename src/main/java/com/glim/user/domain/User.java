@@ -48,14 +48,6 @@ public class User {
     @Column(nullable = false)
     private Long followings;
 
-//    // ✅ 내가 팔로우한 사람들 (팔로우 요청)
-//    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Set<Follow> followingsList = new HashSet<>();
-//
-//    // ✅ 나를 팔로우한 사람들 (팔로우 당함)
-//    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private Set<Follow> followersList = new HashSet<>();
-
     @Column(nullable = false) @Enumerated(EnumType.STRING)
     private Role role;
     @Column(nullable = false)
