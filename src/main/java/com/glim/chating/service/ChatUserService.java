@@ -15,7 +15,11 @@ import com.glim.chating.repository.ChatUserRepository;
 import com.glim.common.exception.ErrorCode;
 import com.glim.common.kafka.dto.Message;
 import com.glim.common.kafka.service.SendMessage;
+import com.glim.common.security.dto.SecurityUserDto;
+import com.glim.common.utils.SecurityUtil;
 import com.glim.user.domain.User;
+import com.glim.user.repository.UserRepository;
+import com.glim.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Limit;
@@ -36,30 +40,27 @@ public class ChatUserService {
 
     private final ChatUserRepository chatUserRepository;
     private final ChatMsgService chatMsgService;
+    private final UserRepository userRepository;
 //    private final UserService userService;
 
     public ViewChatUserResponse findByRoomId(Long roomId) {
-//        Long userId = userService.findIdByUsername(SecurityUtil.getUsername());
-        Long userId = 1L;
-        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserIdNot(roomId, userId).orElseThrow(ErrorCode::throwDummyNotFound);
-//        return new ViewChatUserResponse(userService.findById(chatUser.getUserId()), chatUser);
-        return null;
+        SecurityUserDto user = SecurityUtil.getUser();
+        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserIdNot(roomId, user.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
+        return new ViewChatUserResponse(userRepository.findById(chatUser.getUserId()).orElseThrow(ErrorCode::throwDummyNotFound), chatUser);
     }
 
     @Transactional
     public void updateChatUserReadMsg(Long roomId) {
-//        Long userId = userService.findIdByUsername(SecurityUtil.getUsername());
-        Long userId = 1L;
-        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(roomId, userId).orElseThrow(ErrorCode::throwDummyNotFound);
+        SecurityUserDto user = SecurityUtil.getUser();
+        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(roomId, user.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
         chatUser.update(chatMsgService.getNextMsgId() - 1);
         chatUserRepository.save(chatUser);
     }
 
     @Transactional
     public void escapeChatRoom(Long roomId) {
-//        Long userId = userService.findIdByUsername(SecurityUtil.getUsername());
-        Long userId = 1L;
-        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(roomId, userId).orElseThrow(ErrorCode::throwDummyNotFound);
+        SecurityUserDto user = SecurityUtil.getUser();
+        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(roomId, user.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
         chatUser.escape();
         chatUserRepository.save(chatUser);
     }

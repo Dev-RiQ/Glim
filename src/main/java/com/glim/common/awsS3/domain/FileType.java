@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum FileType {
+    USER_IMAGE("userImages"),
     IMAGE("images"),
     VIDEO("videos"),
     AUDIO("audios");

@@ -25,6 +25,7 @@ public class FileEncoderService {
         List<File> files = null;
         try{
             switch (type) {
+                case USER_IMAGE -> files = imageEncoderRepository.userImageEncoding(multipartFiles);
                 case IMAGE -> files = imageEncoderRepository.imageEncoding(multipartFiles);
                 case VIDEO -> files = videoEncoderRepository.videoEncoding(multipartFiles);
                 case AUDIO -> files = audioEncoderRepository.audioEncoding(multipartFiles);

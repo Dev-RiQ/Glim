@@ -24,6 +24,20 @@ public class ImageEncoderRepository {
 
     private final AwsS3Util awsS3Util;
 
+    public List<File> userImageEncoding(List<MultipartFile> multipartFiles) throws Exception {
+        List<File> files = new ArrayList<>();
+        for (MultipartFile multipartFile : multipartFiles) {
+            String saveFileName = FileType.IMAGE.getType() + "/" + awsS3Util.changedFileName(multipartFile.getOriginalFilename());
+            BufferedImage bi = ImageIO.read(multipartFile.getInputStream());
+            int size = 128;
+            bi = resizeImage(bi,size,size);
+            File file = setNewFile(saveFileName, size);
+            ImageIO.write(bi,"jpg", file);
+            files.add(convertToWebp(file.getParentFile()+"/"+file.getName(), file));
+        }
+        return files;
+    }
+
     public List<File> imageEncoding(List<MultipartFile> multipartFiles) throws Exception {
         List<File> files = new ArrayList<>();
         for (MultipartFile multipartFile : multipartFiles) {

@@ -15,7 +15,10 @@ import com.glim.chating.repository.ChatUserRepository;
 import com.glim.common.exception.ErrorCode;
 import com.glim.common.kafka.dto.Message;
 import com.glim.common.kafka.service.SendMessage;
+import com.glim.common.security.dto.SecurityUserDto;
+import com.glim.common.utils.SecurityUtil;
 import com.glim.user.domain.User;
+import com.glim.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Limit;
@@ -36,7 +39,6 @@ public class ChatMsgService {
 
     private final ChatMsgRepository chatMsgRepository;
     private final SendMessage sender;
-//    private final UserService userService;
 
     public List<ViewChatMsgResponse> findChatMsgListByRoomId(Long roomId, Long offset) {
         List<ChatMsg> chatMsgList = offset == null ?
@@ -59,9 +61,8 @@ public class ChatMsgService {
 
     private ChatMsg setMessage(AddChatMsgRequest addChatMsgRequest) {
         ChatMsg message = new AddChatMsgRequest().toEntity(addChatMsgRequest);
-//        Long userId = userService.findIdByUsername(SecurityUtil.getUsername());
-//        message.setUserId(userId);
-        message.setUserId(1L);
+        SecurityUserDto user = SecurityUtil.getUser();
+        message.setUserId(user.getId());
         message.setMsgId(getNextMsgId());
         message.setCreatedAt(LocalDateTime.now());
         return message;
