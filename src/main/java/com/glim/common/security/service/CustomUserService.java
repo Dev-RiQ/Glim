@@ -83,7 +83,6 @@ public class CustomUserService implements UserDetailsService, OAuth2UserService<
         if (userOptional.isPresent()) {
             return userOptional.get(); // 기존 유저 → 그대로 로그인
         }
-
         // 새 유저 등록 (처음 소셜 로그인)
         User user = User.builder()
                 .username(attributes.getEmail())

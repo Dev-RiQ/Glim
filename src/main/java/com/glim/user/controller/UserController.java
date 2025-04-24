@@ -58,10 +58,10 @@ public class UserController {
         if (!isVerified) {
             throw new CustomException(ErrorCode.INVALID_VERIFICATION_CODE);
         }
-
         user.setNickname(request.getNickname());
         user.setPhone(request.getPhone());
         userRepository.save(user);
+
 
         return ResponseEntity.ok("추가 정보 입력 완료!");
     }
