@@ -73,7 +73,7 @@ public class OAuthAttributes {
 
         return OAuthAttributes.builder()
                 .username(email)                      // username 기준은 이메일
-                .name(name != null ? name : nickname) // 이름 없으면 닉네임 사용
+                .name(name != null ? name : "이름없음") // 이름 없으면 닉네임 사용
                 .email(email)
                 .img(img)
                 .sex(gender)
@@ -88,19 +88,23 @@ public class OAuthAttributes {
     // kakako에서 받아온 정보 처리
     private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+        Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
 
         String email = (String) kakaoAccount.get("email");
-//        String gender = (String) kakaoAccount.get("gender");
-//        String birthday = (String) kakaoAccount.get("birthday");
+        String nickname = profile != null ? (String) profile.get("nickname") : "카카오사용자";
+        String profileImage = profile != null ? (String) profile.get("profile_image_url") : "";
 
         return OAuthAttributes.builder()
-                .username((String) kakaoAccount.get("email"))
-                .email((String) kakaoAccount.get("email"))
-                .name("카카오사용자")  // name은 카카오에서 받지 않으므로 임시값
+                .username(email)
+                .email(email)
+                .name(nickname)
+                .img(profileImage)
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
                 .build();
     }
+
+
 
     public User toEntity(String registrationId) {
         return User.builder()

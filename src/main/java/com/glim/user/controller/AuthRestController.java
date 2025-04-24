@@ -1,16 +1,18 @@
 
 package com.glim.user.controller;
 
+import com.amazonaws.services.s3.model.CSVOutput;
+import com.glim.common.exception.CustomException;
+import com.glim.common.exception.ErrorCode;
 import com.glim.common.jwt.provider.JwtTokenProvider;
 import com.glim.common.jwt.refresh.domain.RefreshToken;
 import com.glim.common.jwt.refresh.dto.RefreshTokenRequest;
 import com.glim.common.jwt.refresh.service.RefreshTokenService;
+import com.glim.common.security.oauth.OAuthAttributes;
+import com.glim.common.security.service.CustomUserService;
 import com.glim.common.security.util.SecurityUtil;
 import com.glim.user.domain.User;
-import com.glim.user.dto.request.AddUserRequest;
-import com.glim.user.dto.request.ChangePasswordRequest;
-import com.glim.user.dto.request.LoginRequest;
-import com.glim.user.dto.request.UpdateUserRequest;
+import com.glim.user.dto.request.*;
 import com.glim.user.dto.response.LoginResponse;
 import com.glim.user.dto.response.UserResponse;
 import com.glim.user.service.UserService;
@@ -25,7 +27,7 @@ import java.util.List;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthRestController {
-
+    private final CustomUserService customUserService;
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
@@ -45,15 +47,37 @@ public class AuthRestController {
         return ResponseEntity.ok(UserResponse.from(user));
     }
 
+
     // ✅ 로그인: 사용자 인증 후 accessToken + refreshToken + user 응답
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         User user = userService.login(request);
         String accessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
+        boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
 
-        return ResponseEntity.ok(new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user)));
+        return ResponseEntity.ok(
+                new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user), isFirstLogin)
+        );
     }
+
+    // ✅ AuthRestController.java - 소셜 로그인 응답 처리용 API
+    @PostMapping("/oauth-login")
+    public ResponseEntity<LoginResponse> socialLogin(@RequestBody OAuthLoginRequest request) {
+        OAuthAttributes oauthAttributes = request.getAttributes();
+        String provider = request.getProvider();
+
+        User user = customUserService.saveOrUpdate(oauthAttributes, provider);
+        String accessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
+
+        boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
+        System.out.println("dsdsdsdsdsdsd");
+        return ResponseEntity.ok(
+                new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user), isFirstLogin)
+        );
+    }
+
 
     // ✅ 회원가입: 신규 사용자 등록
     @PostMapping("/sign-up")
@@ -110,6 +134,5 @@ public class AuthRestController {
         List<UserResponse> result = userService.searchUsersByNickname(nickname);
         return ResponseEntity.ok(result);
     }
-
 
 }

@@ -16,9 +16,11 @@ public class SmsVerificationService {
     private final CoolSmsService coolSmsService;
     private final SmsGeneratorUtil smsGeneratorUtil;
 
-    public void generateAndSendAuthCode(String phone) {
+    public String generateAndSendAuthCode(String phone) {
         String code = smsGeneratorUtil.createCode();
         coolSmsService.sendSms(phone, code);
         authCodeRepository.save(new AuthCodeDocument(phone, code, LocalDateTime.now()));
+        return code; // ✅ 이걸 꼭 리턴해야 컨트롤러에서 code 쓸 수 있어!
     }
+
 }

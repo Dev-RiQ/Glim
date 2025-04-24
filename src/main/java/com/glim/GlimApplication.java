@@ -2,10 +2,11 @@ package com.glim;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableScheduling
 @SpringBootApplication
 public class GlimApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(GlimApplication.class, args);
     }

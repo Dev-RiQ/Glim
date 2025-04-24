@@ -30,15 +30,28 @@ public class AuthUserUtil {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
+    //    public void writeLoginResponse(HttpServletResponse response, User user, String accessToken) throws IOException {
+//        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
+//        LoginResponse loginResponse = new LoginResponse(
+//                accessToken,
+//                refreshToken.getToken(),
+//                UserResponse.from(user)
+//        );
     public void writeLoginResponse(HttpServletResponse response, User user, String accessToken) throws IOException {
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
+        boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
+
         LoginResponse loginResponse = new LoginResponse(
                 accessToken,
                 refreshToken.getToken(),
-                UserResponse.from(user)
+                UserResponse.from(user),
+                isFirstLogin
         );
+
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().write(objectMapper.writeValueAsString(loginResponse));
     }
 }
+
+
