@@ -1,16 +1,12 @@
 package com.glim.payment.controller;
 
-import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.payment.domain.Billing;
 import com.glim.payment.dto.response.BillingResponse;
 import com.glim.payment.repository.BillingRepository;
 import com.glim.payment.service.BillingService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * BillingController는 정기결제 관련 HTTP 요청을 처리하는 REST 컨트롤러입니다.
@@ -62,8 +58,8 @@ public class BillingController {
 
     @GetMapping("/info")
     public ResponseEntity<Billing> getBillingInfo(@RequestParam String customerUid) {
-        Billing billing = billingRepository.findByCustomerUid(customerUid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        System.out.println("****customerUid : " + customerUid);
+        Billing billing = billingService.getBillingInfo(customerUid);
         return ResponseEntity.ok(billing);
     }
 

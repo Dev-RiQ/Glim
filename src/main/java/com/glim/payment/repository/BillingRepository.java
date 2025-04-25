@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BillingRepository extends JpaRepository<Billing, Long> {
-    boolean existsByCustomerUid(String customerUid);
     void deleteByCustomerUid(String customerUid);
-    List<Billing> findAllByIsActiveTrue();
     Optional<Billing> findByCustomerUid(String customerUid);
 }

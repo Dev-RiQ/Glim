@@ -5,9 +5,11 @@ import com.glim.payment.dto.response.BillingResponse;
 import com.glim.payment.repository.BillingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -86,16 +88,15 @@ public class BillingService {
 
     @Transactional
     public void deactivateBillingKey(String customerUid) {
-        String token = getToken();
-        webClient.delete()
-                .uri("/subscribe/customers/" + customerUid)
-                .headers(h -> h.setBearerAuth(token))
-                .retrieve()
-                .bodyToMono(Void.class)
-                .block();
-
         Billing billing = billingRepository.findByCustomerUid(customerUid)
                 .orElseThrow(() -> new IllegalStateException("해당 customerUid 없음"));
-        billingRepository.deleteByCustomerUid(customerUid);
+
+        billing.setActive(false); // 즉시 비활성화하지 않고 다음 결제일까지 유효하게 유지
+        billingRepository.save(billing);
+    }
+
+    public Billing getBillingInfo(String customerUid) {
+        return billingRepository.findByCustomerUid(customerUid)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 }
