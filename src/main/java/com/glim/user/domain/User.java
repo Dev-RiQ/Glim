@@ -92,6 +92,9 @@ public class User {
     public void encodePassword(PasswordEncoder encoder) {
         this.password = encoder.encode(this.password);
     }
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 
 
 }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
@@ -57,5 +58,14 @@ public class JwtTokenProvider { // accessToken 발급, 검증
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8)) // ✅ 시크릿키 설정
+                .build()
+                .parseClaimsJws(token)
+                .getBody(); // ✅ JWT 안에 있는 본문(Claims) 꺼내기
+
+        return Long.valueOf(claims.getSubject()); // subject에 userId가 들어있다고 가정
     }
 }

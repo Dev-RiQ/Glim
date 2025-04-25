@@ -51,11 +51,6 @@ public class UserService {
         if (userRepository.existsByNickname(request.getNickname())) {
             throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
         }
-
-        if (userRepository.existsByPhone(request.getPhone())) {
-            throw new CustomException(ErrorCode.DUPLICATE_PHONE);
-        }
-
         User user = request.toEntity();
         user.encodePassword(passwordEncoder); // 비밀번호 암호화
         userRepository.save(user);
@@ -136,17 +131,25 @@ public class UserService {
     }
 
     public List<UserResponse> searchUsersByNickname(String keyword) {
-        List<User> users = userRepository.findByNicknameContainingIgnoreCase(keyword);
+        List<User> users = userRepository.findTop20ByNicknameContainingIgnoreCase(keyword);
         return users.stream()
                 .map(UserResponse::from)
                 .toList();
     }
+    public List<User> findByPhone(String phone) {
+        return userRepository.findAllByPhone(phone);
+    }
+    public void updatePassword(String username, String newPassword) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-
-
-
-
-
+        user.updatePassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
 
 
 }
+
+
+
+

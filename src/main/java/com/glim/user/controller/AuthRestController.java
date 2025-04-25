@@ -8,10 +8,13 @@ import com.glim.common.jwt.provider.JwtTokenProvider;
 import com.glim.common.jwt.refresh.domain.RefreshToken;
 import com.glim.common.jwt.refresh.dto.RefreshTokenRequest;
 import com.glim.common.jwt.refresh.service.RefreshTokenService;
+import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.common.security.oauth.OAuthAttributes;
 import com.glim.common.security.service.CustomUserService;
 import com.glim.common.security.util.SecurityUtil;
 import com.glim.user.domain.User;
+import com.glim.user.dto.request.FindPasswordRequest;
+import com.glim.user.dto.request.ResetPasswordRequest;
 import com.glim.user.dto.request.*;
 import com.glim.user.dto.response.LoginResponse;
 import com.glim.user.dto.response.UserResponse;
@@ -19,6 +22,7 @@ import com.glim.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +35,7 @@ public class AuthRestController {
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
+
 
     // 로그인한 user 가져오는 api
     @GetMapping("/me")
@@ -61,7 +66,6 @@ public class AuthRestController {
         );
     }
 
-    // ✅ AuthRestController.java - 소셜 로그인 응답 처리용 API
     @PostMapping("/oauth-login")
     public ResponseEntity<LoginResponse> socialLogin(@RequestBody OAuthLoginRequest request) {
         OAuthAttributes oauthAttributes = request.getAttributes();
@@ -72,7 +76,6 @@ public class AuthRestController {
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
         boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
-        System.out.println("dsdsdsdsdsdsd");
         return ResponseEntity.ok(
                 new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user), isFirstLogin)
         );
@@ -119,14 +122,15 @@ public class AuthRestController {
         return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
     }
 
-    // ✅ 로그아웃: refreshToken 삭제 (accessToken은 프론트에서 제거)
+    // ✅ 로그아웃: accessToken 헤더 기반, refreshToken 삭제
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody RefreshTokenRequest request) {
-        Long userId = SecurityUtil.getCurrentUserId();
-        refreshTokenService.validateOwnership(userId, request.getRefreshToken()); // 내거인지 검토
-        refreshTokenService.deleteByToken(request.getRefreshToken());
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String authorizationHeader) {
+        String accessToken = authorizationHeader.replace("Bearer ", "");
+        Long userId = jwtTokenProvider.getUserIdFromToken(accessToken);
+        refreshTokenService.deleteByUserId(userId);
         return ResponseEntity.ok("로그아웃 되었습니다.");
     }
+
 
     // 🔍 닉네임 검색 API
     @GetMapping("/search")
@@ -134,5 +138,28 @@ public class AuthRestController {
         List<UserResponse> result = userService.searchUsersByNickname(nickname);
         return ResponseEntity.ok(result);
     }
+
+    // 전화번호 기반 유저 목록 조회
+    @GetMapping("/accounts")
+    public ResponseEntity<List<UserResponse>> getAccountsByPhone(@AuthenticationPrincipal SecurityUserDto user) {
+        List<User> users = userService.findByPhone(user.getPhone());
+        List<UserResponse> result = users.stream().map(UserResponse::from).toList();
+        return ResponseEntity.ok(result);
+    }
+
+    // 계정 전환 요청
+    @PostMapping("/accounts/switch")
+    public ResponseEntity<LoginResponse> switchAccount(@RequestBody SwitchAccountRequest request) {
+        Long switchToUserId = request.getSwitchToUserId();
+        User user = userService.getUserById(switchToUserId);
+        String accessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
+        return ResponseEntity.ok(new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user), false));
+    }
+
+
+
+
+
 
 }

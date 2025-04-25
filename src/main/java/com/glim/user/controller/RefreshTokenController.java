@@ -41,7 +41,6 @@ public class RefreshTokenController {
         return ResponseEntity.ok(
                 new LoginResponse(newAccessToken, refreshToken.getToken(), UserResponse.from(user), isFirstLogin)
         );
-//        return ResponseEntity.ok(new LoginResponse(newAccessToken, refreshToken.getToken(), UserResponse.from(user)));
     }
 
 }

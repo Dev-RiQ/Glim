@@ -1,6 +1,7 @@
 package com.glim.user.controller;
 
-import com.glim.notification.service.NotificationService;
+import com.glim.common.security.util.SecurityUtil;
+import com.glim.common.statusResponse.StatusResponseDTO;
 import com.glim.user.dto.request.FollowRequest;
 import com.glim.user.dto.response.FollowRecommendResponse;
 import com.glim.user.dto.response.FollowResponse;
@@ -18,8 +19,6 @@ import java.util.List;
 public class FollowController {
 
     private final FollowService followService;
-    private final NotificationService notificationService;
-
     /**
      * ➕ 팔로우 요청
      * POST /api/v1/follow
@@ -29,7 +28,6 @@ public class FollowController {
     @PostMapping
     public ResponseEntity<FollowResponse> follow(@RequestBody FollowRequest request) {
         followService.follow(request.getFollowingId()); // followerId는 내부에서 처리
-//        notificationService.send(request.getFollowingId())
         return ResponseEntity.ok(new FollowResponse("팔로우 성공", true));
     }
 
@@ -50,28 +48,37 @@ public class FollowController {
      * GET /api/v1/follow/check?followingId=5
      * @return true or false
      */
-    @GetMapping("/check")
-    public ResponseEntity<Boolean> isFollowing(@RequestParam Long followingId) {
-        return ResponseEntity.ok(followService.isFollowing(followingId));
+    @GetMapping("/check/{userId}")
+    public ResponseEntity<Boolean> checkFollowing(@PathVariable("userId") Long followingId) {
+        Long myId = SecurityUtil.getCurrentUserId();  // 🔐 현재 로그인한 유저 ID
+        boolean isFollowing = followService.isFollowing(myId, followingId); // ✅ 팔로우 여부 확인
+        return ResponseEntity.ok(isFollowing);  // ✅ true 또는 false 응답
     }
 
     /**
      * 📄 내가 팔로우한 유저 목록
      * GET /api/v1/follow/followings/{userId}
      */
-    @GetMapping("/followings/{userId}")
-    public ResponseEntity<List<FollowUserResponse>> getFollowings(@PathVariable Long userId) {
-        return ResponseEntity.ok(followService.getFollowings(userId));
+    @GetMapping({"/followings/{userId}","/followings/{userId}/{offset}"})
+    public StatusResponseDTO getFollowings(@PathVariable Long userId,
+                                           @PathVariable(required = false) Long offset) {
+        List<FollowUserResponse> followings = followService.getFollowings(userId, offset);
+        return StatusResponseDTO.ok(followings);
     }
 
     /**
      * 📄 나를 팔로우한 유저 목록
      * GET /api/v1/follow/followers/{userId}
      */
-    @GetMapping("/followers/{userId}")
-    public ResponseEntity<List<FollowUserResponse>> getFollowers(@PathVariable Long userId) {
-        return ResponseEntity.ok(followService.getFollowers(userId));
+    @GetMapping({"/followers/{userId}", "/followers/{userId}/{offset}"})
+    public StatusResponseDTO getFollowers(
+            @PathVariable Long userId,
+            @PathVariable(required = false) Long offset) {
+
+        List<FollowUserResponse> followers = followService.getFollowers(userId, offset);
+        return StatusResponseDTO.ok(followers);
     }
+
 
     /**
      * 💡 맞팔 기반 추천

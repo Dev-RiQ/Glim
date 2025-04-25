@@ -12,6 +12,7 @@ import com.glim.user.dto.response.FollowUserResponse;
 import com.glim.user.repository.FollowRepository;
 import com.glim.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,34 +78,41 @@ public class FollowService {
     }
 
     // ✅ 로그인한 사용자가 특정 유저를 팔로우했는지
-    public boolean isFollowing(Long followingId) {
-        Long followerId = SecurityUtil.getCurrentUserId();
+    public boolean isFollowing(Long followerId, Long followingId) {
         return followRepository.existsByFollowerUserIdAndFollowingUserId(followerId, followingId);
     }
 
-    // 특정 사용자가 팔로잉한 유저 목록
-    public List<FollowUserResponse> getFollowings(Long userId) {
-        userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return followRepository.findAllByFollowerUserId(userId).stream()
-                .map(f -> userRepository.findById(f.getFollowingUserId())
-                        .map(u -> new FollowUserResponse(u.getNickname(), u.getImg()))
-                        .orElse(null))
-                .filter(Objects::nonNull)
-                .collect(toList());
+    // 특정 사용자가 팔로잉한 유저 목록
+    public List<FollowUserResponse> getFollowings(Long userId, Long offset) {
+        List<Follow> followList = (offset == null)
+                ? followRepository.findTop20ByFollowerUserIdOrderByIdDesc(userId)
+                : followRepository.findByFollowerUserIdAndIdLessThanOrderByIdDesc(userId, offset, PageRequest.of(0, 30));
+
+        return followList.stream()
+                .map(f -> {
+                    User user = userRepository.findById(f.getFollowingUserId())
+                            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                    return FollowUserResponse.from(user);
+                })
+                .toList();
     }
 
     // 특정 사용자를 팔로우한 유저 목록
-    public List<FollowUserResponse> getFollowers(Long userId) {
-        userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    public List<FollowUserResponse> getFollowers(Long userId, Long offset) {
+        List<Follow> followList = (offset == null)
+                ? followRepository.findTop20ByFollowingUserIdOrderByIdDesc(userId)
+                : followRepository.findByFollowingUserIdAndIdLessThanOrderByIdDesc(userId, offset, PageRequest.of(0, 20));
 
-        return followRepository.findAllByFollowingUserId(userId).stream()
-                .map(f -> userRepository.findById(f.getFollowerUserId())
-                        .map(u -> new FollowUserResponse(u.getNickname(), u.getImg()))
-                        .orElse(null))
-                .filter(Objects::nonNull)
-                .collect(toList());
+        return followList.stream()
+                .map(f -> {
+                    User user = userRepository.findById(f.getFollowerUserId())
+                            .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                    return FollowUserResponse.from(user);
+                })
+                .toList();
     }
+
 
     // ✅ 맞팔로우 기반 추천
     public List<FollowRecommendResponse> getRecommendedUsers() {

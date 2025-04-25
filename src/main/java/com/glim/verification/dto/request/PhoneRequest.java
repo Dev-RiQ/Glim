@@ -1,4 +1,4 @@
-package com.glim.verification.dto;
+package com.glim.verification.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

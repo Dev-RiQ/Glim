@@ -19,10 +19,12 @@ public enum ErrorCode {
     NOT_FOLLOWING_YET(BAD_REQUEST, "팔로우하고 있지 않은 유저입니다."),
     SELF_UNFOLLOW_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "자기 자신을 언팔로우할 수 없습니다."),
     EXPIRED_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "인증번호가 만료되었습니다."),
+    INVALID_RESET_TOKEN(BAD_REQUEST, "유효하지 않은 리셋 토큰입니다."),
 
 
     /* 401 UNAUTHORIZED : 인증 실패 */
     EXPIRED_REFRESH_TOKEN(UNAUTHORIZED, "리프레시 토큰이 만료되었습니다."),
+    EXPIRED_RESET_TOKEN(UNAUTHORIZED, "리프레시 토큰이 만료되었습니다."),
 
     /* 403 FORBIDDEN : 접근 권한 제한 */
     VALID_USER_ID(FORBIDDEN, "해당 정보에 접근 권한이 존재하지 않습니다."),
