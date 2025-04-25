@@ -21,6 +21,7 @@ public class SecurityUserDto implements UserDetails {
     private String img;
     private Role role;
     private String name;
+    private String phone;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -44,6 +45,7 @@ public class SecurityUserDto implements UserDetails {
                 .name(user.getName())
                 .img(user.getImg())
                 .role(user.getRole())
+                .phone(user.getPhone())
                 .build();
     }
 
