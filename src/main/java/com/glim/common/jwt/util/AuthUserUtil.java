@@ -1,6 +1,7 @@
 package com.glim.common.jwt.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.glim.borad.service.BoardService;
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import com.glim.common.jwt.provider.JwtTokenProvider;
@@ -23,6 +24,7 @@ public class AuthUserUtil {
     private final UserRepository userRepository;
     private final RefreshTokenService refreshTokenService;
     private final ObjectMapper objectMapper;
+    private final BoardService boardService;
 
     public User getUserFromToken(String token) {
         Long userId = jwtTokenProvider.getUserId(token);
@@ -30,21 +32,15 @@ public class AuthUserUtil {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
-    //    public void writeLoginResponse(HttpServletResponse response, User user, String accessToken) throws IOException {
-//        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
-//        LoginResponse loginResponse = new LoginResponse(
-//                accessToken,
-//                refreshToken.getToken(),
-//                UserResponse.from(user)
-//        );
     public void writeLoginResponse(HttpServletResponse response, User user, String accessToken) throws IOException {
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
         boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
+        int boardCount = boardService.countBoardsByUserId(user.getId());
 
         LoginResponse loginResponse = new LoginResponse(
                 accessToken,
                 refreshToken.getToken(),
-                UserResponse.from(user),
+                UserResponse.from(user, boardCount),
                 isFirstLogin
         );
 

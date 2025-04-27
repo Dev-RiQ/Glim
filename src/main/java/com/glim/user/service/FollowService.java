@@ -12,6 +12,7 @@ import com.glim.user.dto.response.FollowUserResponse;
 import com.glim.user.repository.FollowRepository;
 import com.glim.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,12 +22,21 @@ import java.util.*;
 import static java.util.stream.Collectors.*;
 
 @Service
-@RequiredArgsConstructor
 public class FollowService {
 
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+
+    public FollowService(
+            FollowRepository followRepository,
+            UserRepository userRepository,
+            @Lazy NotificationService notificationService
+    ) {
+        this.followRepository = followRepository;
+        this.userRepository = userRepository;
+        this.notificationService = notificationService;
+    }
 
     // ✅ 로그인한 사용자 기준 팔로우
     @Transactional
@@ -145,4 +155,10 @@ public class FollowService {
                 .map(u -> new FollowRecommendResponse(u.getId(), u.getNickname(), u.getImg()))
                 .collect(toList());
     }
+
+    @Transactional
+    public void deleteFollowByUser(Long userId) {
+        followRepository.deleteByFollowerUserIdOrFollowingUserId(userId, userId);
+    }
+
 }

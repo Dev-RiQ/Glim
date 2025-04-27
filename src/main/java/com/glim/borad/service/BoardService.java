@@ -82,4 +82,14 @@ public class BoardService {
         boards.setShares(boards.getShares() + share);
         boardRepository.save(boards);
     }
+    // 회원 탈퇴시 해당 회원이 작성한 게시글 삭제
+    @Transactional
+    public void deleteBoardsByUser(Long userId) {
+        boardRepository.deleteByUserId(userId);
+    }
+    // 해당 회원의 총 게시글 수
+    public int countBoardsByUserId(Long userId) {
+        return boardRepository.countByUserId(userId);
+    }
+
 }

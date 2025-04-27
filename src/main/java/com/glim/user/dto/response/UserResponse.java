@@ -8,22 +8,26 @@ import lombok.Getter;
 @Builder
 public class UserResponse {
     private Long id;
-    private String username;
     private String nickname;
     private String img;
-    private Role role;
     private Long followers;
     private Long followings;
+    private String content;
+    private String name;
+    private Integer rate;
+    private Integer boardCount;
 
-    public static UserResponse from(User user) {
+    public static UserResponse from(User user, int boardCount) {
         return UserResponse.builder()
                 .id(user.getId())
-                .username(user.getUsername())
                 .nickname(user.getNickname())
                 .img(user.getImg())
-                .role(user.getRole())
                 .followers(user.getFollowers())
                 .followings(user.getFollowings())
+                .content(user.getContent()) // ✅
+                .name(user.getName())       // ✅
+                .rate(user.getRate())       // ✅
+                .boardCount(boardCount)     // ✅
                 .build();
     }
 }

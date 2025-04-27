@@ -1,20 +1,15 @@
 
 package com.glim.user.controller;
 
-import com.amazonaws.services.s3.model.CSVOutput;
-import com.glim.common.exception.CustomException;
-import com.glim.common.exception.ErrorCode;
+import com.glim.borad.service.BoardService;
 import com.glim.common.jwt.provider.JwtTokenProvider;
 import com.glim.common.jwt.refresh.domain.RefreshToken;
-import com.glim.common.jwt.refresh.dto.RefreshTokenRequest;
 import com.glim.common.jwt.refresh.service.RefreshTokenService;
 import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.common.security.oauth.OAuthAttributes;
 import com.glim.common.security.service.CustomUserService;
 import com.glim.common.security.util.SecurityUtil;
 import com.glim.user.domain.User;
-import com.glim.user.dto.request.FindPasswordRequest;
-import com.glim.user.dto.request.ResetPasswordRequest;
 import com.glim.user.dto.request.*;
 import com.glim.user.dto.response.LoginResponse;
 import com.glim.user.dto.response.UserResponse;
@@ -35,6 +30,7 @@ public class AuthRestController {
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
+    private final BoardService boardService;
 
 
     // 로그인한 user 가져오는 api
@@ -42,15 +38,17 @@ public class AuthRestController {
     public ResponseEntity<UserResponse> getCurrentUser() {
         Long userId = SecurityUtil.getCurrentUserId();
         User user = userService.getUserById(userId);
-        return ResponseEntity.ok(UserResponse.from(user));
+        int boardCount = boardService.countBoardsByUserId(userId); // 🛠 게시글 수 가져오기
+        return ResponseEntity.ok(UserResponse.from(user, boardCount));
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
-        return ResponseEntity.ok(UserResponse.from(user));
+        int boardCount = boardService.countBoardsByUserId(id); // 🛠 게시글 수 가져오기
+        return ResponseEntity.ok(UserResponse.from(user, boardCount));
     }
+
 
 
     // ✅ 로그인: 사용자 인증 후 accessToken + refreshToken + user 응답
@@ -60,9 +58,9 @@ public class AuthRestController {
         String accessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
         boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
-
+        int boardCount = boardService.countBoardsByUserId(user.getId());
         return ResponseEntity.ok(
-                new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user), isFirstLogin)
+                new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user, boardCount), isFirstLogin)
         );
     }
 
@@ -74,10 +72,10 @@ public class AuthRestController {
         User user = customUserService.saveOrUpdate(oauthAttributes, provider);
         String accessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
-
+        int boardCount = boardService.countBoardsByUserId(user.getId());
         boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
         return ResponseEntity.ok(
-                new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user), isFirstLogin)
+                new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user, boardCount), isFirstLogin)
         );
     }
 
@@ -143,7 +141,14 @@ public class AuthRestController {
     @GetMapping("/accounts")
     public ResponseEntity<List<UserResponse>> getAccountsByPhone(@AuthenticationPrincipal SecurityUserDto user) {
         List<User> users = userService.findByPhone(user.getPhone());
-        List<UserResponse> result = users.stream().map(UserResponse::from).toList();
+
+        List<UserResponse> result = users.stream()
+                .map(u -> {
+                    int boardCount = boardService.countBoardsByUserId(u.getId()); // ✅ 유저별 게시글 수 조회
+                    return UserResponse.from(u, boardCount); // ✅ user + boardCount 넘김
+                })
+                .toList();
+
         return ResponseEntity.ok(result);
     }
 
@@ -152,14 +157,65 @@ public class AuthRestController {
     public ResponseEntity<LoginResponse> switchAccount(@RequestBody SwitchAccountRequest request) {
         Long switchToUserId = request.getSwitchToUserId();
         User user = userService.getUserById(switchToUserId);
+
         String accessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
-        return ResponseEntity.ok(new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user), false));
+
+        int boardCount = boardService.countBoardsByUserId(user.getId()); // ✅ 게시글 수 조회
+
+        return ResponseEntity.ok(
+                new LoginResponse(
+                        accessToken,
+                        refreshToken.getToken(),
+                        UserResponse.from(user, boardCount), // ✅ 수정
+                        false
+                )
+        );
     }
 
 
+    // 조회한 마지막 알람 ID 수정
+    @PatchMapping("/update-read-alarm/{id}")
+    public ResponseEntity<String> updateReadAlarmId(@PathVariable Long id, @RequestBody UpdateReadAlarmRequest request) {
+        userService.updateReadAlarmId(id, request.getReadAlarmId());
+        return ResponseEntity.ok("readAlarmId 수정 완료");
+    }
 
+    // 조회한 마지막 게시글 ID 수정
+    @PatchMapping("/update-read-board/{id}")
+    public ResponseEntity<String> updateReadBoardId(@PathVariable Long id, @RequestBody UpdateReadBoardRequest request) {
+        userService.updateReadBoardId(id, request.getReadBoardId());
+        return ResponseEntity.ok("readBoardId 수정 완료");
+    }
 
-
+    // 마지막 게시글 ID 가져오기
+    @GetMapping("/read-board/{id}")
+    public ResponseEntity<Long> getReadBoardId(@PathVariable Long id) {
+        Long readBoardId = userService.getReadBoardId(id);
+        return ResponseEntity.ok(readBoardId);
+    }
+    // 마지막 알람 ID 가져오기
+    @GetMapping("/read-alarm/{id}")
+    public ResponseEntity<Long> getReadAlarmId(@PathVariable Long id) {
+        Long readAlarmId = userService.getReadAlarmId(id);
+        return ResponseEntity.ok(readAlarmId);
+    }
+    @PatchMapping("/update-content/{id}")
+    public ResponseEntity<String> updateContent(@PathVariable Long id, @RequestBody UpdateContentRequest request) {
+        userService.updateContent(id, request.getContent());
+        return ResponseEntity.ok("content 수정 완료");
+    }
+    @PatchMapping("/update-img/{id}")
+    public ResponseEntity<String> updateImg(@PathVariable Long id, @RequestBody UpdateImageRequest request) {
+        userService.updateImg(id, request.getImg());
+        return ResponseEntity.ok("img 수정 완료");
+    }
+    //  유저 rate 수정
+    @PatchMapping("/rate")
+    public ResponseEntity<String> updateRate(@RequestBody UpdateRateRequest request) {
+        Long userId = SecurityUtil.getCurrentUserId();
+        userService.updateRate(userId, request.getRate());
+        return ResponseEntity.ok("rate 수정 완료");
+    }
 
 }

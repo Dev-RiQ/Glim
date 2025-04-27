@@ -1,6 +1,5 @@
 package com.glim.user.dto.request;
 
-import com.glim.user.domain.Sex;
 import lombok.*;
 
 @NoArgsConstructor
@@ -13,5 +12,4 @@ public class UpdateUserRequest {
     private String img;
     private String phone;
     private String content;
-    private Sex sex;
 }

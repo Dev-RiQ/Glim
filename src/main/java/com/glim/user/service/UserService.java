@@ -1,10 +1,13 @@
 package com.glim.user.service;
 
+import com.glim.borad.service.BoardService;
+import com.glim.chating.service.ChatUserService;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
-import com.glim.common.security.dto.SecurityUserDto;
+import com.glim.notification.service.NotificationService;
+import com.glim.stories.service.StoryService;
 import com.glim.user.domain.User;
 import com.glim.user.dto.request.AddUserRequest;
 import com.glim.user.dto.request.ChangePasswordRequest;
@@ -14,6 +17,7 @@ import com.glim.user.dto.response.UserResponse;
 import com.glim.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,13 +26,37 @@ import java.util.List;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AwsS3Util awsS3Util;
+    private final BoardService boardService;
+    private final FollowService followService;
+    private final NotificationService notificationService;
+    private final StoryService storyService;
+    private final ChatUserService chatUserService;
+
+    public UserService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            AwsS3Util awsS3Util,
+            BoardService boardService,
+            @Lazy FollowService followService,
+            @Lazy NotificationService notificationService,
+            StoryService storyService,
+            ChatUserService chatUserService
+    ) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.awsS3Util = awsS3Util;
+        this.boardService = boardService;
+        this.followService = followService;
+        this.notificationService = notificationService;
+        this.storyService = storyService;
+        this.chatUserService = chatUserService;
+    }
 
     public User login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
@@ -97,18 +125,27 @@ public class UserService {
             user.setContent(request.getContent());
         }
 
-        // ✅ 성별 수정
-        if (request.getSex() != null) {
-            user.setSex(request.getSex());
-        }
     }
 
     @Transactional
-    public void deleteUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    public void deleteUser(Long id) {
+        // 1. Board 삭제
+        boardService.deleteBoardsByUser(id);
 
-        userRepository.delete(user); // ✅ 완전 삭제!
+        // 2. Follow 삭제
+        followService.deleteFollowByUser(id);
+
+        // 3. Notification 삭제
+        notificationService.deleteNotificationsByUser(id);
+
+        // 4. Story 삭제
+        storyService.deleteStoriesByUser(id);
+
+        // 5. ChatUser 삭제
+        chatUserService.deleteChatUsersByUser(id);
+
+        // 6. 마지막으로 User 삭제
+        userRepository.deleteById(id);
     }
 
     // 비밀번호 수정 메서드 - 민감한 정보니 프로필 수정과 분리
@@ -132,10 +169,15 @@ public class UserService {
 
     public List<UserResponse> searchUsersByNickname(String keyword) {
         List<User> users = userRepository.findTop20ByNicknameContainingIgnoreCase(keyword);
+
         return users.stream()
-                .map(UserResponse::from)
+                .map(user -> {
+                    int boardCount = boardService.countBoardsByUserId(user.getId()); // ✅ user별 게시글 수 조회
+                    return UserResponse.from(user, boardCount); // ✅ user + boardCount 같이 넘김
+                })
                 .toList();
     }
+
     public List<User> findByPhone(String phone) {
         return userRepository.findAllByPhone(phone);
     }
@@ -146,6 +188,54 @@ public class UserService {
         user.updatePassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
+
+    public String findUsernameByPhone(String phone) {
+        return userRepository.findByPhone(phone)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND))
+                .getUsername();
+    }
+
+    public void updateReadAlarmId(Long id, Long readAlarmId) {
+        User user = getUserById(id);   // 기존 메서드 사용해서 유저 찾고
+        user.updateReadAlarmId(readAlarmId); // 새 필드 업데이트
+        userRepository.save(user);    // 저장
+    }
+
+    public void updateReadBoardId(Long id, Long readBoardId) {
+        User user = getUserById(id);
+        user.updateReadBoardId(readBoardId);
+        userRepository.save(user);
+    }
+
+    public Long getReadBoardId(Long id) {
+        User user = getUserById(id);
+        return user.getReadBoardId();
+    }
+
+    public Long getReadAlarmId(Long id) {
+        User user = getUserById(id);
+        return user.getReadAlarmId();
+    }
+    public void updateContent(Long id, String content) {
+        User user = getUserById(id);
+        user.updateContent(content);
+        userRepository.save(user);
+    }
+    public void updateImg(Long id, String img) {
+        User user = getUserById(id);
+        user.updateImg(img);
+        userRepository.save(user);
+    }
+    public void updateRate(Long userId, Integer rate) {
+        User user = getUserById(userId);
+        user.updateRate(rate);
+    }
+
+
+
+
+
+
 
 
 }

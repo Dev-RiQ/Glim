@@ -4,4 +4,6 @@ import com.glim.stories.domain.Stories;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StoryRepository extends JpaRepository<Stories, Long> {
+    void deleteByUserId(Long userId);
+
 }

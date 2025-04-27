@@ -2,11 +2,9 @@ package com.glim.user.dto.request;
 
 import com.glim.user.domain.PlatForm;
 import com.glim.user.domain.Role;
-import com.glim.user.domain.Sex;
 import com.glim.user.domain.User;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -20,8 +18,6 @@ public class AddUserRequest {
     private String password;
     private String name;
     private String nickname;
-    private Sex sex;
-    private LocalDate birth;
     private String img;
     private String phone;
 
@@ -32,8 +28,6 @@ public class AddUserRequest {
                 .password(password) // 비밀번호 인코딩은 서비스에서!
                 .name(name)
                 .nickname(nickname != null ? nickname : name)
-                .sex(sex)
-                .birth(birth != null ? birth : LocalDate.of(0000, 00, 00))
                 .img(img != null ? img : "")
                 .phone(phone != null ? phone : "")
                 .created_at(LocalDateTime.now())
@@ -43,6 +37,7 @@ public class AddUserRequest {
                 .tags("")
                 .rate(0)
                 .readBoardId(0L)
+                .readAlarmId(0L)
                 .platForm(PlatForm.LOCAL)
                 .build();
     }

@@ -35,7 +35,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         // accessToken 생성
         String accessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
-        System.out.println("Dddddddddd");
+
         // accessToken + refreshToken + user 응답 내려주기
         authUserUtil.writeLoginResponse(response, user, accessToken);
         response.sendRedirect("http://localhost:3000/login/" + accessToken);

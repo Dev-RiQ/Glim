@@ -43,4 +43,12 @@ public class StoryService {
         return stories;
     }
 
+    @Transactional
+    public void deleteStoriesByUser(Long userId) {
+        storyRepository.deleteByUserId(userId);
+    }
+
+
+
+
 }

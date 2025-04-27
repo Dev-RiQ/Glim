@@ -1,5 +1,6 @@
 package com.glim.user.controller;
 
+import com.glim.borad.service.BoardService;
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import com.glim.common.jwt.provider.JwtTokenProvider;
@@ -21,6 +22,7 @@ public class RefreshTokenController {
     private final RefreshTokenService refreshTokenService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final BoardService boardService;
 
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponse> refresh(@RequestBody String refreshTokenValue) {
@@ -38,9 +40,12 @@ public class RefreshTokenController {
 
         boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
 
+        int boardCount = boardService.countBoardsByUserId(user.getId()); // ✅ 게시글 수 조회
+
         return ResponseEntity.ok(
-                new LoginResponse(newAccessToken, refreshToken.getToken(), UserResponse.from(user), isFirstLogin)
+                new LoginResponse(newAccessToken, refreshToken.getToken(), UserResponse.from(user, boardCount), isFirstLogin)
         );
     }
 
 }
+

@@ -42,4 +42,5 @@ public class BgmService {
                 bgmRepository.findFirst10FromOffset(id, offset);
         return bgmsList.stream().map(ViewBgmResponse::new).collect(Collectors.toList());
     }
+
 }

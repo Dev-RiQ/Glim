@@ -64,4 +64,10 @@ public class ChatUserService {
         chatUser.escape();
         chatUserRepository.save(chatUser);
     }
+
+    @Transactional
+    public void deleteChatUsersByUser(Long userId) {
+        chatUserRepository.deleteByUserId(userId);
+    }
+
 }

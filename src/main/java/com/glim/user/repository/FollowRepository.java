@@ -27,5 +27,8 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
             Pageable pageable
     );
 
+    void deleteByFollowerUserIdOrFollowingUserId(Long followerUserId, Long followingUserId);
+
+
 
 }

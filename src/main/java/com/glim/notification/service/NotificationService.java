@@ -52,6 +52,8 @@ public class NotificationService {
     private SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
     private Long viewId = 0L;
 
+
+
     public SseEmitter getEmitter(final HttpServletResponse response) {
         List<NotificationResponse> notifications = getNewNotification();
         if(!notifications.isEmpty()) {
@@ -122,4 +124,11 @@ public class NotificationService {
     public void delete(long id) {
         notificationRepository.deleteById(id);
     }
+
+    @Transactional
+    public void deleteNotificationsByUser(Long userId) {
+        notificationRepository.deleteByUserIdOrSendUserId(userId, userId);
+    }
+
+
 }

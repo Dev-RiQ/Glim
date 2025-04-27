@@ -9,7 +9,6 @@ import com.glim.user.repository.UserRepository;
 import com.glim.user.service.UserService;
 import com.glim.verification.domain.AuthCodeDocument;
 import com.glim.verification.repository.AuthCodeRepository;
-import com.glim.verification.service.SmsVerificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

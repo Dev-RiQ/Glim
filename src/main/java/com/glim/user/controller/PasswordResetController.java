@@ -4,6 +4,7 @@ import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import com.glim.user.domain.ResetToken;
 import com.glim.user.dto.request.FindPasswordRequest;
+import com.glim.user.dto.request.FindUsernameRequest;
 import com.glim.user.dto.request.ResetPasswordRequest;
 import com.glim.user.dto.response.ResetTokenResponse;
 import com.glim.user.service.ResetTokenService;
@@ -23,6 +24,33 @@ public class PasswordResetController {
     private final ResetTokenService resetTokenService;
     private final UserService userService;
     private final VerificationService verificationService;
+
+    // ✅ 아이디 찾기 - 본인인증 후 아이디 공개 ( 마스킹 )
+    @PostMapping("/find-username")
+    public ResponseEntity<String> findUsername(@RequestBody FindUsernameRequest request) {
+        verificationService.verifyCode(request.getPhone(), request.getCode());
+
+        String username = userService.findUsernameByPhone(request.getPhone());
+
+        String maskedUsername = maskUsername(username);
+
+        return ResponseEntity.ok(maskedUsername);
+    }
+
+    // 마스킹 ex) knk0611 -> k*k06*1
+    private String maskUsername(String username) {
+        if (username.length() <= 2) return "*";
+
+        StringBuilder masked = new StringBuilder();
+        for (int i = 0; i < username.length(); i++) {
+            if (i == 0 || i == username.length() - 1) {
+                masked.append(username.charAt(i));
+            } else {
+                masked.append("*");
+            }
+        }
+        return masked.toString();
+    }
 
     // ✅ 비밀번호 찾기 - 본인인증 후 resetToken 발급
     private boolean isTokenExpired(LocalDateTime createdAt) {
@@ -60,5 +88,7 @@ public class PasswordResetController {
 
         return ResponseEntity.ok("비밀번호 재설정 완료");
     }
+
+
 
 }
