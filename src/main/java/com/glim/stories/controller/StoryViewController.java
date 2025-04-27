@@ -24,7 +24,7 @@ public class StoryViewController {
     @PostMapping({"","/"})
     public StatusResponseDTO add(@RequestBody AddStoryViewRequest request) {
         storyViewService.insert(request);
-        Stories stories = storyService.updateView(request.getStoryId(), 1);
-        return StatusResponseDTO.ok();
+        storyService.updateView(request.getStoryId(), 1);
+        return StatusResponseDTO.ok("스토리 조회수 추가");
     }
 }

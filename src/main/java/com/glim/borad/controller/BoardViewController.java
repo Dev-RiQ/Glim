@@ -27,6 +27,6 @@ public class BoardViewController {
     public StatusResponseDTO add(@RequestBody AddBoardViewRequest request) {
         boardViewService.insert(request);
         Boards board = boardService.updateView(request.getBoardId(), 1);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("게시물 조회수 추가 완료");
     }
 }

@@ -18,12 +18,12 @@ public class StoryController {
     @PostMapping({"", "/"})
     public StatusResponseDTO add(@RequestBody AddStoryRequest request) {
         storyService.insert(request);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("스토리 추가 완료");
     }
 
     @DeleteMapping("/{id}")
     public StatusResponseDTO delete(@PathVariable Long id) {
         storyService.delete(id);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("스토리 삭제 완료");
     }
 }

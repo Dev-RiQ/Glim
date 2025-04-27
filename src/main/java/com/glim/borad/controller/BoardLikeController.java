@@ -7,8 +7,6 @@ import com.glim.borad.service.BoardLikeService;
 import com.glim.common.statusResponse.StatusResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -24,14 +22,14 @@ public class BoardLikeController {
     public StatusResponseDTO add(@RequestBody AddBoardLikeRequest request) {
         boardLikeService.insert(request);
         Boards board = boardService.updateLike(request.getBoardId(), 1);
-        return StatusResponseDTO.ok(board);
+        return StatusResponseDTO.ok("좋아요 완료");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@RequestBody AddBoardLikeRequest request, @PathVariable Long id) {
+    public StatusResponseDTO delete(@RequestBody AddBoardLikeRequest request, @PathVariable Long id) {
         boardLikeService.delete(id);
         boardService.updateLike(request.getBoardId(), -1);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return StatusResponseDTO.ok("좋아요 취소 완료");
     }
 
 }

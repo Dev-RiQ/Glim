@@ -27,12 +27,12 @@ public class BgmController {
     @PostMapping({"","/"})
     public StatusResponseDTO add(@RequestBody AddBgmRequest request) {
         bgmService.insert(request);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("Bgm 추가 완료");
     }
 
     @DeleteMapping("/{id}")
     public StatusResponseDTO delete(@PathVariable Long id) {
         bgmService.delete(id);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("Bgm 삭제 완료");
     }
 }

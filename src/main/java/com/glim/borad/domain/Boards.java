@@ -54,7 +54,7 @@ public class Boards {
     private Option commentable;
 
     @Builder
-    public Boards(Long userId, String location, String content, String tagUserIds, Integer bgmId, Boolean boardType, Boolean viewLikes, Boolean viewShares, Boolean commentable){
+    public Boards(Long userId, String location, String content, String tagUserIds, Integer bgmId, String boardType, Boolean viewLikes, Boolean viewShares, Boolean commentable) {
         this.userId = userId;
         this.location = location;
         this.content = content;
@@ -66,7 +66,17 @@ public class Boards {
         this.shares = 0;
         this.views = 0;
         this.bgmId = bgmId;
-        this.boardType = boardType ? BoardType.BASIC : BoardType.SHORTS;
+        switch (boardType) {
+            case "basic":
+                this.boardType = BoardType.BASIC;
+                break;
+            case "shorts":
+                this.boardType = BoardType.SHORTS;
+                break;
+            case "advertisement":
+                this.boardType = BoardType.ADVERTISEMENT;
+                break;
+        }
         this.viewLikes = viewLikes ? Option.TRUE : Option.FALSE;
         this.viewShares = viewShares ? Option.TRUE : Option.FALSE;
         this.commentable = commentable ? Option.TRUE : Option.FALSE;

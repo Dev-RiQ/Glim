@@ -20,12 +20,12 @@ public class BoardSaveController {
     @PostMapping({"","/"})
     public StatusResponseDTO add(@RequestBody AddBoardSaveRequest request) {
         boardSaveService.insert(request);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("게시물 저장 완료");
     }
 
     @DeleteMapping("/{id}")
     public StatusResponseDTO delete(@PathVariable Long id) {
         boardSaveService.delete(id);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("게시물 저장 취소 완료");
     }
 }

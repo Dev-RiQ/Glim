@@ -1,7 +1,5 @@
 package com.glim.stories.service;
 
-import com.glim.borad.dto.request.AddBoardShareRequest;
-import com.glim.borad.repository.BoardShareRepository;
 import com.glim.stories.dto.request.AddStoryShareRequest;
 import com.glim.stories.repository.StoryShareRepository;
 import lombok.RequiredArgsConstructor;
