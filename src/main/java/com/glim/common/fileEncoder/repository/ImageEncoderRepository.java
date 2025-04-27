@@ -27,7 +27,7 @@ public class ImageEncoderRepository {
     public List<File> userImageEncoding(List<MultipartFile> multipartFiles) throws Exception {
         List<File> files = new ArrayList<>();
         for (MultipartFile multipartFile : multipartFiles) {
-            String saveFileName = FileType.IMAGE.getType() + "/" + awsS3Util.changedFileName(multipartFile.getOriginalFilename());
+            String saveFileName = FileType.USER_IMAGE.getType() + "/" + awsS3Util.changedFileName(multipartFile.getOriginalFilename());
             BufferedImage bi = ImageIO.read(multipartFile.getInputStream());
             int size = 128;
             bi = resizeImage(bi,size,size);
@@ -42,9 +42,9 @@ public class ImageEncoderRepository {
         List<File> files = new ArrayList<>();
         for (MultipartFile multipartFile : multipartFiles) {
             String saveFileName = FileType.IMAGE.getType() + "/" + awsS3Util.changedFileName(multipartFile.getOriginalFilename());
-            for(int i = 0 ; i < 4 ; i++){
+            for(int i = 0 ; i < 2 ; i++){
                 BufferedImage bi = ImageIO.read(multipartFile.getInputStream());
-                int size = (int) (128 * Math.pow(2, i));
+                int size = (int) (128 * Math.pow(4, i));
                 bi = resizeImage(bi,size,size);
                 File file = setNewFile(saveFileName, size);
                 ImageIO.write(bi,"jpg", file);
