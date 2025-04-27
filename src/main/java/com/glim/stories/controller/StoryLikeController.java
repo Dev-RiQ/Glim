@@ -1,14 +1,11 @@
 package com.glim.stories.controller;
 
 import com.glim.common.statusResponse.StatusResponseDTO;
-import com.glim.stories.domain.Stories;
 import com.glim.stories.dto.request.AddStoryLikeRequest;
 import com.glim.stories.service.StoryLikeService;
 import com.glim.stories.service.StoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -23,14 +20,14 @@ public class StoryLikeController {
     @PostMapping({"","/"})
     public StatusResponseDTO add(@RequestBody AddStoryLikeRequest request) {
         storyLikeService.insert(request);
-        Stories stories = storyService.updateLike(request.getStoryId(), 1);
-        return StatusResponseDTO.ok(stories);
+        storyService.updateLike(request.getStoryId(), 1);
+        return StatusResponseDTO.ok("스토리 좋아요");
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@RequestBody AddStoryLikeRequest request, @PathVariable Long id) {
+    @DeleteMapping("/{storyId}/{id}")
+    public StatusResponseDTO delete(@PathVariable Long storyId, @PathVariable Long id) {
         storyLikeService.delete(id);
-        storyService.updateLike(request.getStoryId(), -1);
-        return ResponseEntity.ok(HttpStatus.OK);
+        storyService.updateLike(storyId, -1);
+        return StatusResponseDTO.ok("스토리 좋아요 취소");
     }
 }

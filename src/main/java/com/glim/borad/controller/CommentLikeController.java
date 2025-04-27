@@ -23,14 +23,14 @@ public class CommentLikeController {
     @PostMapping({"","/"})
     public StatusResponseDTO add(@RequestBody AddCommentLikeRequest request) {
         commentLikeService.insert(request);
-        BoardComments comments = commentService.updateLike(request.getCommentId(), 1);
-        return StatusResponseDTO.ok(comments);
+        commentService.updateLike(request.getCommentId(), 1);
+        return StatusResponseDTO.ok("댓글 좋아요 완료");
     }
 
     @DeleteMapping("/{id}")
     public StatusResponseDTO delete(@PathVariable Long id, @RequestBody AddCommentLikeRequest request) {
         commentLikeService.delete(id);
-        BoardComments comments = commentService.updateLike(request.getCommentId(), -1);
-        return StatusResponseDTO.ok(comments);
+        commentService.updateLike(request.getCommentId(), -1);
+        return StatusResponseDTO.ok("댓글 좋아요 취소 완료");
     }
 }

@@ -1,6 +1,5 @@
 package com.glim.borad.controller;
 
-import com.glim.borad.domain.Boards;
 import com.glim.borad.dto.request.AddCommentsRequest;
 import com.glim.borad.dto.request.UpdateCommentsRequest;
 import com.glim.borad.dto.response.ViewCommentsResponse;
@@ -38,19 +37,19 @@ public class CommentsController {
     public StatusResponseDTO add(@RequestBody AddCommentsRequest request) {
         commentService.insert(request);
         boardService.updateComment(request.getBoardId(), 1);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("댓글 추가 완료");
     }
 
     @PutMapping("/{id}")
     public StatusResponseDTO update(@PathVariable Long id, @RequestBody UpdateCommentsRequest request) {
         commentService.update(id, request);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("댓글 수정 완료");
     }
 
-    @DeleteMapping("/{id}")
-    public StatusResponseDTO delete(@RequestBody AddCommentsRequest request, @PathVariable Long id) {
+    @DeleteMapping("/{boardId}/{id}")
+    public StatusResponseDTO delete(@PathVariable Long boardId, @PathVariable Long id) {
         commentService.delete(id);
-        Boards board = boardService.updateComment(request.getBoardId(), -1);
-        return StatusResponseDTO.ok(board);
+        boardService.updateComment(boardId, -1);
+        return StatusResponseDTO.ok("댓글 삭제 완료");
     }
 }

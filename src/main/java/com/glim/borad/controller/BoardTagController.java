@@ -7,8 +7,6 @@ import com.glim.borad.service.BoardTagService;
 import com.glim.common.statusResponse.StatusResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -22,19 +20,19 @@ public class BoardTagController {
     @PostMapping({"","/"})
     public StatusResponseDTO add(@RequestBody AddBoardTagRequest request) {
         boardTagService.insert(request);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("테그 완료");
     }
 
     @PutMapping("/{id}")
     public StatusResponseDTO update(@PathVariable Long id, @RequestBody UpdateBoardTagRequest request) {
-        BoardTags tag = boardTagService.update(id, request);
-        return StatusResponseDTO.ok(tag);
+        boardTagService.update(id, request);
+        return StatusResponseDTO.ok("테그 수정 완료");
     }
 
     @DeleteMapping("/{id}")
     public StatusResponseDTO delete(@PathVariable Long id) {
         boardTagService.delete(id);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("테그 삭제 완료");
     }
 
 }

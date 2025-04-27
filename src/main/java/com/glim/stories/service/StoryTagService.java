@@ -1,11 +1,5 @@
 package com.glim.stories.service;
 
-import com.glim.borad.domain.BoardTags;
-import com.glim.borad.dto.request.AddBoardTagRequest;
-import com.glim.borad.dto.request.UpdateBoardTagRequest;
-import com.glim.borad.repository.BoardTagRepository;
-import com.glim.common.exception.ErrorCode;
-import com.glim.stories.domain.StoryTag;
 import com.glim.stories.dto.request.AddStoryTagRequest;
 import com.glim.stories.repository.StoryTagRepository;
 import lombok.RequiredArgsConstructor;

@@ -22,18 +22,18 @@ public class BoardFileController {
     @PostMapping({"","/"})
     public StatusResponseDTO add(@RequestBody AddBoardFileRequest request) {
         boardFileSevice.insert(request);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("파일 저장 완료");
     }
 
     @PutMapping("/{id}")
     public StatusResponseDTO update(@PathVariable Long id, @RequestBody UpdateBoardFileRequest request) {
         boardFileSevice.update(id, request);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("파일 수정 완료");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable Long id) {
+    public StatusResponseDTO delete(@PathVariable Long id) {
         boardFileSevice.delete(id);
-        return ResponseEntity.ok(HttpStatus.OK);
+        return StatusResponseDTO.ok("파일 삭제 완료");
     }
 }

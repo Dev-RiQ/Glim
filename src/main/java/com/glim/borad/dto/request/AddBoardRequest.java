@@ -18,7 +18,7 @@ public class AddBoardRequest {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Integer bgmId;
-    private Boolean boardType;
+    private String boardType;
     private Boolean viewLikes;
     private Boolean viewShares;
     private Boolean commentable;

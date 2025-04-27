@@ -21,13 +21,13 @@ public class BoardShareController {
     public StatusResponseDTO add(@RequestBody AddBoardShareRequest request) {
         boardShareService.insert(request);
         boardService.updateShare(request.getBoardId(), 1);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("게시물 공유 완료");
     }
 
-    @DeleteMapping("/{id}")
-    public StatusResponseDTO delete(@RequestBody AddBoardShareRequest request, @PathVariable Long id) {
-        boardShareService.delete(id);
-        boardService.updateShare(request.getBoardId(), -1);
-        return StatusResponseDTO.ok();
-    }
+//    @DeleteMapping("/{id}")
+//    public StatusResponseDTO delete(@RequestBody AddBoardShareRequest request, @PathVariable Long id) {
+//        boardShareService.delete(id);
+//        boardService.updateShare(request.getBoardId(), -1);
+//        return StatusResponseDTO.ok("게시물 공유 취소");
+//    }
 }

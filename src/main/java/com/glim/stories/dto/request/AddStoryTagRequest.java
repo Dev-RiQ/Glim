@@ -1,7 +1,6 @@
 package com.glim.stories.dto.request;
 
 import com.glim.stories.domain.StoryTag;
-import jakarta.persistence.Column;
 import lombok.*;
 
 @NoArgsConstructor
