@@ -57,3 +57,6 @@
 
 ## 🔗 REST API Docs
 [Glim API](https://greenyeonmi.notion.site/Glim-API-1e0e74df681080ce8c96c67df0d17b80?pvs=4)
+
+## 🔗 Glim React 
+[Glim React](https://github.com/Dev-RiQ/Glim_React)
