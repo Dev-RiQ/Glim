@@ -46,6 +46,7 @@ public class BoardService {
         }
 
     }
+
     @Transactional
     public Boards update(Long id, UpdateBoardRequest request) {
         Boards boards = boardRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);

@@ -3,14 +3,20 @@ package com.glim.stories.service;
 import com.glim.common.exception.ErrorCode;
 import com.glim.stories.domain.Stories;
 import com.glim.stories.dto.request.AddStoryRequest;
+import com.glim.stories.dto.response.ViewStoryResponse;
+import com.glim.stories.repository.StoryLikeRepository;
 import com.glim.stories.repository.StoryRepository;
+import com.glim.stories.repository.StoryTagRepository;
+import com.glim.stories.repository.StoryViewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -19,6 +25,8 @@ import java.util.Optional;
 public class StoryService {
 
     private final StoryRepository storyRepository;
+    private final StoryLikeRepository storyLikeRepository;
+    private final StoryViewRepository storyViewRepository;
 
     @Transactional
     public void insert(AddStoryRequest request) {
@@ -59,12 +67,26 @@ public class StoryService {
     }
 
 
-    public Stories getStory(Long id) {
-        return storyRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
+    public Stories getStory(Long storyId) {
+        return storyRepository.findByStoryId(storyId);
     }
 
-    public Optional<Stories> getStoryList(Long id) {
-        Optional<Stories> list = storyRepository.findByUserId(id);
-        return list;
+    public List<ViewStoryResponse> getStoryList(Long id) {
+        List<Stories> list = storyRepository.findByUserId(id);
+        List<ViewStoryResponse> responses = list.stream().map(ViewStoryResponse::new).collect(Collectors.toList());
+        responses.forEach(viewStoryResponse -> {
+            boolean isLike = storyLikeRepository.existsByStoryIdAndUserId(viewStoryResponse.getStoryId(), viewStoryResponse.getUserId());
+            boolean isView = storyViewRepository.existsByStoryIdAndUserId(viewStoryResponse.getStoryId(), viewStoryResponse.getUserId());
+            viewStoryResponse.setLike(isLike);
+            viewStoryResponse.setViewed(isView);
+        });
+        for(int i = 0; i < responses.size(); i++) {
+            if(!isStory(responses.get(i).getUserId())) {
+                responses.remove(i);
+            }
+        }
+        return responses;
     }
 }
+
+
