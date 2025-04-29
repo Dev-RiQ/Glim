@@ -7,13 +7,17 @@ import com.glim.chating.dto.response.ViewChatUserResponse;
 import com.glim.chating.service.ChatMsgService;
 import com.glim.chating.service.ChatRoomService;
 import com.glim.chating.service.ChatUserService;
+import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.common.statusResponse.StatusResponseDTO;
+import com.glim.common.utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.Fetch;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -34,7 +38,10 @@ public class ChatController {
     @GetMapping({"/{roomId}","/{roomId}/{offset}"})
     public StatusResponseDTO getRoomChatMsgList(@PathVariable Long roomId, @PathVariable(required = false) Long offset) {
         List<ViewChatMsgResponse> roomChatMsgList = chatMsgService.findChatMsgListByRoomId(roomId, offset);
-        return StatusResponseDTO.ok(roomChatMsgList);
+        Map<String, Object> map = new HashMap<>();
+        map.put("msgList", roomChatMsgList);
+        map.put("loginId", SecurityUtil.getUser().getId());
+        return StatusResponseDTO.ok(map);
     }
 
     @GetMapping("/users/{roomId}")

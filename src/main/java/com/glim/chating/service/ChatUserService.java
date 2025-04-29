@@ -3,6 +3,7 @@ package com.glim.chating.service;
 import com.glim.chating.domain.ChatMsg;
 import com.glim.chating.domain.ChatRoom;
 import com.glim.chating.domain.ChatUser;
+import com.glim.chating.domain.ChatUserValid;
 import com.glim.chating.dto.request.AddChatMsgRequest;
 import com.glim.chating.dto.request.AddChatRoomRequest;
 import com.glim.chating.dto.request.AddChatUserRequest;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 public class ChatUserService {
 
     private final ChatUserRepository chatUserRepository;
-    private final ChatMsgService chatMsgService;
+    private final ChatUtil chatUtil;
     private final UserRepository userRepository;
 //    private final UserService userService;
 
@@ -53,7 +54,7 @@ public class ChatUserService {
     public void updateChatUserReadMsg(Long roomId) {
         SecurityUserDto user = SecurityUtil.getUser();
         ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(roomId, user.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
-        chatUser.update(chatMsgService.getNextMsgId() - 1);
+        chatUser.update(chatUtil.getNextMsgId() - 1);
         chatUserRepository.save(chatUser);
     }
 
@@ -70,4 +71,12 @@ public class ChatUserService {
         chatUserRepository.deleteByUserId(userId);
     }
 
+    @Transactional
+    public void checkUserValid(Long roomId) {
+        ChatUser chatUser = chatUserRepository.findById(roomId).orElseThrow(ErrorCode::throwDummyNotFound);
+        if(chatUser.getValid() == ChatUserValid.OUT) {
+            chatUser.reInvite();
+            chatUserRepository.save(chatUser);
+        }
+    }
 }

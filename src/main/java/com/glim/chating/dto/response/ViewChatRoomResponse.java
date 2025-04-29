@@ -18,6 +18,7 @@ public class ViewChatRoomResponse {
     private String nickname;
     private String msg;
     private String updatedAt;
+    private boolean hasRead;
 
     public ViewChatRoomResponse(ChatRoom chatRoom, User user) {
         this.roomId = chatRoom.getId();
@@ -27,11 +28,12 @@ public class ViewChatRoomResponse {
         this.updatedAt = DateTimeUtil.getDateTimeAgo(chatRoom.getCreatedAt());
     }
 
-    public ViewChatRoomResponse(ChatRoom chatRoom, ChatMsg chatMsg, User user) {
+    public ViewChatRoomResponse(ChatRoom chatRoom, ChatMsg chatMsg, User user, boolean hasRead) {
         this.roomId = chatRoom.getId();
         this.img = user.getImg();
         this.nickname = user.getNickname();
         this.msg = chatMsg.getContent();
         this.updatedAt = DateTimeUtil.getDateTimeAgo(chatRoom.getCreatedAt());
+        this.hasRead = hasRead;
     }
 }

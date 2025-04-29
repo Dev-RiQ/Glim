@@ -16,9 +16,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     // 엔드포인트를 등록하는 메서드
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/chat") // 엔드포인트 설정
-                .setAllowedOriginPatterns("*"); // 모든 Origin 허용 -> 배포시에는 보안을 위해 Origin을 정확히 지정
-//                .withSockJS(); // SockJS 사용가능 설정
+        registry.addEndpoint("/chat-socket") // 엔드포인트 설정
+                .setAllowedOriginPatterns("*") // 모든 Origin 허용 -> 배포시에는 보안을 위해 Origin을 정확히 지정
+                .withSockJS(); // SockJS 사용가능 설정
     }
 
     // 메시지 브로커를 구성하는 메서드

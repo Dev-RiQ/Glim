@@ -22,6 +22,8 @@ public class ChatUser {
     private Long userId;
     @Column(name = "read_msg_id")
     private Long readMsgId;
+    @Column(name = "out_msg_id")
+    private Long outMsgId;
     @Enumerated(EnumType.STRING)
     private ChatUserValid valid;
 
@@ -39,5 +41,10 @@ public class ChatUser {
 
     public void escape() {
         this.valid = ChatUserValid.OUT;
+        this.outMsgId = this.readMsgId;
+    }
+
+    public void reInvite(){
+        this.valid = ChatUserValid.IN;
     }
 }

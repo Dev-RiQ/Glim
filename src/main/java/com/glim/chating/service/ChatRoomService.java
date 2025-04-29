@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,9 +63,12 @@ public class ChatRoomService {
             }
             ChatRoom chatRoom = chatRoomRepository.findById(chatUser.getRoomId()).orElseThrow(ErrorCode::throwDummyNotFound);
             ChatMsg chatMsg = chatMsgRepository.findById(chatUser.getRoomId()).orElseThrow(ErrorCode::throwDummyNotFound);
-            chatRoomList.add(new ViewChatRoomResponse(chatRoom, chatMsg, user));
+            Long readId = chatUserRepository.findByRoomIdAndUserId(chatUser.getRoomId(), chatUser.getId()).orElseThrow(ErrorCode::throwDummyNotFound).getReadMsgId();
+            Long lastId = chatMsgRepository.findTop1ByRoomIdOrderByMsgIdDesc(chatUser.getRoomId()).orElseThrow(ErrorCode::throwDummyNotFound).getMsgId();
+            boolean hasRead = readId.equals(lastId);
+            chatRoomList.add(new ViewChatRoomResponse(chatRoom, chatMsg, user, hasRead));
         }
-        return chatRoomList;
+        return chatRoomList.stream().sorted(Comparator.comparing(ViewChatRoomResponse::getUpdatedAt)).toList();
     }
 
     @Transactional
