@@ -16,16 +16,6 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
     @Override
     Optional<Boards> findById(Long aLong);
 
-    List<Boards> findAllByUserIdOrderByIdAsc(Long userId, Limit of);
-
-    List<Boards> findAllByUserIdAndIdLessThanOrderByIdAsc(Long userId, Long offset, Limit of);
-
-    List<Boards> findAllByUserIdAndIdLessThanOrderByIdDesc(Long userId, Long offset, Limit of);
-
-    List<Boards> findAllByUserIdOrderByIdDesc(Long userId, Limit of);
-
-    List<Boards> findAllByUserIdAndIdGreaterThanOrderByIdAsc(Long userId, Long offset, Limit of);
-
     void deleteByUserId(Long userId);
     int countByUserId(Long userId);
 
@@ -56,5 +46,11 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
             @Param("type") String type,
             Pageable pageable
     );
+
+    List<Boards> findByIdIn(List<Long> boardIdList);
+
+    List<Boards> findAllByUserIdOrderByIdDesc(Long userId, Limit of);
+
+    List<Boards> findAllByUserIdAndIdLessThanOrderByIdDesc(Long userId, Long offset, Limit of);
 }
 

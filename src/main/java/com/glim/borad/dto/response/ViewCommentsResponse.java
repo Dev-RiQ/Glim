@@ -4,10 +4,12 @@ import com.glim.borad.domain.BoardComments;
 import com.glim.common.utils.CountUtil;
 import com.glim.common.utils.DateTimeUtil;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
 @ToString
+@Setter
 public class ViewCommentsResponse {
 
     private Long id;
@@ -18,6 +20,8 @@ public class ViewCommentsResponse {
     private String createdAt;
     private String updateAt;
     private Long replyCommentId;
+    private Boolean isReply;
+    private Boolean isLike;
 
 //    private Long userId;
 //    private String content;

@@ -4,8 +4,6 @@ import com.glim.borad.dto.request.UpdateBoardFileRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Setter

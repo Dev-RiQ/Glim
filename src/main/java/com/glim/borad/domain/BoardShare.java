@@ -11,9 +11,6 @@ import lombok.*;
 @ToString()
 public class BoardShare {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "board_share_id", nullable = false)
-    private Long id;
     @Column(name = "board_id", nullable = false)
     private Long boardId;
     @Column(name = "user_id", nullable = false)

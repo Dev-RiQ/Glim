@@ -14,11 +14,11 @@ public class AddBoardFileRequest {
     private String fileName;
     private Boolean fileType;
 
-    public BoardFiles toEntity(AddBoardFileRequest request) {
+    public BoardFiles toEntity(Long boardId, String fileName, String fileType) {
         return BoardFiles.builder()
-                .boardId(request.getBoardId())
-                .fileName(request.getFileName())
-                .fileType(request.getFileType())
+                .boardId(boardId)
+                .fileName(fileName)
+                .fileType(fileType.equals("BASIC"))
                 .build();
     }
 }

@@ -1,13 +1,16 @@
 package com.glim.borad.controller;
 
+import com.glim.borad.domain.Boards;
 import com.glim.borad.dto.request.AddBoardRequest;
 import com.glim.borad.dto.request.UpdateBoardRequest;
 import com.glim.borad.dto.response.ViewBoardResponse;
 import com.glim.borad.service.BoardService;
 import com.glim.common.awsS3.service.AwsS3Util;
+import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.common.statusResponse.StatusResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,17 +24,18 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
-    private final AwsS3Util awsS3Util;
 
     @GetMapping({"/{userId}", "/{userId}/{offset}"})
     public StatusResponseDTO list(@PathVariable Long userId, @PathVariable(required = false) Long offset) {
         List<ViewBoardResponse> board = boardService.list(userId, offset);
-        System.out.println(board.get(9).getId() == null ? "id = " + "null" : "id = " + board.get(9).getId());
+        Boards advertisement = boardService.getRandomAdvertisement();
+        board.add(new ViewBoardResponse(advertisement));
         return StatusResponseDTO.ok(board);
     }
 
-    @PostMapping({"", "/"})
-    public StatusResponseDTO add(@RequestBody AddBoardRequest request) {
+    @PostMapping({"", "/{userId}"})
+    public StatusResponseDTO add(@RequestBody AddBoardRequest request, @AuthenticationPrincipal SecurityUserDto user) {
+        request.setUserId(user.getId());
         boardService.insert(request);
         return StatusResponseDTO.ok("게시물 추가 완료");
     }
@@ -43,7 +47,11 @@ public class BoardController {
     }
 
     @DeleteMapping("/{id}")
-    public StatusResponseDTO delete(@PathVariable Long id) {
+    public StatusResponseDTO delete(@PathVariable Long id, @AuthenticationPrincipal SecurityUserDto user) {
+        boolean isUser = boardService.isLoginUser(id, user.getId());
+        if(!isUser || !user.getNickname().equals("admin")) {
+            return null;
+        }
         boardService.delete(id);
         return StatusResponseDTO.ok("게시물 삭제 완료");
     }

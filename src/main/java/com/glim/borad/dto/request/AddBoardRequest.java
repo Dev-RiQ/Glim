@@ -4,6 +4,7 @@ import com.glim.borad.domain.Boards;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,11 +14,13 @@ import java.time.LocalDateTime;
 public class AddBoardRequest {
     private Long userId;
     private String location;
+    private List<String> img;
     private String content;
-    private String tagUserIds;
+    private List<String> tagUserIds;
+    private List<String> tags;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Integer bgmId;
+    private Long bgmId;
     private String boardType;
     private Boolean viewLikes;
     private Boolean viewShares;
@@ -28,12 +31,13 @@ public class AddBoardRequest {
                 .userId(addBoardRequest.getUserId())
                 .location(addBoardRequest.getLocation())
                 .content(addBoardRequest.getContent())
-                .tagUserIds(addBoardRequest.getTagUserIds())
+                .tagUserIds(addBoardRequest.getTagUserIds().toString())
                 .bgmId(addBoardRequest.getBgmId())
                 .boardType(addBoardRequest.getBoardType())
                 .viewLikes(addBoardRequest.getViewLikes())
                 .viewShares(addBoardRequest.getViewShares())
                 .commentable(addBoardRequest.getCommentable())
                 .build();
+
     }
 }

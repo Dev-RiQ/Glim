@@ -4,6 +4,7 @@ import com.glim.borad.domain.BoardComments;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
+import java.util.Optional;
 
 public interface BoardCommentsRepository extends JpaRepository<BoardComments, Long> {
     List<BoardComments> findAllById(Long id);
@@ -17,4 +18,7 @@ public interface BoardCommentsRepository extends JpaRepository<BoardComments, Lo
     List<BoardComments> findAllByReplyCommentIdOrderByIdAsc(Long commentId, Limit of);
 
     List<BoardComments> findAllByReplyCommentIdAndIdGreaterThanOrderByIdAsc(Long commentId, Long offset, Limit of);
+
+
+    Optional<BoardComments> findByReplyCommentId(Long id);
 }

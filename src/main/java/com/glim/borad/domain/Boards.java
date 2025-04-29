@@ -39,7 +39,7 @@ public class Boards {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
     @Column(name = "bgm_id", nullable = false)
-    private Integer bgmId;
+    private Long bgmId;
     @Column(name = "board_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private BoardType boardType;
@@ -54,7 +54,7 @@ public class Boards {
     private Option commentable;
 
     @Builder
-    public Boards(Long userId, String location, String content, String tagUserIds, Integer bgmId, String boardType, Boolean viewLikes, Boolean viewShares, Boolean commentable) {
+    public Boards(Long userId, String location, String content, String tagUserIds, Long bgmId, String boardType, Boolean viewLikes, Boolean viewShares, Boolean commentable) {
         this.userId = userId;
         this.location = location;
         this.content = content;

@@ -9,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -43,12 +46,25 @@ public class StoryService {
         return stories;
     }
 
+    public Boolean isStory(Long userId) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime yesterday = now.minusHours(24);
+
+        return storyRepository.existsByUserIdAndCreatedAtBetween(userId, yesterday, now);
+    }
+
     @Transactional
     public void deleteStoriesByUser(Long userId) {
         storyRepository.deleteByUserId(userId);
     }
 
 
+    public Stories getStory(Long id) {
+        return storyRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
+    }
 
-
+    public Optional<Stories> getStoryList(Long id) {
+        Optional<Stories> list = storyRepository.findByUserId(id);
+        return list;
+    }
 }
