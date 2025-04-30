@@ -5,6 +5,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UpdateReadBoardRequest {
-    private Long readBoardId;
+public class CheckUsernameRequest {
+    private String username;
 }

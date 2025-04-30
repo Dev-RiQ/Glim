@@ -11,7 +11,9 @@ import com.glim.common.security.service.CustomUserService;
 import com.glim.common.security.util.SecurityUtil;
 import com.glim.user.domain.User;
 import com.glim.user.dto.request.*;
+import com.glim.user.dto.response.AccessTokenResponse;
 import com.glim.user.dto.response.LoginResponse;
+import com.glim.user.dto.response.UpdateUserResponse;
 import com.glim.user.dto.response.UserResponse;
 import com.glim.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -38,18 +40,16 @@ public class AuthRestController {
     public ResponseEntity<UserResponse> getCurrentUser() {
         Long userId = SecurityUtil.getCurrentUserId();
         User user = userService.getUserById(userId);
-        int boardCount = boardService.countBoardsByUserId(userId); // 🛠 게시글 수 가져오기
+        int boardCount = boardService.countBoardsByUserId(userId);
         return ResponseEntity.ok(UserResponse.from(user, boardCount));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         User user = userService.getUserById(id);
-        int boardCount = boardService.countBoardsByUserId(id); // 🛠 게시글 수 가져오기
+        int boardCount = boardService.countBoardsByUserId(id);
         return ResponseEntity.ok(UserResponse.from(user, boardCount));
     }
-
-
 
     // ✅ 로그인: 사용자 인증 후 accessToken + refreshToken + user 응답
     @PostMapping("/login")
@@ -64,6 +64,7 @@ public class AuthRestController {
         );
     }
 
+    // 소셜로그인
     @PostMapping("/oauth-login")
     public ResponseEntity<LoginResponse> socialLogin(@RequestBody OAuthLoginRequest request) {
         OAuthAttributes oauthAttributes = request.getAttributes();
@@ -87,6 +88,32 @@ public class AuthRestController {
         return ResponseEntity.ok("회원가입 성공!");
     }
 
+    @PostMapping("/check-username")
+    public ResponseEntity<String> checkUsername(@RequestBody CheckUsernameRequest request) {
+        userService.checkUsernameDuplicate(request.getUsername());
+        return ResponseEntity.ok("사용 가능한 아이디입니다!");
+    }
+
+    @PostMapping("/check-nickname")
+    public ResponseEntity<String> checkNickname(@RequestBody CheckNicknameRequest request) {
+        userService.checkNicknameDuplicate(request.getNickname());
+        return ResponseEntity.ok("사용 가능한 닉네임입니다!");
+    }
+
+    // ✅ 회원정보 조회 (닉네임, 이미지, 이름, 콘텐츠만 조회)
+    @GetMapping("/update/{id}")
+    public ResponseEntity<UpdateUserResponse> getSimpleUserInfo(@PathVariable Long id) {
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+        User targetUser = userService.getUserById(id);
+
+        boolean isFollowing = userService.isFollowing(currentUserId, id); // ✅ 팔로우 여부 확인
+        UpdateUserResponse response = UpdateUserResponse.from(targetUser, currentUserId, isFollowing);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
     // ✅ 회원정보 수정: 로그인한 사용자만 본인 정보 수정 가능
     @PutMapping("/update/{id}")
     public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UpdateUserRequest request) {
@@ -96,6 +123,14 @@ public class AuthRestController {
         }
         userService.updateUser(id, request);
         return ResponseEntity.ok("회원정보 수정 완료");
+    }
+
+    // 전화번호 수정
+    @PutMapping("/user/update-phone")
+    public ResponseEntity<String> updatePhone(@RequestBody VerifyRequest request) {
+        Long userId = SecurityUtil.getCurrentUserId();
+        userService.updatePhoneWithVerification(userId, request);
+        return ResponseEntity.ok("전화번호 변경 완료");
     }
 
     // ✅ 회원 탈퇴: 로그인한 사용자만 본인 탈퇴 가능
@@ -173,43 +208,20 @@ public class AuthRestController {
         );
     }
 
-
-    // 조회한 마지막 알람 ID 수정
-    @PatchMapping("/update-read-alarm/{id}")
-    public ResponseEntity<String> updateReadAlarmId(@PathVariable Long id, @RequestBody UpdateReadAlarmRequest request) {
-        userService.updateReadAlarmId(id, request.getReadAlarmId());
-        return ResponseEntity.ok("readAlarmId 수정 완료");
-    }
-
-    // 조회한 마지막 게시글 ID 수정
-    @PatchMapping("/update-read-board/{id}")
-    public ResponseEntity<String> updateReadBoardId(@PathVariable Long id, @RequestBody UpdateReadBoardRequest request) {
-        userService.updateReadBoardId(id, request.getReadBoardId());
-        return ResponseEntity.ok("readBoardId 수정 완료");
-    }
-
-    // 마지막 게시글 ID 가져오기
-    @GetMapping("/read-board/{id}")
-    public ResponseEntity<Long> getReadBoardId(@PathVariable Long id) {
-        Long readBoardId = userService.getReadBoardId(id);
-        return ResponseEntity.ok(readBoardId);
-    }
-    // 마지막 알람 ID 가져오기
-    @GetMapping("/read-alarm/{id}")
-    public ResponseEntity<Long> getReadAlarmId(@PathVariable Long id) {
-        Long readAlarmId = userService.getReadAlarmId(id);
-        return ResponseEntity.ok(readAlarmId);
-    }
+    // 소개글 수정
     @PatchMapping("/update-content/{id}")
     public ResponseEntity<String> updateContent(@PathVariable Long id, @RequestBody UpdateContentRequest request) {
         userService.updateContent(id, request.getContent());
         return ResponseEntity.ok("content 수정 완료");
     }
+
+    // 이미지 수정
     @PatchMapping("/update-img/{id}")
     public ResponseEntity<String> updateImg(@PathVariable Long id, @RequestBody UpdateImageRequest request) {
         userService.updateImg(id, request.getImg());
         return ResponseEntity.ok("img 수정 완료");
     }
+
     //  유저 rate 수정
     @PatchMapping("/rate")
     public ResponseEntity<String> updateRate(@RequestBody UpdateRateRequest request) {
@@ -217,5 +229,12 @@ public class AuthRestController {
         userService.updateRate(userId, request.getRate());
         return ResponseEntity.ok("rate 수정 완료");
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AccessTokenResponse> refresh(@RequestBody RefreshTokenRequest request) {
+        AccessTokenResponse accessTokenResponse = userService.refreshAccessToken(request);
+        return ResponseEntity.ok(accessTokenResponse);
+    }
+
 
 }

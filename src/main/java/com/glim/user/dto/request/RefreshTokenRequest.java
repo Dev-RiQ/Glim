@@ -5,6 +5,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UpdateReadAlarmRequest {
-    private Long readAlarmId;
+public class RefreshTokenRequest {
+    private String refreshToken;
 }

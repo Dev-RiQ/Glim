@@ -21,5 +21,5 @@ public class RankingBoardDocument {
     private String thumbnailUrl;
     private Integer viewCount;
     private Integer likeCount;
-    private LocalDateTime createdDate;
+    private LocalDateTime createdAt;
 }

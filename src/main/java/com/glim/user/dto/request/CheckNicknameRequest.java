@@ -1,11 +1,10 @@
 package com.glim.user.dto.request;
 
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Setter
-public class SocialInfoRequest {
+@NoArgsConstructor
+public class CheckNicknameRequest {
     private String nickname;
-    private String phone;
 }
