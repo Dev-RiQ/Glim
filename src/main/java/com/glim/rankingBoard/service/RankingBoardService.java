@@ -118,9 +118,9 @@ public class RankingBoardService {
         List<Boards> boards;
 
         if ("view".equals(criteria)) {
-            boards = boardRepository.findTopBoardsByPeriodAndType(start, now, boardType, PageRequest.of(0, 20));
+            boards = boardRepository.findByCreatedAtBetweenAndBoardTypeOrderByViewsDescCreatedAtDesc(start, now, boardType, PageRequest.of(0, 20));
         } else if ("like".equals(criteria)) {
-            boards = boardRepository.findTopBoardsByLikesAndType(start, now, boardType, PageRequest.of(0, 20));
+            boards = boardRepository.findByCreatedAtBetweenAndBoardTypeOrderByLikesDescCreatedAtDesc(start, now, boardType, PageRequest.of(0, 20));
         } else {
             throw new IllegalArgumentException("Invalid criteria: " + criteria);
         }

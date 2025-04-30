@@ -18,42 +18,20 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
     Optional<Boards> findById(Long aLong);
 
     void deleteByUserId(Long userId);
+
     int countByUserId(Long userId);
 
     // ✅ 조회 기간 + 타입별 조회수 높은 게시글 Top 20 조회
-    @Query("""
-            SELECT b FROM Boards b 
-            WHERE b.createdAt BETWEEN :start AND :end
-              AND b.boardType = :type
-            ORDER BY b.views DESC, b.createdAt DESC
-            """)
-    List<Boards> findTopBoardsByPeriodAndType(
-            @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end,
-            @Param("type") BoardType type,   // ❗ String -> BoardType (Enum)으로 수정
-            Pageable pageable
-    );
+    List<Boards> findByCreatedAtBetweenAndBoardTypeOrderByViewsDescCreatedAtDesc(LocalDateTime start, LocalDateTime end, BoardType type, Pageable pageable);
 
     // ✅ 조회 기간 + 타입별 좋아요 높은 게시글 Top 20 조회
-    @Query("""
-            SELECT b FROM Boards b 
-            WHERE b.createdAt BETWEEN :start AND :end
-              AND b.boardType = :type
-            ORDER BY b.likes DESC, b.createdAt DESC
-            """)
-    List<Boards> findTopBoardsByLikesAndType(
-            @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end,
-            @Param("type") BoardType type,   // ❗ String -> BoardType (Enum)으로 수정
-            Pageable pageable
-    );
+    List<Boards> findByCreatedAtBetweenAndBoardTypeOrderByLikesDescCreatedAtDesc(LocalDateTime start, LocalDateTime end, BoardType type, Pageable pageable);
 
     List<Boards> findByIdIn(List<Long> boardIdList);
 
     List<Boards> findAllByUserIdOrderByIdDesc(Long userId, Limit of);
 
     List<Boards> findAllByUserIdAndIdLessThanOrderByIdDesc(Long userId, Long offset, Limit of);
-    
-    List<Boards> boardType(BoardType boardType);
+
 }
 

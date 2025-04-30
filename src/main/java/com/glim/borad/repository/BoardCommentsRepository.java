@@ -19,6 +19,5 @@ public interface BoardCommentsRepository extends JpaRepository<BoardComments, Lo
 
     List<BoardComments> findAllByReplyCommentIdAndIdGreaterThanOrderByIdAsc(Long commentId, Long offset, Limit of);
 
-
     Optional<BoardComments> findByReplyCommentId(Long id);
 }
