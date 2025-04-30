@@ -16,6 +16,7 @@ import com.glim.tag.repository.ViewTagRepository;
 import com.glim.user.domain.User;
 import com.glim.user.dto.request.*;
 import com.glim.user.dto.response.AccessTokenResponse;
+import com.glim.user.dto.response.FollowRecommendResponse;
 import com.glim.user.dto.response.LoginResponse;
 import com.glim.user.dto.response.UserResponse;
 import com.glim.user.repository.FollowRepository;
@@ -99,6 +100,14 @@ public class UserService {
             throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
         }
         User user = request.toEntity();
+
+        // ✅ 이미지가 빈 문자열이거나 null이면 기본 이미지 적용
+        if (user.getImg() == null || user.getImg().isBlank()) {
+            user.setImg("userimages/user-default-image");
+        }
+
+        user.setImg(awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128));
+
         user.encodePassword(passwordEncoder); // 비밀번호 암호화
         userRepository.save(user);
     }
@@ -132,11 +141,6 @@ public class UserService {
             throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
         }
 
-        // ✅ 전화번호 중복 검사
-        if (request.getName() != null) {
-            user.setName(request.getName());
-        }
-
         // ✅ 닉네임 수정
         if (request.getNickname() != null) {
             user.setNickname(request.getNickname());
@@ -150,7 +154,7 @@ public class UserService {
 
         // ✅ 이름 수정
         if (request.getName() != null) {
-            user.setPhone(request.getName());
+            user.setName(request.getName());
         }
 
         // ✅ 소개글 수정
@@ -200,13 +204,13 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
-    public List<UserResponse> searchUsersByNickname(String keyword) {
+    public List<FollowRecommendResponse> searchUsersByNickname(String keyword) {
         List<User> users = userRepository.findTop20ByNicknameContainingIgnoreCase(keyword);
 
         return users.stream()
                 .map(user -> {
-                    int boardCount = boardService.countBoardsByUserId(user.getId()); // ✅ user별 게시글 수 조회
-                    return UserResponse.from(user, boardCount); // ✅ user + boardCount 같이 넘김
+                    boolean isStory = storyService.isStory(user.getId());
+                    return FollowRecommendResponse.from(user,isStory); // ✅ user + boardCount 같이 넘김
                 })
                 .toList();
     }

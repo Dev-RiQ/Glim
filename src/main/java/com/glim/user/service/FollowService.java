@@ -5,6 +5,7 @@ import com.glim.common.exception.ErrorCode;
 import com.glim.common.security.util.SecurityUtil;
 import com.glim.notification.domain.Type;
 import com.glim.notification.service.NotificationService;
+import com.glim.stories.service.StoryService;
 import com.glim.user.domain.Follow;
 import com.glim.user.domain.User;
 import com.glim.user.dto.response.FollowRecommendResponse;
@@ -27,15 +28,17 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final StoryService storyService;
 
     public FollowService(
             FollowRepository followRepository,
             UserRepository userRepository,
-            @Lazy NotificationService notificationService
-    ) {
+            @Lazy NotificationService notificationService,
+            StoryService storyService) {
         this.followRepository = followRepository;
         this.userRepository = userRepository;
         this.notificationService = notificationService;
+        this.storyService = storyService;
     }
 
     // ✅ 로그인한 사용자 기준 팔로우
@@ -103,7 +106,9 @@ public class FollowService {
                 .map(f -> {
                     User user = userRepository.findById(f.getFollowingUserId())
                             .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-                    return FollowUserResponse.from(user);
+
+                    boolean isStory = storyService.isStory(user.getId());
+                    return FollowUserResponse.from(user, isStory);
                 })
                 .toList();
     }
@@ -118,7 +123,9 @@ public class FollowService {
                 .map(f -> {
                     User user = userRepository.findById(f.getFollowerUserId())
                             .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-                    return FollowUserResponse.from(user);
+
+                    boolean isStory = storyService.isStory(user.getId());
+                    return FollowUserResponse.from(user, isStory);
                 })
                 .toList();
     }
@@ -152,7 +159,7 @@ public class FollowService {
         return userRepository.findAllById(candidateIds).stream()
                 .sorted(Comparator.comparing(User::getFollowers).reversed())
                 .limit(5)
-                .map(u -> new FollowRecommendResponse(u.getId(), u.getNickname(), u.getImg()))
+                .map(u -> new FollowRecommendResponse(u.getId(), u.getNickname(), u.getImg(), u.getName(), storyService.isStory(u.getId())))
                 .collect(toList());
     }
 

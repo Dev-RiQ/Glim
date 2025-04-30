@@ -1,5 +1,7 @@
 package com.glim.common.security.service;
 
+import com.glim.common.awsS3.domain.FileSize;
+import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import com.glim.common.security.dto.SecurityUserDto;
@@ -30,6 +32,7 @@ import java.util.Optional;
 public class CustomUserService implements UserDetailsService, OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UserRepository userRepository;
+    private final AwsS3Util awsS3Util;
 
     // 로컬 로그인 처리
     @Override
@@ -83,13 +86,19 @@ public class CustomUserService implements UserDetailsService, OAuth2UserService<
         if (userOptional.isPresent()) {
             return userOptional.get(); // 기존 유저 → 그대로 로그인
         }
+
+        // ✅ img가 null이거나 빈 문자열이면 기본 이미지 경로로 설정
+        String rawImg = "userimages/user-default-image";
+
+        String finalImg = awsS3Util.getURL(rawImg, FileSize.IMAGE_128);
+
         // 새 유저 등록 (처음 소셜 로그인)
         User user = User.builder()
                 .username(attributes.getEmail())
                 .name(attributes.getName())
                 .nickname(null) // 👉 nickname은 입력받을 예정
                 .phone(null)    // 👉 phone도 본인인증 후 입력받을 예정
-                .img(attributes.getImg())
+                .img(finalImg)
                 .role(Role.ROLE_USER)
                 .followers(0L)
                 .followings(0L)

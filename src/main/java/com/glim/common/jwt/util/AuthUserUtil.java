@@ -7,6 +7,7 @@ import com.glim.common.exception.ErrorCode;
 import com.glim.common.jwt.provider.JwtTokenProvider;
 import com.glim.common.jwt.refresh.domain.RefreshToken;
 import com.glim.common.jwt.refresh.service.RefreshTokenService;
+import com.glim.stories.service.StoryService;
 import com.glim.user.domain.User;
 import com.glim.user.dto.response.LoginResponse;
 import com.glim.user.dto.response.UserResponse;
@@ -25,6 +26,7 @@ public class AuthUserUtil {
     private final RefreshTokenService refreshTokenService;
     private final ObjectMapper objectMapper;
     private final BoardService boardService;
+    private final StoryService storyService;
 
     public User getUserFromToken(String token) {
         Long userId = jwtTokenProvider.getUserId(token);
@@ -36,11 +38,12 @@ public class AuthUserUtil {
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
         boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
         int boardCount = boardService.countBoardsByUserId(user.getId());
+        boolean isStory = storyService.isStory(user.getId());
 
         LoginResponse loginResponse = new LoginResponse(
                 accessToken,
                 refreshToken.getToken(),
-                UserResponse.from(user, boardCount),
+                UserResponse.from(user, boardCount, isStory),
                 isFirstLogin
         );
 
