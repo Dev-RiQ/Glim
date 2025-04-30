@@ -38,6 +38,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         // accessToken + refreshToken + user 응답 내려주기
         authUserUtil.writeLoginResponse(response, user, accessToken);
-        response.sendRedirect("http://localhost:3000/login/" + accessToken);
+
+        if((user.getNickname() == null || user.getNickname().isBlank())
+                && (user.getPhone() == null || user.getPhone().isBlank())) {
+            response.sendRedirect("http://localhost:3000/login/" + accessToken + "/noPhone");
+        }else{
+            response.sendRedirect("http://localhost:3000/login/" + accessToken);
+        }
     }
 }

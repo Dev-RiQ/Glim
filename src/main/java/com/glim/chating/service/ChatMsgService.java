@@ -3,6 +3,7 @@ package com.glim.chating.service;
 import com.glim.chating.domain.ChatMsg;
 import com.glim.chating.domain.ChatRoom;
 import com.glim.chating.domain.ChatUser;
+import com.glim.chating.domain.ChatUserValid;
 import com.glim.chating.dto.request.AddChatMsgRequest;
 import com.glim.chating.dto.request.AddChatRoomRequest;
 import com.glim.chating.dto.request.AddChatUserRequest;
@@ -38,14 +39,16 @@ import java.util.stream.Collectors;
 public class ChatMsgService {
 
     private final ChatMsgRepository chatMsgRepository;
+    private final ChatUserService chatUserService;
     private final SendMessage sender;
+    private final ChatUtil chatUtil;
 
     public List<ViewChatMsgResponse> findChatMsgListByRoomId(Long roomId, Long offset) {
         List<ChatMsg> chatMsgList = offset == null ?
             chatMsgRepository.findAllByRoomIdOrderByMsgIdDesc(roomId, Limit.of(30))
             : chatMsgRepository.findAllByRoomIdAndMsgIdLessThanOrderByMsgIdDesc(roomId, offset, Limit.of(30));
         if(chatMsgList == null || chatMsgList.isEmpty()) {
-            ErrorCode.throwDummyNotFound();
+            return Collections.emptyList();
         }
         Collections.reverse(chatMsgList);
         return chatMsgList.stream().map(ViewChatMsgResponse::new).collect(Collectors.toList());
@@ -55,6 +58,7 @@ public class ChatMsgService {
     public void sendMessage(AddChatMsgRequest request) {
         ChatMsg message = setMessage(request);
         log.info("send message : {}", message);
+        chatUserService.checkUserValid(request.getRoomId());
         chatMsgRepository.save(message);
         sender.publishMessage(new Message(message));
     }
@@ -63,13 +67,9 @@ public class ChatMsgService {
         ChatMsg message = new AddChatMsgRequest().toEntity(addChatMsgRequest);
         SecurityUserDto user = SecurityUtil.getUser();
         message.setUserId(user.getId());
-        message.setMsgId(getNextMsgId());
+        message.setMsgId(chatUtil.getNextMsgId());
         message.setCreatedAt(LocalDateTime.now());
         return message;
     }
 
-    public Long getNextMsgId(){
-        ChatMsg chatMsg = chatMsgRepository.findTop1ByOrderByMsgIdDesc().orElse(null);
-        return chatMsg == null ? 1L : (chatMsg.getMsgId() + 1);
-    }
 }
