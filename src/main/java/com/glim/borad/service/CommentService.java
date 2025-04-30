@@ -32,7 +32,15 @@ public class CommentService {
         List<BoardComments> commentsList = offset == null ?
                 boardCommentsRepository.findAllByBoardIdAndReplyCommentIdOrderByIdAsc(id, 0L, Limit.of(30)) :
                 boardCommentsRepository.findAllByBoardIdAndIdGreaterThanAndReplyCommentIdOrderByIdAsc(id, offset, 0L, Limit.of(30));
-        return commentsList.stream().map(ViewCommentsResponse::new).collect(Collectors.toList());
+        // 커멘트아이디에 해당 댓글 번호 있는지 없는지
+        List<ViewCommentsResponse> list = commentsList.stream().map(ViewCommentsResponse::new).collect(Collectors.toList());
+        list.forEach(viewCommentsResponse -> {
+
+            BoardComments obj = boardCommentsRepository.findByReplyCommentId(viewCommentsResponse.getId()).orElse(null);
+
+            viewCommentsResponse.setIsReply(obj == null ? false : true);
+        });
+        return list;
     }
 
     public List<ViewCommentsResponse> replyList(Long replyCommentId, Long offset) {

@@ -20,13 +20,16 @@ public class Bgms {
     private String artist;
     @Column(nullable = false)
     private String title;
+    @Column(nullable = false)
+    private String fileName;
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @Builder
-    public Bgms(String artist, String title, LocalDateTime createdAt) {
+    public Bgms(String artist, String title, String fileName, LocalDateTime createdAt) {
         this.artist = artist;
         this.title = title;
+        this.fileName = fileName;
         this.createdAt = createdAt;
     }
 }

@@ -21,7 +21,7 @@ public class BoardFileController {
 
     @PostMapping({"","/"})
     public StatusResponseDTO add(@RequestBody AddBoardFileRequest request) {
-        boardFileSevice.insert(request);
+//        boardFileSevice.insert(request);
         return StatusResponseDTO.ok("파일 저장 완료");
     }
 

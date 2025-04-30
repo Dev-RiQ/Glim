@@ -1,6 +1,5 @@
 package com.glim.borad.controller;
 
-import com.glim.borad.domain.BoardTags;
 import com.glim.borad.dto.request.AddBoardTagRequest;
 import com.glim.borad.dto.request.UpdateBoardTagRequest;
 import com.glim.borad.service.BoardTagService;
@@ -19,7 +18,7 @@ public class BoardTagController {
 
     @PostMapping({"","/"})
     public StatusResponseDTO add(@RequestBody AddBoardTagRequest request) {
-        boardTagService.insert(request);
+//        boardTagService.insert(request);
         return StatusResponseDTO.ok("테그 완료");
     }
 

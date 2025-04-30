@@ -12,12 +12,9 @@ import java.time.LocalDateTime;
 @Table(name = "board_saves")
 @ToString()
 public class BoardSaves {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "board_save_id", nullable = false)
-    private Long id;
     @Column(name = "user_id", nullable = false)
     private Long userId;
+    @Id
     @Column(name = "board_id", nullable = false)
     private Long boardId;
     @Column(name = "created_at", nullable = false)

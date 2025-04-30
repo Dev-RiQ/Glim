@@ -18,10 +18,10 @@ public class BoardTagService {
 
     private final BoardTagRepository boardTagRepository;
 
-    @Transactional
-    public void insert(AddBoardTagRequest request) {
-        boardTagRepository.save(new AddBoardTagRequest().toEntity(request));
-    }
+//    @Transactional
+//    public void insert(AddBoardTagRequest request) {
+//        boardTagRepository.save(new AddBoardTagRequest().toEntity(request));
+//    }
 
     @Transactional
     public BoardTags update(Long id, UpdateBoardTagRequest request) {

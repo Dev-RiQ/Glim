@@ -12,9 +12,6 @@ import lombok.*;
 @ToString()
 public class BoardTags {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "board_tag_id", nullable = false)
-    private Long id;
     @Column(name = "board_id", nullable = false)
     private Long boardId;
     @Column(nullable = false)

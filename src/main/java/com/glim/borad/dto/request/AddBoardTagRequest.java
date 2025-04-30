@@ -10,14 +10,13 @@ import lombok.*;
 @ToString
 public class AddBoardTagRequest {
 
-    private Long tagId;
     private Long boardId;
     private String tag;
 
-    public BoardTags toEntity(AddBoardTagRequest addBoardTagRequest) {
+    public BoardTags toEntity(Long boardId, String tag) {
         return BoardTags.builder()
-                .boardId(addBoardTagRequest.getBoardId())
-                .tag(addBoardTagRequest.getTag())
+                .boardId(boardId)
+                .tag(tag)
                 .build();
     }
 }

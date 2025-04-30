@@ -12,11 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "story_likes")
 @ToString()
 public class StoryLikes {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "story_like_id", nullable = false)
-    private Long storyLikeId;
     @Column(name = "stroy_id", nullable = false)
     private Long stroyId;
     @Column(name = "user_id", nullable = false)
