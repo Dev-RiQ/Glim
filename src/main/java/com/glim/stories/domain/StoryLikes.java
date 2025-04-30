@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @ToString()
 public class StoryLikes {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "story_like_id", nullable = false)
     private Long id;
     @Column(name = "story_id", nullable = false)

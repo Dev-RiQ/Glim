@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "story_likes")
+@Table(name = "story_tags")
 @ToString()
 public class StoryTag {
 
