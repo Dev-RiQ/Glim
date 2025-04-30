@@ -13,16 +13,18 @@ import java.time.LocalDateTime;
 @ToString()
 public class StoryLikes {
     @Id
-    @Column(name = "stroy_id", nullable = false)
-    private Long stroyId;
+    @Column(name = "story_like_id", nullable = false)
+    private Long id;
+    @Column(name = "story_id", nullable = false)
+    private Long storyId;
     @Column(name = "user_id", nullable = false)
     private Long userId;
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @Builder
-    public StoryLikes(Long stroyId, Long userId, LocalDateTime createdAt) {
-        this.stroyId = stroyId;
+    public StoryLikes(Long storyId, Long userId, LocalDateTime createdAt) {
+        this.storyId = storyId;
         this.userId = userId;
         this.createdAt = createdAt;
     }

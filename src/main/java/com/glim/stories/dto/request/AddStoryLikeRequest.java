@@ -18,7 +18,7 @@ public class AddStoryLikeRequest {
 
     public StoryLikes toEntity(AddStoryLikeRequest request) {
         return StoryLikes.builder()
-                .stroyId(request.getStoryId())
+                .storyId(request.getStoryId())
                 .userId(request.getUserId())
                 .createdAt(LocalDateTime.now())
                 .build();

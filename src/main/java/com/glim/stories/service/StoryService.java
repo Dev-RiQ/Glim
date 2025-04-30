@@ -68,7 +68,7 @@ public class StoryService {
 
 
     public Stories getStory(Long storyId) {
-        return storyRepository.findByStoryId(storyId);
+        return storyRepository.findById(storyId).orElseThrow(ErrorCode::throwDummyNotFound);
     }
 
     public List<ViewStoryResponse> getStoryList(Long id) {
