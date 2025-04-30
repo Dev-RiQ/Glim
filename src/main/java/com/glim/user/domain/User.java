@@ -128,4 +128,9 @@ public class User {
     public void updateRate(Integer rate) {
         this.rate = rate;
     }
+    // 전화번호 수정
+    public void updatePhone(String phone) {
+        this.phone = phone;
+    }
+
 }

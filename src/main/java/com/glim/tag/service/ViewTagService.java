@@ -34,4 +34,8 @@ public class ViewTagService {
                 .map(ViewTag::getTag)
                 .toList();
     }
+
+    public List<ViewTag> getTop20ViewTags(Long userId) {
+        return viewTagRepository.findTop20ByUserIdOrderByViewsDesc(userId);
+    }
 }

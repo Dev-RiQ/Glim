@@ -10,6 +10,6 @@ import lombok.*;
 public class UpdateUserRequest {
     private String nickname;
     private String img;
-    private String phone;
+    private String name;
     private String content;
 }

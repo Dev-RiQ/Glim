@@ -11,4 +11,6 @@ public interface ViewTagRepository extends JpaRepository<ViewTag, Long> {
     Optional<ViewTag> findByUserIdAndTag(Long userId, String tag);
 
     List<ViewTag> findTop20ByUserIdOrderByViewsDesc(Long userId);
+
+
 }

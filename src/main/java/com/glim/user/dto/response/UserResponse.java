@@ -24,10 +24,10 @@ public class UserResponse {
                 .img(user.getImg())
                 .followers(user.getFollowers())
                 .followings(user.getFollowings())
-                .content(user.getContent()) // ✅
-                .name(user.getName())       // ✅
-                .rate(user.getRate())       // ✅
-                .boardCount(boardCount)     // ✅
+                .content(user.getContent())
+                .name(user.getName())
+                .rate(user.getRate())
+                .boardCount(boardCount)
                 .build();
     }
 }

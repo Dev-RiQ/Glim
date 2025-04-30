@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SocialInfoRequest {
-    private String nickname;
+public class VerifyRequest {
     private String phone;
+    private String code;
 }

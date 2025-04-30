@@ -1,5 +1,6 @@
 package com.glim.borad.repository;
 
+import com.glim.borad.domain.BoardType;
 import com.glim.borad.domain.Boards;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +30,7 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
     void deleteByUserId(Long userId);
     int countByUserId(Long userId);
 
-    // 조회 기간 + 타입별 조회수 높은 게시글 Top 20 조회
+    // ✅ 조회 기간 + 타입별 조회수 높은 게시글 Top 20 조회
     @Query("""
             SELECT b FROM Boards b 
             WHERE b.createdAt BETWEEN :start AND :end
@@ -39,11 +40,11 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
     List<Boards> findTopBoardsByPeriodAndType(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
-            @Param("type") String type,
+            @Param("type") BoardType type,   // ❗ String -> BoardType (Enum)으로 수정
             Pageable pageable
     );
 
-    // 조회 기간 + 타입별 좋아요 높은 게시글 Top 20 조회
+    // ✅ 조회 기간 + 타입별 좋아요 높은 게시글 Top 20 조회
     @Query("""
             SELECT b FROM Boards b 
             WHERE b.createdAt BETWEEN :start AND :end
@@ -53,8 +54,10 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
     List<Boards> findTopBoardsByLikesAndType(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
-            @Param("type") String type,
+            @Param("type") BoardType type,   // ❗ String -> BoardType (Enum)으로 수정
             Pageable pageable
     );
+
+    List<Boards> boardType(BoardType boardType);
 }
 

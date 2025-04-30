@@ -31,37 +31,8 @@ public class UserController {
     @PostMapping("/social-info")
     public ResponseEntity<String> completeSocialInfo(@RequestBody SocialInfoRequest request) {
         Long userId = SecurityUtil.getCurrentUserId();
-        User user = userService.getUserById(userId);
-
-        if (request.getNickname() != null && userRepository.existsByNickname(request.getNickname())) {
-            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
-        }
-
-        // ✅ 인증번호 유효성 검사 (Mongo에 저장된 인증 코드 기준 + 3분 제한 체크)
-        AuthCodeDocument authCode = authCodeRepository.findByPhone(request.getPhone())
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_VERIFICATION_CODE));
-
-        // ⏱️ 인증번호 유효 시간: 3분
-        if (authCode.getCreatedAt().plusMinutes(3).isBefore(LocalDateTime.now())) {
-            throw new CustomException(ErrorCode.EXPIRED_VERIFICATION_CODE);
-        }
-
-        if (!authCode.getCode().equals(request.getVerificationCode())) {
-            throw new CustomException(ErrorCode.INVALID_VERIFICATION_CODE);
-        }
-
-        boolean isVerified = authCode.getCode().equals(request.getVerificationCode());
-        if (!isVerified) {
-            throw new CustomException(ErrorCode.INVALID_VERIFICATION_CODE);
-        }
-        if (!isVerified) {
-            throw new CustomException(ErrorCode.INVALID_VERIFICATION_CODE);
-        }
-        user.setNickname(request.getNickname());
-        user.setPhone(request.getPhone());
-        userRepository.save(user);
-
-
+        userService.completeSocialInfo(userId, request); // ✅ Service로 위임
         return ResponseEntity.ok("추가 정보 입력 완료!");
     }
+
 }
