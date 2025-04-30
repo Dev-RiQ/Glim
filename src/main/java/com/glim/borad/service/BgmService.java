@@ -4,6 +4,7 @@ import com.glim.borad.domain.Bgms;
 import com.glim.borad.dto.request.AddBgmRequest;
 import com.glim.borad.dto.response.ViewBgmResponse;
 import com.glim.borad.repository.BgmRepository;
+import com.glim.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class BgmService {
 
     @Transactional
     public void delete(Long id) {
+        bgmRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
         bgmRepository.deleteById(id);
     }
 

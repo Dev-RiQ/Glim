@@ -18,13 +18,13 @@ public class AddBoardRequest {
     private String content;
     private List<String> tagUserIds;
     private List<String> tags;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private Long bgmId;
     private String boardType;
     private Boolean viewLikes;
     private Boolean viewShares;
     private Boolean commentable;
+
+
 
     public Boards toEntity(AddBoardRequest addBoardRequest) {
         return Boards.builder()

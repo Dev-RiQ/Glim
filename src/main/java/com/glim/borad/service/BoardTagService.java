@@ -3,6 +3,7 @@ package com.glim.borad.service;
 import com.glim.borad.domain.BoardTags;
 import com.glim.borad.dto.request.AddBoardTagRequest;
 import com.glim.borad.dto.request.UpdateBoardTagRequest;
+import com.glim.borad.repository.BoardRepository;
 import com.glim.borad.repository.BoardTagRepository;
 import com.glim.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BoardTagService {
 
     private final BoardTagRepository boardTagRepository;
+    private final BoardRepository boardRepository;
 
 //    @Transactional
 //    public void insert(AddBoardTagRequest request) {
@@ -33,6 +35,7 @@ public class BoardTagService {
 
     @Transactional
     public void delete(Long id) {
+        boardRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
         boardTagRepository.deleteById(id);
     }
 }

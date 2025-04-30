@@ -5,9 +5,11 @@ import com.glim.borad.dto.request.UpdateCommentsRequest;
 import com.glim.borad.dto.response.ViewCommentsResponse;
 import com.glim.borad.service.BoardService;
 import com.glim.borad.service.CommentService;
+import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.common.statusResponse.StatusResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,9 +49,8 @@ public class CommentsController {
     }
 
     @DeleteMapping("/{boardId}/{id}")
-    public StatusResponseDTO delete(@PathVariable Long boardId, @PathVariable Long id) {
-        commentService.delete(id);
-        boardService.updateComment(boardId, -1);
+    public StatusResponseDTO delete(@PathVariable Long boardId, @AuthenticationPrincipal SecurityUserDto user) {
+        commentService.delete(boardId, user.getId());
         return StatusResponseDTO.ok("댓글 삭제 완료");
     }
 }
