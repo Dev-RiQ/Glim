@@ -5,6 +5,7 @@ import com.glim.borad.domain.FileType;
 import com.glim.borad.dto.request.AddBoardFileRequest;
 import com.glim.borad.dto.request.UpdateBoardFileRequest;
 import com.glim.borad.repository.BoardFileRepository;
+import com.glim.borad.repository.BoardRepository;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.ErrorCode;
@@ -22,6 +23,7 @@ public class BoardFileSevice {
     private final AwsS3Util awsS3Util;
 
     private final BoardFileRepository boardFileRepository;
+    private final BoardRepository boardRepository;
 
 //    @Transactional
 //    public BoardFiles insert(AddBoardFileRequest request) {
@@ -37,7 +39,8 @@ public class BoardFileSevice {
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(Long id, Long boardId) {
+        boardRepository.findById(boardId).orElseThrow(ErrorCode::throwDummyNotFound);
         boardFileRepository.deleteById(id);
     }
 

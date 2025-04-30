@@ -1,10 +1,12 @@
 package com.glim.borad.service;
 
 import com.glim.borad.domain.BoardComments;
+import com.glim.borad.domain.Boards;
 import com.glim.borad.dto.request.AddCommentsRequest;
 import com.glim.borad.dto.request.UpdateCommentsRequest;
 import com.glim.borad.dto.response.ViewCommentsResponse;
 import com.glim.borad.repository.BoardCommentsRepository;
+import com.glim.borad.repository.BoardRepository;
 import com.glim.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 public class CommentService {
 
     private final BoardCommentsRepository boardCommentsRepository;
+    private final BoardService boardService;
+    private final BoardRepository boardRepository;
 
     @Transactional
     public void insert(AddCommentsRequest request) {
@@ -57,8 +61,10 @@ public class CommentService {
         boardCommentsRepository.save(comments);
     }
     @Transactional
-    public void delete(Long id) {
-        boardCommentsRepository.deleteById(id);
+    public void delete(Long boardId, Long userId) {
+        Boards board = boardRepository.findById(boardId).orElseThrow(ErrorCode::throwDummyNotFound);
+        boardCommentsRepository.deleteById(boardId);
+        boardService.updateComment(boardId, -1);
     }
 
     @Transactional

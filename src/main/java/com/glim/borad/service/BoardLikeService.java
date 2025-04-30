@@ -2,6 +2,8 @@ package com.glim.borad.service;
 
 import com.glim.borad.dto.request.AddBoardLikeRequest;
 import com.glim.borad.repository.BoardLikeRepository;
+import com.glim.borad.repository.BoardRepository;
+import com.glim.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BoardLikeService {
 
     private final BoardLikeRepository boardLikeRepository;
+    private final BoardRepository boardRepository;
 
     @Transactional
     public void insert(AddBoardLikeRequest request) {
@@ -22,6 +25,7 @@ public class BoardLikeService {
 
     @Transactional
     public void delete(Long boardId, Long userId) {
+        boardRepository.findById(boardId).orElseThrow(ErrorCode::throwDummyNotFound);
         boardLikeRepository.deleteByBoardIdAndUserId(boardId, userId);
     }
 

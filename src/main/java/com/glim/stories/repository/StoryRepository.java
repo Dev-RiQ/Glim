@@ -12,4 +12,6 @@ public interface StoryRepository extends JpaRepository<Stories, Long> {
     List<Stories> findByUserId(Long userId);
 
     Boolean existsByUserIdAndCreatedAtBetween(Long userId, LocalDateTime createdAtAfter, LocalDateTime createdAtBefore);
+
+    List<Stories> findByUserIdAndCreatedAtBetween(Long id, LocalDateTime yesterday, LocalDateTime now);
 }

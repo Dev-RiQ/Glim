@@ -25,6 +25,13 @@ public class BoardController {
 
     private final BoardService boardService;
 
+
+    @GetMapping({"/main","/main/{offset}"})
+    public StatusResponseDTO getMainBoard(@AuthenticationPrincipal SecurityUserDto user, @PathVariable(required = false) Long offset){
+        List<ViewBoardResponse> list = boardService.getMainBoard(user.getId(), offset);
+        return StatusResponseDTO.ok(list);
+    }
+
     @GetMapping({"/{userId}", "/{userId}/{offset}"})
     public StatusResponseDTO list(@PathVariable Long userId, @PathVariable(required = false) Long offset) {
         List<ViewBoardResponse> board = boardService.list(userId, offset);
@@ -33,9 +40,18 @@ public class BoardController {
         return StatusResponseDTO.ok(board);
     }
 
+//    @GetMapping("/tag")
+//    public StatusResponseDTO getTagList(@AuthenticationPrincipal SecurityUserDto user){
+//        List<ViewBoardResponse> tagList = boardService.getTagList(user.getId());
+//        return StatusResponseDTO.ok(tagList);
+//    }
+
     @PostMapping({"", "/{userId}"})
-    public StatusResponseDTO add(@RequestBody AddBoardRequest request, @AuthenticationPrincipal SecurityUserDto user) {
-        request.setUserId(user.getId());
+    public StatusResponseDTO add(@RequestBody AddBoardRequest request, @PathVariable Long userId) {
+        for(int i = 0; i < request.getImg().size(); i++) {
+
+        }
+        request.setUserId(userId);
         boardService.insert(request);
         return StatusResponseDTO.ok("게시물 추가 완료");
     }

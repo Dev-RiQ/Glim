@@ -1,5 +1,6 @@
 package com.glim.borad.dto.response;
 
+import com.glim.borad.domain.BoardType;
 import com.glim.borad.domain.Boards;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.utils.CountUtil;
@@ -15,11 +16,10 @@ import java.util.List;
 @ToString
 @Setter
 public class ViewBoardResponse {
-    private AwsS3Util awsS3Util;
 
     private final Long id;
     private final String location;
-    private final List<String> img = List.of();
+    private  List<String> img = List.of();
     private final String content;
     private final String view;
     private final String like;
@@ -33,24 +33,11 @@ public class ViewBoardResponse {
     private Boolean isLike;
     private Boolean isSave;
     private List<String> tags = List.of();
+    private BoardType boardType;
 
     public ViewBoardResponse(Boards board) {
         this.id = board.getId();
         this.location = board.getLocation();
-//        for(int i = 0; i < request.size(); i++){
-//            switch (board.getBoardType()) {
-//                case BASIC:
-//                    this.img.add(awsS3Util.getURL(request.get(i).getFileName(), FileSize.IMAGE_512));
-//                    break;
-//                case SHORTS:
-//                    this.img.add(awsS3Util.getURL(request.get(i).getFileName(), FileSize.VIDEO));
-//                    this.img.add(awsS3Util.getURL(request.get(i).getFileName(), FileSize.VIDEO_THUMBNAIL));
-//                    break;
-//                case ADVERTISEMENT:
-//                    this.img.add(awsS3Util.getURL(request.get(i).getFileName(), FileSize.VIDEO));
-//                    break;
-//            }
-//        }
         this.content = board.getContent();
         this.view = CountUtil.getCountString(board.getViews());
         this.like = CountUtil.getCountString(board.getLikes());
@@ -59,6 +46,7 @@ public class ViewBoardResponse {
         this.tagId = board.getTagUserIds();
         this.createdAt = DateTimeUtil.getDateTimeAgo(board.getCreatedAt());
         this.updatedAt = DateTimeUtil.getDateTimeAgo(board.getUpdatedAt());
+        this.boardType = board.getBoardType();
     }
 
 }

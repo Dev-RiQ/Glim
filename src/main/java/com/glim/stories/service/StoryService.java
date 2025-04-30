@@ -72,19 +72,16 @@ public class StoryService {
     }
 
     public List<ViewStoryResponse> getStoryList(Long id) {
-        List<Stories> list = storyRepository.findByUserId(id);
-        List<ViewStoryResponse> responses = list.stream().map(ViewStoryResponse::new).collect(Collectors.toList());
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime yesterday = now.minusHours(24);
+        List<Stories> stories = storyRepository.findByUserIdAndCreatedAtBetween(id, yesterday, now);
+        List<ViewStoryResponse> responses = stories.stream().map(ViewStoryResponse::new).collect(Collectors.toList());
         responses.forEach(viewStoryResponse -> {
             boolean isLike = storyLikeRepository.existsByStoryIdAndUserId(viewStoryResponse.getStoryId(), viewStoryResponse.getUserId());
             boolean isView = storyViewRepository.existsByStoryIdAndUserId(viewStoryResponse.getStoryId(), viewStoryResponse.getUserId());
             viewStoryResponse.setLike(isLike);
             viewStoryResponse.setViewed(isView);
         });
-        for(int i = 0; i < responses.size(); i++) {
-            if(!isStory(responses.get(i).getUserId())) {
-                responses.remove(i);
-            }
-        }
         return responses;
     }
 }

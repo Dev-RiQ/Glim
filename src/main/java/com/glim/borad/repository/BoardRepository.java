@@ -33,5 +33,16 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
 
     List<Boards> findAllByUserIdAndIdLessThanOrderByIdDesc(Long userId, Long offset, Limit of);
 
+    List<Boards> boardType(BoardType boardType);
+
+    List<Boards> findAllByUserIdInOrderByIdDesc(List<Long> followedUserIds, Limit of);
+
+    List<Boards> findAllByUserIdInAndIdLessThanOrderByIdDesc(List<Long> followedUserIds, Long offset, Limit of);
+
+    List<Boards> findAllByIdNotInOrderByIdDesc(List<Long> excludeIds, Limit of);
+
+    List<Boards> findAllByIdNotInAndIdLessThanOrderByIdDesc(List<Long> excludeIds, Long offset, Limit of);
+
+    List<Boards> findAllByUserId(Long userId);
 }
 

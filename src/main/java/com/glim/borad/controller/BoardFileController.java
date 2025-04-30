@@ -32,8 +32,8 @@ public class BoardFileController {
     }
 
     @DeleteMapping("/{id}")
-    public StatusResponseDTO delete(@PathVariable Long id) {
-        boardFileSevice.delete(id);
+    public StatusResponseDTO delete(@PathVariable Long id,@PathVariable Long boardId) {
+        boardFileSevice.delete(id,boardId);
         return StatusResponseDTO.ok("파일 삭제 완료");
     }
 }
