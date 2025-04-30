@@ -1,4 +1,5 @@
 package com.glim.user.dto.response;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.glim.user.domain.Role;
 import com.glim.user.domain.User;
 import lombok.Builder;
@@ -16,8 +17,10 @@ public class UserResponse {
     private String name;
     private Integer rate;
     private Integer boardCount;
+    @JsonProperty("isStory")
+    private boolean story;
 
-    public static UserResponse from(User user, int boardCount) {
+    public static UserResponse from(User user, int boardCount, boolean story) {
         return UserResponse.builder()
                 .id(user.getId())
                 .nickname(user.getNickname())
@@ -28,6 +31,7 @@ public class UserResponse {
                 .name(user.getName())
                 .rate(user.getRate())
                 .boardCount(boardCount)
+                .story(story)
                 .build();
     }
 }

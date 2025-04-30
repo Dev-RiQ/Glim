@@ -7,22 +7,19 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class FollowRecommendResponse {
+public class AccountAbleUser {
     private Long userId;
     private String nickname;
     private String img;
     private String name;
-    @JsonProperty("isStory")
-    private boolean story;
 
     // ✅ 정적 팩토리 메서드 추가
-    public static FollowRecommendResponse from(User user, boolean story) {
-        return new FollowRecommendResponse(
+    public static AccountAbleUser from(User user, boolean story, boolean connected) {
+        return new AccountAbleUser(
                 user.getId(),
                 user.getNickname(),
                 user.getImg(),
-                user.getName(),
-                story
+                user.getName()
         );
     }
 }

@@ -36,34 +36,60 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        // 인증 헤더가 없거나 형식이 잘못되었을 경우 => 그냥 다음 필터로 넘기기 (비인증 요청 가능하도록 login, sign-up.. 등)
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 헤더에서 JWT 토큰 추출
         String token = authHeader.substring(7);
+        Long userId = null;
 
-        // 토큰 검증 실패 시 예외 발생
-        if (!jwtTokenProvider.validateToken(token)) {
-            throw new JwtException("Invalid JWT token");
+        try {
+            // 유효한 AccessToken이면 그대로 인증 처리
+            if (jwtTokenProvider.validateToken(token)) {
+                userId = jwtTokenProvider.getUserId(token);
+            }
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            // AccessToken이 만료된 경우 → RefreshToken으로 대체
+            String refreshToken = request.getHeader("X-Refresh-Token");
+
+            if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {
+                userId = jwtTokenProvider.getUserId(refreshToken);
+
+                // 새 AccessToken 생성
+                String newAccessToken = jwtTokenProvider.createToken(userId, "USER"); // 또는 Role
+
+                // 응답 헤더에 새 accessToken 추가
+//                response.setHeader("Authorization", "Bearer " + newAccessToken);
+                // ✅ JSON 응답으로 accessToken 내려주기
+                response.setContentType("application/json;charset=UTF-8");
+                response.setStatus(HttpServletResponse.SC_OK);
+
+                String json = "{ \"accessToken\": \"" + newAccessToken + "\" }";
+                response.getWriter().write(json);
+
+                return;
+            } else {
+                // RefreshToken 없거나 유효하지 않음
+                filterChain.doFilter(request, response);
+                return;
+            }
         }
 
-        // 토큰이 유효하다면 인증 처리
-        Long userId = jwtTokenProvider.getUserId(token);
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        SecurityUserDto securityUserDto = SecurityUserDto.of(user);
+        // userId가 유효한 경우만 인증 객체 설정
+        if (userId != null) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            SecurityUserDto securityUserDto = SecurityUserDto.of(user);
 
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(
-                        securityUserDto, null, securityUserDto.getAuthorities());
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(
+                            securityUserDto, null, securityUserDto.getAuthorities());
 
-        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+        }
 
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-
-        filterChain.doFilter(request, response); // 다음 필터로 이동
+        filterChain.doFilter(request, response);
     }
 }

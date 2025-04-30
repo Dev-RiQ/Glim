@@ -1,6 +1,5 @@
 package com.glim.rankingBoard.controller;
 
-import com.glim.borad.domain.BoardType;
 import com.glim.rankingBoard.dto.request.RankingBoardRequest;
 import com.glim.rankingBoard.dto.response.RankingBoardResponse;
 import com.glim.rankingBoard.service.RankingBoardService;
@@ -25,16 +24,6 @@ public class RankingBoardController {
                 request.getType(),
                 request.getCriteria()
         );
-        return ResponseEntity.ok(rankings);
-    }
-
-    @GetMapping("/{type}/{period}/{criteria}")
-    public ResponseEntity<List<RankingBoardResponse>> getRankingListGet(
-            @PathVariable("type") BoardType type,
-            @PathVariable("period") String period,
-            @PathVariable("criteria") String criteria
-    ) {
-        List<RankingBoardResponse> rankings = rankingBoardService.getRankingList(period, type, criteria);
         return ResponseEntity.ok(rankings);
     }
 

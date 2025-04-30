@@ -44,7 +44,6 @@ public class OAuthAttributes {
                 .username((String) attributes.get("email"))
                 .name((String) attributes.get("name"))
                 .email((String) attributes.get("email"))
-                .img((String) attributes.get("picture"))
                 .phone("") // 구글은 전화번호 없음
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
@@ -56,7 +55,6 @@ public class OAuthAttributes {
                 .username((String) response.get("email"))
                 .name((String) response.get("name"))
                 .email((String) response.get("email"))
-                .img((String) response.get("profile_image"))
                 .phone((String) response.get("mobile"))
                 .attributes(response)
                 .nameAttributeKey(userNameAttributeName)
@@ -71,7 +69,6 @@ public class OAuthAttributes {
                 .username((String) kakaoAccount.get("email"))
                 .name(profile != null ? (String) profile.get("nickname") : "카카오사용자")
                 .email((String) kakaoAccount.get("email"))
-                .img(profile != null ? (String) profile.get("profile_image_url") : "")
                 .phone("") // 카카오는 전화번호 따로 받아야 함
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
