@@ -230,12 +230,6 @@ public class AuthRestController {
         return ResponseEntity.ok("rate 수정 완료");
     }
 
-    // refreshToken 검증 후 accessToken 발급
-    @PostMapping("/refresh")
-    public ResponseEntity<AccessTokenResponse> refresh(@RequestBody RefreshTokenRequest request) {
-        AccessTokenResponse accessTokenResponse = userService.refreshAccessToken(request);
-        return ResponseEntity.ok(accessTokenResponse);
-    }
 
 
 }
