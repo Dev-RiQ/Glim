@@ -4,6 +4,8 @@ import com.glim.borad.domain.BoardComments;
 import com.glim.common.utils.CountUtil;
 import com.glim.common.utils.DateTimeUtil;
 import com.glim.user.domain.User;
+import com.glim.user.dto.response.ViewBoardUserResponse;
+import com.glim.user.repository.UserRepository;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,7 +15,9 @@ import lombok.ToString;
 @Setter
 public class ViewCommentsResponse {
 
-    private User user;
+    private UserRepository userRepository;
+
+    private ViewBoardUserResponse user;
     private Long id;
     private String content;
     private String likes;
@@ -22,19 +26,9 @@ public class ViewCommentsResponse {
     private Boolean isReply;
     private Boolean isLike;
 
-//    private Long userId;
-//    private String content;
-//    private String likes;
-//    private String createdAt;
-
-//    public ViewCommentsResponse(BoardComments boardComments) {
-//        this.userId = boardComments.getUserId();
-//        this.content = boardComments.getContent();
-//        this.likes = CountUtil.getCountString(boardComments.getLikes());
-//        this.createdAt = DateTimeUtil.getDateTimeAgo(boardComments.getCreatedAt());
-//    }
 
     public ViewCommentsResponse(BoardComments boardComments) {
+        this.user = new ViewBoardUserResponse(userRepository.findUserById(boardComments.getUserId()));
         this.id = boardComments.getId();
         this.content = boardComments.getContent();
         this.likes = CountUtil.getCountString(boardComments.getLikes());
