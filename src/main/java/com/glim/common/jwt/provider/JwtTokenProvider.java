@@ -1,9 +1,6 @@
 package com.glim.common.jwt.provider;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +25,7 @@ public class JwtTokenProvider { // accessToken 발급, 검증
 
     @PostConstruct
     protected void init() {
+        System.out.println("⚠️  [DEBUG] 읽어온 secretKey: " + secretKey);
         key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
@@ -51,14 +49,13 @@ public class JwtTokenProvider { // accessToken 발급, 검증
                 .parseClaimsJws(token).getBody().getSubject());
     }
 
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
+    public void validateTokenOrThrow(String token) {
+        Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token);
     }
+
     public Long getUserIdFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8)) // ✅ 시크릿키 설정
@@ -67,5 +64,9 @@ public class JwtTokenProvider { // accessToken 발급, 검증
                 .getBody(); // ✅ JWT 안에 있는 본문(Claims) 꺼내기
 
         return Long.valueOf(claims.getSubject()); // subject에 userId가 들어있다고 가정
+    }
+
+    public Long getUserIdFromExpiredToken(ExpiredJwtException e) {
+        return Long.parseLong(e.getClaims().getSubject());
     }
 }

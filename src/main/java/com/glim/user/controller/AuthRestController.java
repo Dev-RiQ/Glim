@@ -220,13 +220,6 @@ public class AuthRestController {
         return ResponseEntity.ok("img 수정 완료");
     }
 
-    //  유저 rate 수정
-    @PatchMapping("/rate")
-    public ResponseEntity<String> updateRate(@RequestBody UpdateRateRequest request) {
-        Long userId = SecurityUtil.getCurrentUserId();
-        userService.updateRate(userId, request.getRate());
-        return ResponseEntity.ok("rate 수정 완료");
-    }
 
 
 

@@ -82,8 +82,15 @@ public class UserService {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+        // 더미 유저 구분 조건 (예: nickname이 knk_06X로 시작하면 더미라고 가정)
+        if (user.getNickname().startsWith("knk_")) {
+            if (!request.getPassword().equals(user.getPassword())) {
+                throw new CustomException(ErrorCode.INVALID_PASSWORD);
+            }
+        } else {
+            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                throw new CustomException(ErrorCode.INVALID_PASSWORD);
+            }
         }
 
         return user;
@@ -103,11 +110,8 @@ public class UserService {
 
         // ✅ 이미지가 빈 문자열이거나 null이면 기본 이미지 적용
         if (user.getImg() == null || user.getImg().isBlank()) {
-            user.setImg("userimages/user-default-image");
+            user.setImg(awsS3Util.getURL("userimages/user-default-image",FileSize.IMAGE_128));
         }
-
-        user.setImg(awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128));
-
         user.encodePassword(passwordEncoder); // 비밀번호 암호화
         userRepository.save(user);
     }
@@ -272,7 +276,7 @@ public class UserService {
     // 업데이트 이미지
     public void updateImg(Long id, String img) {
         User user = getUserById(id);
-        user.updateImg(img);
+        user.updateImg(awsS3Util.getURL(img, FileSize.IMAGE_128));
         userRepository.save(user);
     }
 
