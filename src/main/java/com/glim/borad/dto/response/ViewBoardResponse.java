@@ -8,6 +8,7 @@ import com.glim.common.utils.DateTimeUtil;
 import com.glim.user.domain.User;
 import com.glim.user.dto.response.UserResponse;
 import com.glim.user.dto.response.ViewBoardUserResponse;
+import com.glim.user.repository.UserRepository;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -18,6 +19,7 @@ import java.util.List;
 @ToString
 @Setter
 public class ViewBoardResponse {
+    private UserRepository userRepository;
 
     private ViewBoardUserResponse user;
     private final Long id;
@@ -38,6 +40,7 @@ public class ViewBoardResponse {
     private BoardType boardType;
 
     public ViewBoardResponse(Boards board) {
+        this.user = new ViewBoardUserResponse(userRepository.findUserById(board.getUserId()));
         this.id = board.getId();
         this.location = board.getLocation();
         this.content = board.getContent();
