@@ -25,7 +25,7 @@ public class RankingBoardResponse {
                 .contentImgUrl(contentImgUrl)
                 .viewCount(document.getViewCount())
                 .likeCount(document.getLikeCount())
-                .createdAt(DateTimeUtil.getDateTimeAgo(document.getCreatedAt())) 
+                .createdAt(DateTimeUtil.getDateTimeAgo(document.getCreatedAt()))
                 .build();
     }
 }

@@ -10,6 +10,8 @@ public interface RefreshTokenRepository extends MongoRepository<RefreshToken, St
     Optional<RefreshToken> findByToken(String token);
     void deleteByUserId(Long userId);
     void deleteByToken(String token);         // ✅ 개별 로그아웃 용
+    Optional<RefreshToken> findByUserId(Long userId);  // userId로 조회 추가
+
 
 
 }
