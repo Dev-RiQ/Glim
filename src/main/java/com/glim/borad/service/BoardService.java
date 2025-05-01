@@ -196,7 +196,7 @@ public class BoardService {
     }
 
     public ViewBoardResponse getShorts(Long id) {
-        ViewBoardResponse shorts = new ViewBoardResponse(boardRepository.findByBoardTypeAndBoardId(BoardType.SHORTS, id));
+        ViewBoardResponse shorts = new ViewBoardResponse(boardRepository.findByBoardTypeAndId(BoardType.SHORTS, id));
         return shorts;
     }
 

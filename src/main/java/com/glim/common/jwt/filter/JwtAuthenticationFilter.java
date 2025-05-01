@@ -30,51 +30,6 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-//
-//    private final JwtTokenProvider jwtTokenProvider;
-//    private final UserRepository userRepository;
-//
-//    @Override
-//    protected void doFilterInternal(HttpServletRequest request,
-//                                    HttpServletResponse response,
-//                                    FilterChain filterChain)
-//            throws ServletException, IOException {
-//
-//        String authHeader = request.getHeader("Authorization");
-//
-//        // 인증 헤더가 없거나 형식이 잘못되었을 경우 => 그냥 다음 필터로 넘기기 (비인증 요청 가능하도록 login, sign-up.. 등)
-//        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-//                System.out.println("Authorization 헤더 값: " + authHeader);
-
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
-//
-//        // 헤더에서 JWT 토큰 추출
-//        String token = authHeader.substring(7);
-//
-//        // 토큰 검증 실패 시 예외 발생
-//        if (!jwtTokenProvider.validateToken(token)) {
-//            throw new JwtException("Invalid JWT token");
-//        }
-//
-//        // 토큰이 유효하다면 인증 처리
-//        Long userId = jwtTokenProvider.getUserId(token);
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-//        SecurityUserDto securityUserDto = SecurityUserDto.of(user);
-//
-//        UsernamePasswordAuthenticationToken authToken =
-//                new UsernamePasswordAuthenticationToken(
-//                        securityUserDto, null, securityUserDto.getAuthorities());
-//
-//        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//
-//        SecurityContextHolder.getContext().setAuthentication(authToken);
-//
-//        filterChain.doFilter(request, response); // 다음 필터로 이동
-//    }
-//}
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
