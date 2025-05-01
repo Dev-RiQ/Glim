@@ -16,6 +16,11 @@ public class AddStoryLikeRequest {
     private Long userId;
     private LocalDateTime createdAt;
 
+    public AddStoryLikeRequest(Long storyId, Long id) {
+        this.storyId = storyId;
+        this.userId = id;
+    }
+
     public StoryLikes toEntity(AddStoryLikeRequest request) {
         return StoryLikes.builder()
                 .storyId(request.getStoryId())

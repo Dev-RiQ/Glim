@@ -1,7 +1,9 @@
 package com.glim.borad.dto.response;
 
+import com.glim.borad.domain.Bgms;
 import com.glim.borad.domain.BoardType;
 import com.glim.borad.domain.Boards;
+import com.glim.borad.domain.Option;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.utils.CountUtil;
 import com.glim.common.utils.DateTimeUtil;
@@ -13,21 +15,21 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @ToString
 @Setter
 public class ViewBoardResponse {
-    private UserRepository userRepository;
 
     private ViewBoardUserResponse user;
     private final Long id;
     private final String location;
-    private  List<String> img = List.of();
+    private  List<String> img;
     private final String content;
-    private final String view;
-    private final String like;
+    private final String viewCount;
+    private final String likeCount;
     private final String comment;
     private final String share;
     private final String tagId;
@@ -36,22 +38,29 @@ public class ViewBoardResponse {
     private ViewBgmResponse bgm;
     private Boolean isLike;
     private Boolean isSave;
-    private List<String> tags = List.of();
+    private List<String> tags;
     private BoardType boardType;
+    private boolean commentable;
+    private boolean viewLikes;
 
-    public ViewBoardResponse(Boards board) {
-        this.user = new ViewBoardUserResponse(userRepository.findUserById(board.getUserId()));
+    public ViewBoardResponse(Boards board, ViewBoardUserResponse user, ViewBgmResponse bgm) {
+        this.user = user;
         this.id = board.getId();
         this.location = board.getLocation();
         this.content = board.getContent();
-        this.view = CountUtil.getCountString(board.getViews());
-        this.like = CountUtil.getCountString(board.getLikes());
+        this.viewCount = CountUtil.getCountString(board.getViews());
+        this.likeCount = CountUtil.getCountString(board.getLikes());
         this.comment = CountUtil.getCountString(board.getComments());
         this.share = CountUtil.getCountString(board.getShares());
         this.tagId = board.getTagUserIds();
+        this.bgm = bgm;
         this.createdAt = DateTimeUtil.getDateTimeAgo(board.getCreatedAt());
         this.updatedAt = DateTimeUtil.getDateTimeAgo(board.getUpdatedAt());
         this.boardType = board.getBoardType();
+        this.img = new ArrayList<>();
+        this.tags = new ArrayList<>();
+        this.commentable = board.getCommentable().toString().equals("TRUE");
+        this.viewLikes = board.getViewLikes().toString().equals("TRUE");
     }
 
 }

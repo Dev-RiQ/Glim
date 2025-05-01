@@ -22,8 +22,8 @@ public class AddStoryRequest {
         return Stories.builder()
                 .userId(addStoryRequest.getUserId())
                 .fileName(addStoryRequest.getFileName())
-                .likes(addStoryRequest.getLikes())
-                .views(addStoryRequest.getViews())
+                .likes(0)
+                .views(0)
                 .createdAt(LocalDateTime.now())
                 .build();
     }

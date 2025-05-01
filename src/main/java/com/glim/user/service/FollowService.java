@@ -168,4 +168,18 @@ public class FollowService {
         followRepository.deleteByFollowerUserIdOrFollowingUserId(userId, userId);
     }
 
+    public List<FollowUserResponse> getHasStoryList() {
+        Long id = SecurityUtil.getCurrentUserId();
+        List<Follow> list = followRepository.findAllByFollowingUserId(id);
+        if(list.isEmpty()) return Collections.emptyList();
+        List<FollowUserResponse> responses = new ArrayList<>();
+        for(Follow follow : list) {
+            if(storyService.isStory(follow.getFollowingUserId())){
+                User user = userRepository.findById(follow.getFollowerUserId()).orElse(null);
+                if(user == null) continue;
+                responses.add(FollowUserResponse.from(user, true));
+            }
+        }
+        return responses;
+    }
 }

@@ -80,9 +80,7 @@ public class AwsS3Repository {
 
     private void deleteImage(String filename) {
         amazonS3Client.deleteObject(bucket, filename + FileSize.IMAGE_128.getTypeAndSizeUri());
-        amazonS3Client.deleteObject(bucket, filename + FileSize.IMAGE_256.getTypeAndSizeUri());
         amazonS3Client.deleteObject(bucket, filename + FileSize.IMAGE_512.getTypeAndSizeUri());
-        amazonS3Client.deleteObject(bucket, filename + FileSize.IMAGE_1024.getTypeAndSizeUri());
     }
 
     private void deleteVideo(String filename) {

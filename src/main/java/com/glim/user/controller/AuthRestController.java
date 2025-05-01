@@ -2,6 +2,7 @@
 package com.glim.user.controller;
 
 import com.glim.borad.service.BoardService;
+import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.jwt.provider.JwtTokenProvider;
 import com.glim.common.jwt.refresh.domain.RefreshToken;
@@ -42,7 +43,8 @@ public class AuthRestController {
         User user = userService.getUserById(userId);
         int boardCount = boardService.countBoardsByUserId(userId);
         boolean isStory = storyService.isStory(userId);
-        return ResponseEntity.ok(UserResponse.from(user, boardCount, isStory));
+        String url = awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128);
+        return ResponseEntity.ok(UserResponse.from(user, boardCount, isStory,url));
     }
 
     // 회원정보
@@ -67,8 +69,9 @@ public class AuthRestController {
         boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
         int boardCount = boardService.countBoardsByUserId(user.getId());
         boolean isStory = storyService.isStory(user.getId());
+        String img = awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128);
         return ResponseEntity.ok(
-                new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user, boardCount, isStory), isFirstLogin)
+                new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user, boardCount, isStory, img), isFirstLogin)
         );
     }
 
@@ -84,8 +87,9 @@ public class AuthRestController {
         int boardCount = boardService.countBoardsByUserId(user.getId());
         boolean isStory = storyService.isStory(user.getId());
         boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
+        String img = awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128);
         return ResponseEntity.ok(
-                new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user, boardCount, isStory), isFirstLogin)
+                new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user, boardCount, isStory, img), isFirstLogin)
         );
     }
 
@@ -193,12 +197,13 @@ public class AuthRestController {
 
         int boardCount = boardService.countBoardsByUserId(user.getId()); // ✅ 게시글 수 조회
         boolean isStory = storyService.isStory(user.getId());
+        String img = awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128);
 
         return ResponseEntity.ok(
                 new LoginResponse(
                         accessToken,
                         refreshToken.getToken(),
-                        UserResponse.from(user, boardCount, isStory), // ✅ 수정
+                        UserResponse.from(user, boardCount, isStory, img), // ✅ 수정
                         false
                 )
         );

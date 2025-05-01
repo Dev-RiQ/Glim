@@ -1,20 +1,22 @@
 package com.glim.stories.service;
 
+import com.glim.common.awsS3.domain.FileSize;
+import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.ErrorCode;
 import com.glim.stories.domain.Stories;
 import com.glim.stories.dto.request.AddStoryRequest;
 import com.glim.stories.dto.response.ViewStoryResponse;
 import com.glim.stories.repository.StoryLikeRepository;
 import com.glim.stories.repository.StoryRepository;
-import com.glim.stories.repository.StoryTagRepository;
 import com.glim.stories.repository.StoryViewRepository;
+import com.glim.user.dto.response.ViewBoardUserResponse;
+import com.glim.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +29,8 @@ public class StoryService {
     private final StoryRepository storyRepository;
     private final StoryLikeRepository storyLikeRepository;
     private final StoryViewRepository storyViewRepository;
+    private final UserRepository userRepository;
+    private final AwsS3Util awsS3Util;
 
     @Transactional
     public void insert(AddStoryRequest request) {
@@ -71,16 +75,20 @@ public class StoryService {
         return storyRepository.findById(storyId).orElseThrow(ErrorCode::throwDummyNotFound);
     }
 
-    public List<ViewStoryResponse> getStoryList(Long id) {
+    public List<ViewStoryResponse> getStoryList(Long userId) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime yesterday = now.minusHours(24);
-        List<Stories> stories = storyRepository.findByUserIdAndCreatedAtBetween(id, yesterday, now);
+        ViewBoardUserResponse user = new ViewBoardUserResponse(userRepository.findById(userId).orElseThrow(ErrorCode::throwDummyNotFound));
+        user.setIsStory(true);
+        user.setIsMine(userId.equals(user.getId()));
+        user.setImg(awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128));
+        List<Stories> stories = storyRepository.findByUserIdAndCreatedAtBetween(userId, yesterday, now);
         List<ViewStoryResponse> responses = stories.stream().map(ViewStoryResponse::new).collect(Collectors.toList());
         responses.forEach(viewStoryResponse -> {
-            boolean isLike = storyLikeRepository.existsByStoryIdAndUserId(viewStoryResponse.getStoryId(), viewStoryResponse.getUserId());
-            boolean isView = storyViewRepository.existsByStoryIdAndUserId(viewStoryResponse.getStoryId(), viewStoryResponse.getUserId());
-            viewStoryResponse.setLike(isLike);
-            viewStoryResponse.setViewed(isView);
+            boolean isLike = storyLikeRepository.existsByStoryIdAndUserId(viewStoryResponse.getId(), userId);
+            viewStoryResponse.setIsLike(isLike);
+            viewStoryResponse.setUser(user);
+            viewStoryResponse.setImg(awsS3Util.getURL(viewStoryResponse.getImg(), FileSize.IMAGE_512));
         });
         return responses;
     }

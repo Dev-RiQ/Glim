@@ -29,49 +29,49 @@ public class BoardController {
     private final BoardSaveService boardSaveService;
 
 
-    @GetMapping({"/main","/main/{offset}"})
+    @GetMapping({"","/{offset}"})
     public StatusResponseDTO getMainBoard(@AuthenticationPrincipal SecurityUserDto user, @PathVariable(required = false) Long offset){
         List<ViewBoardResponse> list = boardService.getMainBoard(user.getId(), offset);
-        Boards advertisement = boardService.getRandomAdvertisement();
-        list.add(new ViewBoardResponse(advertisement));
+        ViewBoardResponse advertisement = boardService.getRandomAdvertisement(user.getId());
+        if(advertisement != null){
+            list.add(advertisement);
+        }
         return StatusResponseDTO.ok(list);
     }
 
     @GetMapping({"/my/{id}", "/my/{id}/{offset}"})
     public StatusResponseDTO list(@PathVariable(required = false) Long offset, @AuthenticationPrincipal SecurityUserDto user) {
         List<ViewMyPageBoardResponse> board = boardService.list(user.getId(), offset);
-        Boards advertisement = boardService.getRandomAdvertisement();
-        board.add(new ViewMyPageBoardResponse(advertisement));
         return StatusResponseDTO.ok(board);
     }
 
     @GetMapping("/{id}")
     public StatusResponseDTO show(@PathVariable Long id, @AuthenticationPrincipal SecurityUserDto user) {
-        ViewBoardResponse board = boardService.getBoard(id);
+        ViewBoardResponse board = boardService.getBoard(user.getId(), id);
         return StatusResponseDTO.ok(board);
     }
 
     @GetMapping("/shorts/{id}")
     public StatusResponseDTO shorts(@PathVariable Long id, @AuthenticationPrincipal SecurityUserDto user) {
-        ViewBoardResponse shorts = boardService.getShorts(id);
+        ViewBoardResponse shorts = boardService.getShorts(user.getId(), id);
         return StatusResponseDTO.ok(shorts);
     }
 
     @GetMapping({"/shorts","/shorts/{offset}"})
     public StatusResponseDTO listShorts(@PathVariable(required = false) Long offset, @AuthenticationPrincipal SecurityUserDto user) {
         List<ViewBoardResponse> list = boardService.getShortsList(offset, user.getId());
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok(list);
     }
 
     @GetMapping({"/myShorts/{id}","/myShorts/{id}/{offset}"})
     public StatusResponseDTO MyShortsList(@PathVariable(required = false) Long offset, @AuthenticationPrincipal SecurityUserDto user) {
         List<ViewBoardResponse> list = boardService.getMyShortsList(offset, user.getId());
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok(list);
     }
 
-    @GetMapping({"/board/search","/board/search/{offset}"})
-    public StatusResponseDTO search(@PathVariable Long offset, @AuthenticationPrincipal SecurityUserDto user) {
-        List<ViewBoardResponse> list = boardService.allList(offset);
+    @GetMapping({"/search","/search/{offset}"})
+    public StatusResponseDTO search(@PathVariable(required = false) Long offset) {
+        List<ViewMyPageBoardResponse > list = boardService.allList(offset);
         return StatusResponseDTO.ok(list);
     }
 

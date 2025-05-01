@@ -16,7 +16,11 @@ public class StoryViewService {
     private final StoryViewRepository storyViewRepository;
 
     @Transactional
-    public void insert(AddStoryViewRequest request) {
+    public boolean insert(AddStoryViewRequest request) {
+        if(storyViewRepository.existsByStoryIdAndUserId(request.getStoryId(),request.getUserId())){
+            return false;
+        }
         storyViewRepository.save(new AddStoryViewRequest().toEntity(request));
+        return true;
     }
 }

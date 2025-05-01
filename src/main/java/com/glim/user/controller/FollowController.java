@@ -88,4 +88,9 @@ public class FollowController {
     public ResponseEntity<List<FollowRecommendResponse>> getRecommendedUsers() {
         return ResponseEntity.ok(followService.getRecommendedUsers());
     }
+
+    @GetMapping("/story")
+    public StatusResponseDTO getStory() {
+        return StatusResponseDTO.ok(followService.getHasStoryList()); 
+    }
 }

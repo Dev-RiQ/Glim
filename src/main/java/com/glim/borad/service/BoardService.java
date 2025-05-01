@@ -1,10 +1,8 @@
 package com.glim.borad.service;
 
+import com.glim.admin.domain.Advertisement;
 import com.glim.admin.repository.AdvertisementRepository;
-import com.glim.borad.domain.Bgms;
-import com.glim.borad.domain.BoardFiles;
-import com.glim.borad.domain.BoardType;
-import com.glim.borad.domain.Boards;
+import com.glim.borad.domain.*;
 import com.glim.borad.dto.request.AddBoardFileRequest;
 import com.glim.borad.dto.request.AddBoardRequest;
 import com.glim.borad.dto.request.AddBoardTagRequest;
@@ -16,8 +14,8 @@ import com.glim.borad.repository.*;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.ErrorCode;
+import com.glim.stories.service.StoryService;
 import com.glim.user.domain.Follow;
-import com.glim.user.domain.User;
 import com.glim.user.dto.response.ViewBoardUserResponse;
 import com.glim.user.repository.FollowRepository;
 import com.glim.user.repository.UserRepository;
@@ -26,10 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.View;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -47,6 +45,7 @@ public class BoardService {
     private final UserRepository userRepository;
     private final AdvertisementRepository advertisementRepository;
     private final FollowRepository followRepository;
+    private final StoryService storyService;
 
     @Transactional
     public void insert(AddBoardRequest request) {
@@ -57,7 +56,6 @@ public class BoardService {
         for (int i = 0; i < request.getTags().size(); i++) {
             boardTagRepository.save(new AddBoardTagRequest().toEntity(board.getId(), request.getTags().get(i)));
         }
-
     }
 
     @Transactional
@@ -83,11 +81,27 @@ public class BoardService {
 
             boardList.addAll(fillBoards);
         }
-
-        List<ViewBoardResponse> list = boardList.stream().map(ViewBoardResponse::new).collect(Collectors.toList());
+        // 테스트용
+        if (boardList.size() < 10) {
+          boardList = boardRepository.findAllByBoardTypeOrderByIdDesc(BoardType.BASIC, Limit.of(10));
+        }
+        //
+        List<ViewBoardResponse> list = boardList.stream().map((board) -> getView(board, id)).collect(Collectors.toList());
         list = getSubBoard(list, id);
 
         return list;
+    }
+
+    private ViewBoardResponse getView(Boards board,Long id){
+        ViewBoardUserResponse viewBoardUserResponse = new ViewBoardUserResponse(userRepository.findById(board.getUserId()).orElseThrow(ErrorCode::throwDummyNotFound));
+        viewBoardUserResponse.setImg(awsS3Util.getURL(viewBoardUserResponse.getImg(), FileSize.IMAGE_128));
+        viewBoardUserResponse.setIsMine(Objects.equals(id, board.getUserId()));
+        viewBoardUserResponse.setIsStory(storyService.isStory(board.getUserId()));
+        ViewBgmResponse viewBgmResponse = null;
+        if(board.getBgmId() != 0){
+            viewBgmResponse = new ViewBgmResponse(bgmRepository.findById(board.getBgmId()).orElseThrow(ErrorCode::throwDummyNotFound));
+        }
+        return new ViewBoardResponse(board, viewBoardUserResponse, viewBgmResponse);
     }
 
     public List<ViewBoardResponse> getSubBoard(List<ViewBoardResponse> list, Long id) {
@@ -96,17 +110,17 @@ public class BoardService {
             boolean isLike = boardLikeRepository.existsByBoardIdAndUserId(viewBoardResponse.getId(), id);
             boolean isSave = boardLikeRepository.existsByBoardIdAndUserId(viewBoardResponse.getId(), id);
             List<BoardFiles> files = boardFileRepository.findAllByBoardId(viewBoardResponse.getId());
-            files.forEach(file -> {
+            for (BoardFiles file : files) {
                 switch (file.getFileType()) {
-                    case IMAGE:
+                    case IMAGE ->{
                         viewBoardResponse.getImg().add(awsS3Util.getURL(file.getFileName(), FileSize.IMAGE_512));
-                        break;
-                    case VIDEO:
+                    }
+                    case VIDEO -> {
                         viewBoardResponse.getImg().add(awsS3Util.getURL(file.getFileName(), FileSize.VIDEO));
                         viewBoardResponse.getImg().add(awsS3Util.getURL(file.getFileName(), FileSize.VIDEO_THUMBNAIL));
-                        break;
+                    }
                 }
-            });
+            }
 //            UserResponse user = new UserResponse(userRepository.findById(boardList.get(i).getUserId()),1);
             viewBoardResponse.setIsLike(isLike);
             viewBoardResponse.setIsSave(isSave);
@@ -181,9 +195,13 @@ public class BoardService {
         return boardRepository.findByIdIn(boardIdList);
     }
 
-    public Boards getRandomAdvertisement() {
-        Long id = advertisementRepository.findRandomApprovedAdvertisement().getBoardId();
-        return boardRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
+    public ViewBoardResponse getRandomAdvertisement(Long userId) {
+        Advertisement ad = advertisementRepository.findRandomApprovedAdvertisement();
+        if (ad != null) {
+            Long id = ad.getBoardId();
+            return getView(boardRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound), userId);
+        }
+        return null;
     }
 
     public boolean isLoginUser(Long id, Long userId) {
@@ -191,13 +209,12 @@ public class BoardService {
         return boards.getUserId().equals(userId);
     }
 
-    public ViewBoardResponse getBoard(Long id) {
-        return boardRepository.findById(id).stream().map(ViewBoardResponse::new).findFirst().orElseThrow(ErrorCode::throwDummyNotFound);
+    public ViewBoardResponse getBoard(Long userId, Long id) {
+        return boardRepository.findById(id).stream().map((board) -> getView(board, userId)).findFirst().orElseThrow(ErrorCode::throwDummyNotFound);
     }
 
-    public ViewBoardResponse getShorts(Long id) {
-        ViewBoardResponse shorts = new ViewBoardResponse(boardRepository.findByBoardTypeAndId(BoardType.SHORTS, id));
-        return shorts;
+    public ViewBoardResponse getShorts(Long userId, Long id) {
+        return getView(boardRepository.findByBoardTypeAndId(BoardType.SHORTS, id),userId);
     }
 
     public List<ViewBoardResponse> getShortsList(Long offset, Long userId) {
@@ -206,7 +223,7 @@ public class BoardService {
                 : boardRepository.findAllByBoardTypeAndIdLessThanOrderByIdDesc(BoardType.SHORTS, offset, Limit.of(5));
 
         List<ViewBoardResponse> list = boardList.stream()
-                .map(ViewBoardResponse::new)
+                .map((board) -> getView(board, userId))
                 .collect(Collectors.toList());
 
         list = getSubBoard(list, userId);
@@ -215,27 +232,25 @@ public class BoardService {
         return list;
     }
 
-    public List<ViewBoardResponse> getMyShortsList(Long offset, Long id) {
+    public List<ViewBoardResponse> getMyShortsList(Long offset, Long userId) {
         List<Boards> boardList = (offset == null)
-                ? boardRepository.findAllByUserIdAndBoardTypeOrderByIdDesc(id, BoardType.SHORTS, Limit.of(20))
-                : boardRepository.findAllByUserIdAndBoardTypeAndIdLessThanOrderByIdDesc(id, BoardType.SHORTS, offset, Limit.of(20));
+                ? boardRepository.findAllByUserIdAndBoardTypeOrderByIdDesc(userId, BoardType.SHORTS, Limit.of(20))
+                : boardRepository.findAllByUserIdAndBoardTypeAndIdLessThanOrderByIdDesc(userId, BoardType.SHORTS, offset, Limit.of(20));
 
         List<ViewBoardResponse> list = boardList.stream()
-                .map(ViewBoardResponse::new)
+                .map((board) -> getView(board, userId))
                 .collect(Collectors.toList());
 
 
         return list;
     }
 
-    public List<ViewBoardResponse> allList(Long offset) {
+    public List<ViewMyPageBoardResponse> allList(Long offset) {
         List<Boards> boardList = boardRepository.findAllByOrderByIdDesc(Limit.of(30));
-
-        List<ViewBoardResponse> list = boardList.stream()
-                .map(ViewBoardResponse::new)
+        if(boardList.isEmpty()) return Collections.emptyList();
+        return boardList.stream()
+                .map(ViewMyPageBoardResponse::new)
                 .collect(Collectors.toList());
-
-        return list;
     }
 
 //    public List<ViewBoardResponse> getTagList(Long id) {

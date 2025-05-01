@@ -1,5 +1,6 @@
 package com.glim.borad.dto.response;
 
+import com.glim.borad.domain.BoardType;
 import com.glim.borad.domain.Boards;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,8 +15,10 @@ public class ViewMyPageBoardResponse {
 
     private Long id;
     private List<String> img = List.of();
+    private BoardType type;
 
     public ViewMyPageBoardResponse(Boards board) {
         this.id = board.getId();
+        this.type = board.getBoardType();
     }
 }

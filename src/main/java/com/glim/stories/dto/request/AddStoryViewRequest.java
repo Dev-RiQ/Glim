@@ -12,6 +12,11 @@ public class AddStoryViewRequest {
     private Long storyId;
     private Long userId;
 
+    public AddStoryViewRequest(Long storyId, Long id) {
+        this.storyId = storyId;
+        this.userId = id;
+    }
+
     public StoryViews toEntity(AddStoryViewRequest request) {
         return StoryViews.builder()
                 .storyId(request.getStoryId())

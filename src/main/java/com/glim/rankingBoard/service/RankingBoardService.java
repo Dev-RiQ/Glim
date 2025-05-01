@@ -50,7 +50,7 @@ public class RankingBoardService {
     private String getContentImageUrl(RankingBoardDocument document, BoardType type) {
         if (type == BoardType.SHORTS) {
             if (document.getThumbnailUrl() != null) {
-                return awsS3Util.getURL(document.getThumbnailUrl(), FileSize.IMAGE_256);
+                return awsS3Util.getURL(document.getThumbnailUrl(), FileSize.IMAGE_128);
             } else {
                 return null;
             }
@@ -58,7 +58,7 @@ public class RankingBoardService {
             List<BoardFiles> images = boardFileRepository.findByBoardIdAndFileTypeOrderByBoardFileIdAsc(document.getBoardId(), FileType.IMAGE);
             if (!images.isEmpty()) {
                 String firstImageFileName = images.get(0).getFileName();
-                return awsS3Util.getURL(firstImageFileName, FileSize.IMAGE_256);
+                return awsS3Util.getURL(firstImageFileName, FileSize.IMAGE_128);
             }
         }
         return null;

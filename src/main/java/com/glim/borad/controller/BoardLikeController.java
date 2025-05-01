@@ -18,8 +18,8 @@ public class BoardLikeController {
     private final BoardLikeService boardLikeService;
     private final BoardService boardService;
 
-    @PostMapping({"","/"})
-    public StatusResponseDTO add(@RequestBody AddBoardLikeRequest request) {
+    @PostMapping({"/{boardId}"})
+    public StatusResponseDTO add(@RequestBody AddBoardLikeRequest request,@PathVariable Long boardId) {
         boardLikeService.insert(request);
         Boards board = boardService.updateLike(request.getBoardId(), 1);
         return StatusResponseDTO.ok("좋아요 완료");

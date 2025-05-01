@@ -21,14 +21,9 @@ public class StoryController {
 
     private final StoryService storyService;
 
-    @GetMapping("/view")
-    public StatusResponseDTO getStory(@PathVariable Long userId) {
-        return StatusResponseDTO.ok(storyService.getStory(userId));
-    }
-
-    @GetMapping({"","/"})
-    public StatusResponseDTO getStoryList(@PathVariable Long id) {
-        List<ViewStoryResponse> list = storyService.getStoryList(id);
+    @GetMapping({"/{userId}"})
+    public StatusResponseDTO getStoryList(@PathVariable Long userId) {
+        List<ViewStoryResponse> list = storyService.getStoryList(userId);
         return StatusResponseDTO.ok(list);
     }
 

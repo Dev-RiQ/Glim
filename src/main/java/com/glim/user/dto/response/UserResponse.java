@@ -1,5 +1,7 @@
 package com.glim.user.dto.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.glim.common.awsS3.domain.FileSize;
+import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.user.domain.Role;
 import com.glim.user.domain.User;
 import lombok.Builder;
@@ -20,11 +22,11 @@ public class UserResponse {
     @JsonProperty("isStory")
     private boolean story;
 
-    public static UserResponse from(User user, int boardCount, boolean story) {
+    public static UserResponse from(User user, int boardCount, boolean story, String img) {
         return UserResponse.builder()
                 .id(user.getId())
                 .nickname(user.getNickname())
-                .img(user.getImg())
+                .img(img)
                 .followers(user.getFollowers())
                 .followings(user.getFollowings())
                 .content(user.getContent())

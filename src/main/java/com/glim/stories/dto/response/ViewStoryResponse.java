@@ -4,6 +4,7 @@ import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.utils.CountUtil;
 import com.glim.common.utils.DateTimeUtil;
 import com.glim.stories.domain.Stories;
+import com.glim.user.dto.response.ViewBoardUserResponse;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,19 +14,15 @@ import lombok.ToString;
 @Setter
 public class ViewStoryResponse {
 
-    private Long storyId;
-    private Long userId;
-    private String likes;
-    private String views;
+    private ViewBoardUserResponse user;
+    private Long id;
     private String createdAt;
-    private boolean isLike;
-    private boolean viewed;
+    private String img;
+    private Boolean isLike;
 
     public ViewStoryResponse(Stories stories) {
-        this.storyId = stories.getId();
-        this.userId = stories.getId();
-        this.likes = CountUtil.getCountString(stories.getLikes());
-        this.views = CountUtil.getCountString(stories.getViews());
+        this.id = stories.getId();
+        this.img = stories.getFileName();
         this.createdAt = DateTimeUtil.getDateTimeAgo(stories.getCreatedAt());
     }
 

@@ -16,7 +16,7 @@ public class AwsS3Util {
     private static final String URL = "https://s3.%s.amazonaws.com/%s/%s%s";
 
     public String getURL(String fileName, FileSize typeAndSize){
-        return String.format(URL, region, bucket, fileName, typeAndSize.getTypeAndSizeUri());
+        return java.lang.String.format(URL, region, bucket, fileName, typeAndSize.getTypeAndSizeUri());
     }
 
     public List<String> getSaveFilenames(List<String> originalFilenames){
