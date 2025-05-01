@@ -3,7 +3,6 @@ package com.glim.borad.dto.response;
 import com.glim.borad.domain.BoardComments;
 import com.glim.common.utils.CountUtil;
 import com.glim.common.utils.DateTimeUtil;
-import com.glim.user.domain.User;
 import com.glim.user.dto.response.ViewBoardUserResponse;
 import com.glim.user.repository.UserRepository;
 import lombok.Getter;
@@ -13,8 +12,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @Setter
-public class ViewCommentsResponse {
-
+public class ViewReplyCommentResponse {
     private UserRepository userRepository;
 
     private ViewBoardUserResponse user;
@@ -23,11 +21,9 @@ public class ViewCommentsResponse {
     private String likes;
     private String createdAt;
     private Long replyCommentId;
-    private Boolean isReply;
     private Boolean isLike;
 
-
-    public ViewCommentsResponse(BoardComments boardComments) {
+    public ViewReplyCommentResponse(BoardComments boardComments) {
         this.user = new ViewBoardUserResponse(userRepository.findUserById(boardComments.getUserId()));
         this.id = boardComments.getId();
         this.content = boardComments.getContent();
@@ -35,5 +31,4 @@ public class ViewCommentsResponse {
         this.createdAt = DateTimeUtil.getDateTimeAgo(boardComments.getCreatedAt());
         this.replyCommentId = boardComments.getReplyCommentId();
     }
-
 }

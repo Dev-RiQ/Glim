@@ -17,6 +17,7 @@ public class CommentLikeService {
 
     private final CommentLikeRepository commentLikeRepository;
     private final BoardRepository boardRepository;
+    private final CommentService commentService;
 
     @Transactional
     public void insert(AddCommentLikeRequest request) {
@@ -24,8 +25,9 @@ public class CommentLikeService {
     }
 
     @Transactional
-    public void delete(Long id) {
-        boardRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
-        commentLikeRepository.deleteById(id);
+    public void delete(Long commnetId, Long userId) {
+//        boardRepository.findById(commnetId).orElseThrow(ErrorCode::throwDummyNotFound);
+        commentService.updateLike(commnetId, -1);
+        commentLikeRepository.deleteById(commnetId);
     }
 }

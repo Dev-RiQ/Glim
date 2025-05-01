@@ -25,8 +25,8 @@ public class BoardLikeController {
         return StatusResponseDTO.ok("좋아요 완료");
     }
 
-    @DeleteMapping("")
-    public StatusResponseDTO delete(@RequestBody AddBoardLikeRequest request) {
+    @DeleteMapping("/{boardId}")
+    public StatusResponseDTO delete(@RequestBody AddBoardLikeRequest request, @PathVariable Long boardId) {
         boardLikeService.delete(request.getBoardId(), request.getUserId());
         boardService.updateLike(request.getBoardId(), -1);
         return StatusResponseDTO.ok("좋아요 취소 완료");

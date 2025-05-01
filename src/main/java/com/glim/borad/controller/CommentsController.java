@@ -3,6 +3,7 @@ package com.glim.borad.controller;
 import com.glim.borad.dto.request.AddCommentsRequest;
 import com.glim.borad.dto.request.UpdateCommentsRequest;
 import com.glim.borad.dto.response.ViewCommentsResponse;
+import com.glim.borad.dto.response.ViewReplyCommentResponse;
 import com.glim.borad.service.BoardService;
 import com.glim.borad.service.CommentService;
 import com.glim.common.security.dto.SecurityUserDto;
@@ -30,27 +31,21 @@ public class CommentsController {
     }
 
     @GetMapping({"/reply/{replyCommentId}","/reply/{replyCommentId}/{offset}"})
-    public StatusResponseDTO replyList(@PathVariable Long replyCommentId, @PathVariable(required = false) Long offset) {
-        List<ViewCommentsResponse> board = commentService.replyList(replyCommentId, offset);
+    public StatusResponseDTO replyList(@AuthenticationPrincipal SecurityUserDto user, @PathVariable Long replyCommentId, @PathVariable(required = false) Long offset) {
+        List<ViewReplyCommentResponse> board = commentService.replyList(replyCommentId, offset, user);
         return StatusResponseDTO.ok(board);
     }
 
     @PostMapping({"","/"})
-    public StatusResponseDTO add(@RequestBody AddCommentsRequest request) {
-        commentService.insert(request);
+    public StatusResponseDTO add(@RequestBody AddCommentsRequest request, @AuthenticationPrincipal SecurityUserDto user) {
+        commentService.insert(request, user.getId());
         boardService.updateComment(request.getBoardId(), 1);
         return StatusResponseDTO.ok("댓글 추가 완료");
     }
 
-    @PutMapping("/{id}")
-    public StatusResponseDTO update(@PathVariable Long id, @RequestBody UpdateCommentsRequest request) {
-        commentService.update(id, request);
-        return StatusResponseDTO.ok("댓글 수정 완료");
-    }
-
-    @DeleteMapping("/{boardId}/{id}")
-    public StatusResponseDTO delete(@PathVariable Long boardId, @AuthenticationPrincipal SecurityUserDto user) {
-        commentService.delete(boardId, user.getId());
+    @DeleteMapping("/{id}")
+    public StatusResponseDTO delete(@PathVariable Long id) {
+        commentService.delete(id);
         return StatusResponseDTO.ok("댓글 삭제 완료");
     }
 }

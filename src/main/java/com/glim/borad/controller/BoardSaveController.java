@@ -23,6 +23,7 @@ public class BoardSaveController {
     private final BoardSaveService boardSaveService;
     private final BoardService boardService;
 
+    // 저장한 게시물 목록
     @GetMapping("")
     public StatusResponseDTO getSaveList(@RequestParam Long userId) {
         List<Long> boardIdList = boardSaveService.getSaveList(userId);
@@ -30,15 +31,15 @@ public class BoardSaveController {
         return StatusResponseDTO.ok(boardList);
     }
 
-    @PostMapping({"","/"})
-    public StatusResponseDTO add(@RequestBody AddBoardSaveRequest request) {
-        boardSaveService.insert(request);
-        return StatusResponseDTO.ok("게시물 저장 완료");
-    }
+//    @PostMapping("/{boardId}")
+//    public StatusResponseDTO add(@RequestBody AddBoardSaveRequest request) {
+//        boardSaveService.insert(request);
+//        return StatusResponseDTO.ok("게시물 저장 완료");
+//    }
 
-    @DeleteMapping("/{id}")
-    public StatusResponseDTO delete(@RequestBody AddBoardSaveRequest request) {
-        boardSaveService.delete(request.getBoardId(), request.getUserId());
-        return StatusResponseDTO.ok("게시물 저장 취소 완료");
-    }
+//    @DeleteMapping("/{boardId}")
+//    public StatusResponseDTO delete(@RequestBody AddBoardSaveRequest request, @RequestParam Long boardId) {
+//        boardSaveService.delete(request.getBoardId(), request.getUserId());
+//        return StatusResponseDTO.ok("게시물 저장 취소 완료");
+//    }
 }

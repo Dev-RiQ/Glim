@@ -5,9 +5,12 @@ import com.glim.borad.domain.Boards;
 import com.glim.borad.dto.request.AddCommentsRequest;
 import com.glim.borad.dto.request.UpdateCommentsRequest;
 import com.glim.borad.dto.response.ViewCommentsResponse;
+import com.glim.borad.dto.response.ViewReplyCommentResponse;
 import com.glim.borad.repository.BoardCommentsRepository;
 import com.glim.borad.repository.BoardRepository;
 import com.glim.common.exception.ErrorCode;
+import com.glim.common.security.dto.SecurityUserDto;
+import com.glim.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Limit;
@@ -28,8 +31,8 @@ public class CommentService {
     private final BoardRepository boardRepository;
 
     @Transactional
-    public void insert(AddCommentsRequest request) {
-        boardCommentsRepository.save(new AddCommentsRequest().toEntity(request));
+    public void insert(AddCommentsRequest request, Long userId) {
+        boardCommentsRepository.save(new AddCommentsRequest().toEntity(request, userId));
     }
 
     public List<ViewCommentsResponse> list(Long id, Long offset) {
@@ -47,24 +50,17 @@ public class CommentService {
         return list;
     }
 
-    public List<ViewCommentsResponse> replyList(Long replyCommentId, Long offset) {
+    public List<ViewReplyCommentResponse> replyList(Long replyCommentId, Long offset, SecurityUserDto user) {
         List<BoardComments> commentsList = offset == null ?
                 boardCommentsRepository.findAllByReplyCommentIdOrderByIdAsc(replyCommentId, Limit.of(30)) :
                 boardCommentsRepository.findAllByReplyCommentIdAndIdGreaterThanOrderByIdAsc(replyCommentId, offset, Limit.of(30));
-        return commentsList.stream().map(ViewCommentsResponse::new).collect(Collectors.toList());
-    }
-
-    @Transactional
-    public void update(Long id, UpdateCommentsRequest request) {
-        BoardComments comments = boardCommentsRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
-        comments.update(request);
-        boardCommentsRepository.save(comments);
+        return null;
     }
     @Transactional
-    public void delete(Long boardId, Long userId) {
-        Boards board = boardRepository.findById(boardId).orElseThrow(ErrorCode::throwDummyNotFound);
-        boardCommentsRepository.deleteById(boardId);
-        boardService.updateComment(boardId, -1);
+    public void delete(Long commentId) {
+        BoardComments comments = boardCommentsRepository.findById(commentId).orElseThrow(ErrorCode::throwDummyNotFound);
+        boardCommentsRepository.deleteById(commentId);
+        boardService.updateComment(comments.getBoardId(), -1);
     }
 
     @Transactional

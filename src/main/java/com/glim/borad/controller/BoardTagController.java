@@ -16,22 +16,5 @@ public class BoardTagController {
 
     private final BoardTagService boardTagService;
 
-    @PostMapping({"","/"})
-    public StatusResponseDTO add(@RequestBody AddBoardTagRequest request) {
-//        boardTagService.insert(request);
-        return StatusResponseDTO.ok("테그 완료");
-    }
-
-    @PutMapping("/{id}")
-    public StatusResponseDTO update(@PathVariable Long id, @RequestBody UpdateBoardTagRequest request) {
-        boardTagService.update(id, request);
-        return StatusResponseDTO.ok("테그 수정 완료");
-    }
-
-    @DeleteMapping("/{id}")
-    public StatusResponseDTO delete(@PathVariable Long id) {
-        boardTagService.delete(id);
-        return StatusResponseDTO.ok("테그 삭제 완료");
-    }
 
 }

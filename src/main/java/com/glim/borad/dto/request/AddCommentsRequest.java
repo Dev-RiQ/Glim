@@ -13,15 +13,13 @@ public class AddCommentsRequest {
     private Long boardId;
     private Long userId;
     private String content;
-    private Integer likes;
     private Long replyId;
 
-    public BoardComments toEntity(AddCommentsRequest addCommentsRequest) {
+    public BoardComments toEntity(AddCommentsRequest addCommentsRequest, Long userId) {
         return BoardComments.builder()
                 .boardId(addCommentsRequest.getBoardId())
-                .userId(addCommentsRequest.getUserId())
+                .userId(userId)
                 .content(addCommentsRequest.getContent())
-                .likes(addCommentsRequest.getLikes())
                 .replyId(addCommentsRequest.getReplyId())
                 .build();
     }

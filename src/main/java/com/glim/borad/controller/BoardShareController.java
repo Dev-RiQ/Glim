@@ -17,12 +17,12 @@ public class BoardShareController {
     private final BoardShareService boardShareService;
     private final BoardService boardService;
 
-    @PostMapping({"","/"})
-    public StatusResponseDTO add(@RequestBody AddBoardShareRequest request) {
-        boardShareService.insert(request);
-        boardService.updateShare(request.getBoardId(), 1);
-        return StatusResponseDTO.ok("게시물 공유 완료");
-    }
+//    @PostMapping({"","/"})
+//    public StatusResponseDTO add(@RequestBody AddBoardShareRequest request) {
+//        boardShareService.insert(request);
+//        boardService.updateShare(request.getBoardId(), 1);
+//        return StatusResponseDTO.ok("게시물 공유 완료");
+//    }
 
 //    @DeleteMapping("/{id}")
 //    public StatusResponseDTO delete(@RequestBody AddBoardShareRequest request, @PathVariable Long id) {
