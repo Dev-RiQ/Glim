@@ -11,7 +11,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @Setter
-public class ViewCommentsResponse {
+public class ViewReplyCommentResponse {
 
     private User user;
     private Long id;
@@ -19,27 +19,14 @@ public class ViewCommentsResponse {
     private String likes;
     private String createdAt;
     private Long replyCommentId;
-    private Boolean isReply;
     private Boolean isLike;
 
-//    private Long userId;
-//    private String content;
-//    private String likes;
-//    private String createdAt;
-
-//    public ViewCommentsResponse(BoardComments boardComments) {
-//        this.userId = boardComments.getUserId();
-//        this.content = boardComments.getContent();
-//        this.likes = CountUtil.getCountString(boardComments.getLikes());
-//        this.createdAt = DateTimeUtil.getDateTimeAgo(boardComments.getCreatedAt());
-//    }
-
-    public ViewCommentsResponse(BoardComments boardComments) {
+    public ViewReplyCommentResponse(BoardComments boardComments, User user) {
+        this.user = user;
         this.id = boardComments.getId();
         this.content = boardComments.getContent();
         this.likes = CountUtil.getCountString(boardComments.getLikes());
         this.createdAt = DateTimeUtil.getDateTimeAgo(boardComments.getCreatedAt());
         this.replyCommentId = boardComments.getReplyCommentId();
     }
-
 }

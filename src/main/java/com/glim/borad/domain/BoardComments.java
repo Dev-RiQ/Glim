@@ -33,11 +33,11 @@ public class BoardComments {
     private Long replyCommentId;
 
     @Builder
-    public BoardComments(Long boardId, Long userId, String content, Integer likes, Long replyId) {
+    public BoardComments(Long boardId, Long userId, String content, Long replyId) {
         this.boardId = boardId;
         this.userId = userId;
         this.content = content;
-        this.likes = likes;
+        this.likes = 0;
         this.createdAt = LocalDateTime.now();
         this.updateAt = LocalDateTime.now();
         this.replyCommentId = replyId;

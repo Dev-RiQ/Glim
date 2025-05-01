@@ -19,6 +19,30 @@ INSERT INTO story_views (story_id, user_id)
 VALUES
     (1, 1),
     (2, 2);
+INSERT INTO users (
+    username, password, name, nickname, content, img, phone,
+    created_date, followers, followings, role, tags, rate,
+    read_board_id, read_alarm_id, plat_form
+) VALUES
+      (
+          'user001', 'encrypted_pw_001', '홍길동', '@gildong',
+          '안녕하세요! 여행을 좋아해요.', 'https://example.com/images/user1.jpg', '010-1234-5678',
+          NOW(), 100, 50, 'ROLE_USER', '여행,사진', 1, 0, 0, 'LOCAL'
+      ),
+      (
+          'user002', 'encrypted_pw_002', '김영희', '@younghee',
+          '맛집 탐방 중입니다.', 'https://example.com/images/user2.jpg', '010-2345-6789',
+          NOW(), 250, 120, 'ROLE_USER', '맛집,카페', 2, 0, 0, 'NAVER'
+      ),
+      (
+          'user003', 'encrypted_pw_003', '이철수', '@chulsoo',
+          '일상 공유 계정입니다.', 'https://example.com/images/user3.jpg', '010-3456-7890',
+          NOW(), 400, 300, 'ROLE_ADMIN', '일상,운동', 3, 0, 0, 'GOOGLE'
+      );
+
+
+
+
 
 
 -- 삽입 확인

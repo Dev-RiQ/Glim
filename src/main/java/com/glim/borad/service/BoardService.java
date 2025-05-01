@@ -3,6 +3,7 @@ package com.glim.borad.service;
 import com.glim.admin.repository.AdvertisementRepository;
 import com.glim.borad.domain.Bgms;
 import com.glim.borad.domain.BoardFiles;
+import com.glim.borad.domain.BoardType;
 import com.glim.borad.domain.Boards;
 import com.glim.borad.dto.request.AddBoardFileRequest;
 import com.glim.borad.dto.request.AddBoardRequest;
@@ -10,12 +11,14 @@ import com.glim.borad.dto.request.AddBoardTagRequest;
 import com.glim.borad.dto.request.UpdateBoardRequest;
 import com.glim.borad.dto.response.ViewBgmResponse;
 import com.glim.borad.dto.response.ViewBoardResponse;
+import com.glim.borad.dto.response.ViewMyPageBoardResponse;
 import com.glim.borad.repository.*;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.ErrorCode;
 import com.glim.user.domain.Follow;
 import com.glim.user.domain.User;
+import com.glim.user.dto.response.ViewBoardUserResponse;
 import com.glim.user.repository.FollowRepository;
 import com.glim.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -68,12 +71,10 @@ public class BoardService {
     public List<ViewBoardResponse> getMainBoard(Long id, Long offset) {
         List<Follow> followList = followRepository.findAllByFollowerUserId(id);
         List<Long> followedUserIds = followList.stream().map(Follow::getFollowingUserId).collect(Collectors.toList());
-        User user1 = (User) userRepository.findAllById(Collections.singleton(id));
-        System.out.println("userTag = " + user1.getTags());
         List<Boards> boardList = (offset == null) ? boardRepository.findAllByUserIdInOrderByIdDesc(followedUserIds, Limit.of(10)) : boardRepository.findAllByUserIdInAndIdLessThanOrderByIdDesc(followedUserIds, offset, Limit.of(10));
         if (boardList.size() < 10) {
-            User user = (User) userRepository.findAllById(Collections.singleton(id));
-            System.out.println("userTag = " + user.getTags());
+//            User user = (User) userRepository.findAllById(Collections.singleton(id));
+//            System.out.println("userTag = " + user.getTags());
         }
         if (boardList.size() < 10) {
             int remain = 10 - boardList.size();
@@ -91,6 +92,7 @@ public class BoardService {
 
     public List<ViewBoardResponse> getSubBoard(List<ViewBoardResponse> list, Long id) {
         list.forEach(viewBoardResponse -> {
+//            ViewBoardUserResponse viewBoardUserResponse = viewBoardResponse.
             boolean isLike = boardLikeRepository.existsByBoardIdAndUserId(viewBoardResponse.getId(), id);
             boolean isSave = boardLikeRepository.existsByBoardIdAndUserId(viewBoardResponse.getId(), id);
             List<BoardFiles> files = boardFileRepository.findAllByBoardId(viewBoardResponse.getId());
@@ -112,23 +114,23 @@ public class BoardService {
         return list;
     }
 
-    public List<ViewBoardResponse> list(Long userId, Long offset) {
+    public List<ViewMyPageBoardResponse> list(Long userId, Long offset) {
         List<Boards> boardList = offset == null ? boardRepository.findAllByUserIdOrderByIdDesc(userId, Limit.of(20)) : boardRepository.findAllByUserIdAndIdLessThanOrderByIdDesc(userId, offset, Limit.of(20));
-        List<ViewBoardResponse> list = boardList.stream().map(ViewBoardResponse::new).collect(Collectors.toList());
 
-        list = getSubBoard(list, userId);
+//        list = getSubBoard(list, userId);
 
-        for (int i = 0; i < boardList.size(); i++) {
-            Bgms bgm = bgmRepository.findById(boardList.get(i).getBgmId()).orElseThrow(ErrorCode::throwDummyNotFound);
-            ViewBgmResponse bgms = new ViewBgmResponse(bgm);
-            list.get(i).setBgm(bgms);
-        }
+//        for (int i = 0; i < boardList.size(); i++) {
+//            Bgms bgm = bgmRepository.findById(boardList.get(i).getBgmId()).orElseThrow(ErrorCode::throwDummyNotFound);
+//            ViewBgmResponse bgms = new ViewBgmResponse(bgm);
+//            list.get(i).setBgm(bgms);
+//        }
 
-        return list;
+        return boardList.stream().map(ViewMyPageBoardResponse::new).collect(Collectors.toList());
     }
 
     @Transactional
     public void delete(Long id) {
+
         boardRepository.deleteById(id);
     }
 
@@ -187,6 +189,53 @@ public class BoardService {
     public boolean isLoginUser(Long id, Long userId) {
         Boards boards = boardRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
         return boards.getUserId().equals(userId);
+    }
+
+    public ViewBoardResponse getBoard(Long id) {
+        return boardRepository.findById(id).stream().map(ViewBoardResponse::new).findFirst().orElseThrow(ErrorCode::throwDummyNotFound);
+    }
+
+    public ViewBoardResponse getShorts(Long id) {
+        ViewBoardResponse shorts = new ViewBoardResponse(boardRepository.findByBoardTypeAndBoardId(BoardType.SHORTS, id));
+        return shorts;
+    }
+
+    public List<ViewBoardResponse> getShortsList(Long offset, Long userId) {
+        List<Boards> boardList = (offset == null)
+                ? boardRepository.findAllByBoardTypeOrderByIdDesc(BoardType.SHORTS, Limit.of(5))
+                : boardRepository.findAllByBoardTypeAndIdLessThanOrderByIdDesc(BoardType.SHORTS, offset, Limit.of(5));
+
+        List<ViewBoardResponse> list = boardList.stream()
+                .map(ViewBoardResponse::new)
+                .collect(Collectors.toList());
+
+        list = getSubBoard(list, userId);
+
+
+        return list;
+    }
+
+    public List<ViewBoardResponse> getMyShortsList(Long offset, Long id) {
+        List<Boards> boardList = (offset == null)
+                ? boardRepository.findAllByUserIdAndBoardTypeOrderByIdDesc(id, BoardType.SHORTS, Limit.of(20))
+                : boardRepository.findAllByUserIdAndBoardTypeAndIdLessThanOrderByIdDesc(id, BoardType.SHORTS, offset, Limit.of(20));
+
+        List<ViewBoardResponse> list = boardList.stream()
+                .map(ViewBoardResponse::new)
+                .collect(Collectors.toList());
+
+
+        return list;
+    }
+
+    public List<ViewBoardResponse> allList(Long offset) {
+        List<Boards> boardList = boardRepository.findAllByOrderByIdDesc(Limit.of(30));
+
+        List<ViewBoardResponse> list = boardList.stream()
+                .map(ViewBoardResponse::new)
+                .collect(Collectors.toList());
+
+        return list;
     }
 
 //    public List<ViewBoardResponse> getTagList(Long id) {
