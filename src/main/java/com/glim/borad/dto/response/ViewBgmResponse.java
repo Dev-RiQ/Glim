@@ -13,11 +13,11 @@ public class ViewBgmResponse {
     private final String artist;
     private final String fileName;
 
-    public ViewBgmResponse(Bgms bgm) {
+    public ViewBgmResponse(Bgms bgm,String fileName) {
         this.id = bgm.getId();
         this.title = bgm.getTitle();
         this.artist = bgm.getArtist();
-        this.fileName = bgm.getFileName();
+        this.fileName =fileName;
     }
 
 }

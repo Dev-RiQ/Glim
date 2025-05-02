@@ -4,6 +4,8 @@ import com.glim.borad.domain.Bgms;
 import com.glim.borad.dto.request.AddBgmRequest;
 import com.glim.borad.dto.response.ViewBgmResponse;
 import com.glim.borad.repository.BgmRepository;
+import com.glim.common.awsS3.domain.FileSize;
+import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class BgmService {
 
     private final BgmRepository bgmRepository;
+    private final AwsS3Util awsS3Util;
 
     @Transactional
     public void insert(AddBgmRequest request) {
@@ -35,14 +38,18 @@ public class BgmService {
     }
 
     public List<ViewBgmResponse> list() {
-        return bgmRepository.findAll().stream().map(ViewBgmResponse::new).collect(Collectors.toList());
+        return bgmRepository.findAll().stream().map(this::getURL).collect(Collectors.toList());
+    }
+
+    private ViewBgmResponse getURL(Bgms bgms) {
+        return new ViewBgmResponse(bgms, awsS3Util.getURL(bgms.getFileName(), FileSize.AUDIO));
     }
 
     public List<ViewBgmResponse> list(Long id, Long offset) {
         List<Bgms> bgmsList = offset == null ?
                 bgmRepository.findFirst10From(id) :
                 bgmRepository.findFirst10FromOffset(id, offset);
-        return bgmsList.stream().map(ViewBgmResponse::new).collect(Collectors.toList());
+        return bgmsList.stream().map(this::getURL).collect(Collectors.toList());
     }
 
 }

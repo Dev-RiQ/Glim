@@ -90,7 +90,8 @@ public class BoardService {
         viewBoardUserResponse.setIsStory(storyService.isStory(board.getUserId()));
         ViewBgmResponse viewBgmResponse = null;
         if(board.getBgmId() != 0){
-            viewBgmResponse = new ViewBgmResponse(bgmRepository.findById(board.getBgmId()).orElseThrow(ErrorCode::throwDummyNotFound));
+            Bgms bgm  = bgmRepository.findById(board.getBgmId()).orElseThrow(ErrorCode::throwDummyNotFound);
+            viewBgmResponse = new ViewBgmResponse(bgm,bgm.getFileName());
         }
         return new ViewBoardResponse(board, viewBoardUserResponse, viewBgmResponse);
     }
