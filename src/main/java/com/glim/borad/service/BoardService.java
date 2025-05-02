@@ -145,7 +145,7 @@ public class BoardService {
     }
 
     private ViewMyPageBoardResponse getByPageBoard(Boards board){
-        BoardFiles file = boardFileRepository.findOneByBoardId(board.getId());
+        BoardFiles file = boardFileRepository.findAllByBoardId(board.getId(), Limit.of(1));
         String img;
         if(board.getBoardType().equals(BoardType.BASIC)){
             img = awsS3Util.getURL(file.getFileName(), FileSize.IMAGE_128);
