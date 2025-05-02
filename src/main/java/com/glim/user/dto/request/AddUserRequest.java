@@ -28,7 +28,7 @@ public class AddUserRequest {
                 .password(password) // 비밀번호 인코딩은 서비스에서!
                 .name(name)
                 .nickname(nickname != null ? nickname : name)
-                .img(img != null ? img : "")
+                .img(img)
                 .phone(phone != null ? phone : "")
                 .created_at(LocalDateTime.now())
                 .followers(0L)
