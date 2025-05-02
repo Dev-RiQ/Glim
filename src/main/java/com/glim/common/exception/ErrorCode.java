@@ -12,7 +12,7 @@ import static org.springframework.http.HttpStatus.*;
 @AllArgsConstructor
 public enum ErrorCode {
     /* 400 BAD_REQUEST : 잘못된 요청 */
-    DUMMY_BAD_REQUEST(BAD_REQUEST,"잘못된 더미 값이 존재합니다."),
+    DUMMY_BAD_REQUEST(BAD_REQUEST,"잘못된 더미값이 존재합니다"),
     INVALID_PASSWORD(BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     INVALID_REFRESH_TOKEN(BAD_REQUEST, "유효하지 않은 리프레시 토큰입니다."),
     INVALID_VERIFICATION_CODE(BAD_REQUEST, "인증번호가 일치하지 않습니다."),
@@ -40,6 +40,8 @@ public enum ErrorCode {
     DUPLICATE_NICKNAME(CONFLICT, "이미 사용 중인 닉네임입니다."),
     DUPLICATE_PHONE(CONFLICT, "이미 등록된 전화번호입니다."),
     DUPLICATE_FOLLOW(CONFLICT, "이미 팔로우된 계정입니다."),
+    DUPLICATE_FOLLOWMINE(CONFLICT, "자기자신은 팔로우 할 수 없습니다."),
+
 
 
     /* 500 : */

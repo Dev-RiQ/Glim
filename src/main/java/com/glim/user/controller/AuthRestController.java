@@ -57,25 +57,19 @@ public class AuthRestController {
         int boardCount = boardService.countBoardsByUserId(id);
         boolean isFollowing = userService.isFollowing(currentUserId, id);
         boolean isStory = storyService.isStory(currentUserId);
-        UserProfileResponse response = UserProfileResponse.from(currentUserId, targetUser, boardCount, isFollowing, isStory);
+        String img = awsS3Util.getURL(targetUser.getImg(), FileSize.IMAGE_128);
+        UserProfileResponse response = UserProfileResponse.from(currentUserId, targetUser, boardCount, isFollowing, isStory, img);
         return ResponseEntity.ok(response);
     }
 
 
-    // ✅ 로그인: 사용자 인증 후 accessToken + refreshToken + user 응답
+    // 로그인: 사용자 인증 후 accessToken + refreshToken + user 응답
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
-        User user = userService.login(request);
-        String accessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
-        boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
-        int boardCount = boardService.countBoardsByUserId(user.getId());
-        boolean isStory = storyService.isStory(user.getId());
-        String img = awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128);
-        return ResponseEntity.ok(
-                new LoginResponse(accessToken, refreshToken.getToken(), UserResponse.from(user, boardCount, isStory, img), isFirstLogin)
-        );
+        LoginResponse response = userService.loginAndGenerateTokens(request);
+        return ResponseEntity.ok(response);
     }
+
 
     // 소셜로그인
     @PostMapping("/oauth-login")
@@ -96,7 +90,7 @@ public class AuthRestController {
     }
 
 
-    // ✅ 회원가입: 신규 사용자 등록
+    // 회원가입: 신규 사용자 등록
     @PostMapping("/sign-up")
     public ResponseEntity<String> signUp(@RequestBody AddUserRequest request) {
         userService.registerUser(request);
@@ -115,7 +109,7 @@ public class AuthRestController {
         return ResponseEntity.ok("사용 가능한 닉네임입니다!");
     }
 
-    // ✅ 마이페이지 조회 (닉네임, 이미지, 이름, 콘텐츠만 조회)
+    // 마이페이지 조회 (닉네임, 이미지, 이름, 콘텐츠만 조회)
     @GetMapping("/update")
     public ResponseEntity<UserViewResponse> getSimpleUserInfo() {
         Long currentUserId = SecurityUtil.getCurrentUserId();
@@ -123,7 +117,7 @@ public class AuthRestController {
         return ResponseEntity.ok(UserViewResponse.from(user, awsS3Util));
     }
 
-    // ✅ 마이페이지 수정: 로그인한 사용자만 본인 정보 수정 가능
+    // 마이페이지 수정: 로그인한 사용자만 본인 정보 수정 가능
     @PutMapping("/update")
     public ResponseEntity<String> updateUser(@RequestBody UpdateUserRequest request) {
         Long currentUserId = SecurityUtil.getCurrentUserId();
@@ -139,7 +133,7 @@ public class AuthRestController {
         return ResponseEntity.ok("전화번호 변경 완료");
     }
 
-    // ✅ 회원 탈퇴: 로그인한 사용자만 본인 탈퇴 가능
+    // 회원 탈퇴: 로그인한 사용자만 본인 탈퇴 가능
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteUser() {
         Long currentUserId = SecurityUtil.getCurrentUserId();
@@ -147,7 +141,7 @@ public class AuthRestController {
         return ResponseEntity.ok("회원 탈퇴 완료");
     }
 
-    // ✅ 비밀번호 변경: 로그인한 사용자만 본인 비밀번호 수정 가능
+    // 비밀번호 변경: 로그인한 사용자만 본인 비밀번호 수정 가능
     @PatchMapping("/password")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest request) {
         Long currentUserId = SecurityUtil.getCurrentUserId();
@@ -155,7 +149,7 @@ public class AuthRestController {
         return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
     }
 
-    // ✅ 로그아웃: accessToken 헤더 기반, refreshToken 삭제
+    // 로그아웃: accessToken 헤더 기반, refreshToken 삭제
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String authorizationHeader) {
         String accessToken = authorizationHeader.replace("Bearer ", "");
@@ -165,7 +159,7 @@ public class AuthRestController {
     }
 
 
-    // 🔍 닉네임 검색 API
+    // 닉네임 검색 API
     @PostMapping("/search")
     public ResponseEntity<List<FollowRecommendResponse>> searchUsersByNickname(@RequestBody NicknameSearchRequest request) {
         List<FollowRecommendResponse> result = userService.searchUsersByNickname(request.getNickname());
@@ -181,6 +175,7 @@ public class AuthRestController {
                 .filter(u -> !u.getId().equals(user.getId()))
                 .map(u -> {
                     boolean isStory = storyService.isStory(u.getId());
+                    u.setImg(awsS3Util.getURL(u.getImg(), FileSize.IMAGE_128));
                     return FollowRecommendResponse.from(u, isStory);
                 })
                 .toList();
@@ -197,7 +192,7 @@ public class AuthRestController {
         String accessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        int boardCount = boardService.countBoardsByUserId(user.getId()); // ✅ 게시글 수 조회
+        int boardCount = boardService.countBoardsByUserId(user.getId());
         boolean isStory = storyService.isStory(user.getId());
         String img = awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128);
 
@@ -205,7 +200,7 @@ public class AuthRestController {
                 new LoginResponse(
                         accessToken,
                         refreshToken.getToken(),
-                        UserResponse.from(user, boardCount, isStory, img), // ✅ 수정
+                        UserResponse.from(user, boardCount, isStory, img),
                         false
                 )
         );

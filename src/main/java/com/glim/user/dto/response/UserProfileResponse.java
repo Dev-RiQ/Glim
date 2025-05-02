@@ -18,16 +18,15 @@ public class UserProfileResponse {
     private String name;
     private Integer rate;
     private Integer boardCount;
-    @JsonProperty("isStory")
-    private boolean story;
-    private boolean isMine;        // ✅ 내가 조회한 내 프로필인지 여부
-    private boolean isFollowing;   // ✅ 내가 이 유저를 팔로우 중인지 여부
+    private Boolean isStory;
+    private Boolean isMine;        // ✅ 내가 조회한 내 프로필인지 여부
+    private Boolean isFollowing;   // ✅ 내가 이 유저를 팔로우 중인지 여부
 
-    public static UserProfileResponse from(Long currentUserId, User target, int boardCount, boolean isFollowing ,boolean story) {
+    public static UserProfileResponse from(Long currentUserId, User target, int boardCount, boolean isFollowing ,boolean isStory, String img) {
         return UserProfileResponse.builder()
                 .id(target.getId())
                 .nickname(target.getNickname())
-                .img(target.getImg())
+                .img(img)
                 .followers(target.getFollowers())
                 .followings(target.getFollowings())
                 .content(target.getContent())
@@ -36,7 +35,7 @@ public class UserProfileResponse {
                 .boardCount(boardCount)
                 .isMine(target.getId().equals(currentUserId))  // ✅ isMine 계산
                 .isFollowing(isFollowing)
-                .story(story)
+                .isStory(isStory)
                 .build();
     }
 }

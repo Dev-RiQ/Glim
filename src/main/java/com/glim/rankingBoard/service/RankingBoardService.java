@@ -46,10 +46,12 @@ public class RankingBoardService {
 
     private String getContentImageUrl(RankingBoardDocument document, BoardType type) {
         if (type == BoardType.SHORTS) {
-            if (document.getThumbnailUrl() != null) {
-                return awsS3Util.getURL(document.getThumbnailUrl(), FileSize.IMAGE_128);
-            } else {
-                return null;
+            List<BoardFiles> videos = boardFileRepository.findByBoardIdAndFileTypeOrderByBoardFileIdAsc(
+                    document.getBoardId(), FileType.VIDEO
+            );
+            if (!videos.isEmpty()) {
+                String firstVideoFileName = videos.get(0).getFileName();
+                return awsS3Util.getURL(firstVideoFileName, FileSize.VIDEO_THUMBNAIL);
             }
         } else if (type == BoardType.BASIC) {
             List<BoardFiles> images = boardFileRepository.findByBoardIdAndFileTypeOrderByBoardFileIdAsc(document.getBoardId(), FileType.IMAGE);

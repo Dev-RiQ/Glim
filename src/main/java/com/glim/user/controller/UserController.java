@@ -23,9 +23,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserRepository userRepository;
     private final UserService userService;
-    private final AuthCodeRepository authCodeRepository;
 
     // ✅ UserController.java - 추가 정보 입력 API
     @PostMapping("/social-info")

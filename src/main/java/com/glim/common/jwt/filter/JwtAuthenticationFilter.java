@@ -79,7 +79,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 response.setContentType("application/json;charset=UTF-8");
                 response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().write("{ \"accessToken\": \"" + newAccessToken + "\" }");
+                response.getWriter().write("{ \"token\": \"" + newAccessToken + "\" }");
                 return;
 
 

@@ -79,12 +79,28 @@ public class UserService {
         this.followRepository = followRepository;
     }
 
+    public LoginResponse loginAndGenerateTokens(LoginRequest request) {
+        User user = login(request);
+        String accessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
+        boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
+        int boardCount = boardService.countBoardsByUserId(user.getId());
+        boolean isStory = storyService.isStory(user.getId());
+        String img = awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128);
+
+        return new LoginResponse(
+                accessToken,
+                refreshToken.getToken(),
+                UserResponse.from(user, boardCount, isStory, img),
+                isFirstLogin
+        );
+    }
+
     public User login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // 더미 유저 구분 조건 (예: nickname이 knk_06X로 시작하면 더미라고 가정)
-        if (user.getNickname().startsWith("knk_")) {
+        if (user.getUsername().startsWith("test")) {
             if (!request.getPassword().equals(user.getPassword())) {
                 throw new CustomException(ErrorCode.INVALID_PASSWORD);
             }
@@ -206,13 +222,15 @@ public class UserService {
     }
 
     public List<FollowRecommendResponse> searchUsersByNickname(String keyword) {
-        Long currentUserId = SecurityUtil.getCurrentUserId();        List<User> users = userRepository.findTop20ByNicknameContainingIgnoreCase(keyword);
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+        List<User> users = userRepository.findTop20ByNicknameContainingIgnoreCase(keyword);
 
         return users.stream()
                 .filter(user -> !user.getId().equals(currentUserId))  // ✅ 본인 제외
                 .map(user -> {
                     boolean isStory = storyService.isStory(user.getId());
-                    return FollowRecommendResponse.from(user,isStory); // ✅ user + boardCount 같이 넘김
+                    user.setImg(awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128));
+                    return FollowRecommendResponse.from(user,isStory);
                 })
                 .toList();
     }

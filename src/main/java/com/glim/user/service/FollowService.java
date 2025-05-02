@@ -1,5 +1,7 @@
 package com.glim.user.service;
 
+import com.glim.common.awsS3.domain.FileSize;
+import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import com.glim.common.security.util.SecurityUtil;
@@ -29,16 +31,19 @@ public class FollowService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final StoryService storyService;
+    private final AwsS3Util awsS3Util;
 
     public FollowService(
             FollowRepository followRepository,
             UserRepository userRepository,
             @Lazy NotificationService notificationService,
-            StoryService storyService) {
+            StoryService storyService,
+            AwsS3Util awsS3Util) {
         this.followRepository = followRepository;
         this.userRepository = userRepository;
         this.notificationService = notificationService;
         this.storyService = storyService;
+        this.awsS3Util = awsS3Util;
     }
 
     // ✅ 로그인한 사용자 기준 팔로우
@@ -106,7 +111,7 @@ public class FollowService {
                 .map(f -> {
                     User user = userRepository.findById(f.getFollowingUserId())
                             .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
+                    user.setImg(awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128));
                     boolean isStory = storyService.isStory(user.getId());
                     return FollowUserResponse.from(user, isStory);
                 })
@@ -123,7 +128,7 @@ public class FollowService {
                 .map(f -> {
                     User user = userRepository.findById(f.getFollowerUserId())
                             .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
+                    user.setImg(awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128));
                     boolean isStory = storyService.isStory(user.getId());
                     return FollowUserResponse.from(user, isStory);
                 })
@@ -159,7 +164,13 @@ public class FollowService {
         return userRepository.findAllById(candidateIds).stream()
                 .sorted(Comparator.comparing(User::getFollowers).reversed())
                 .limit(5)
-                .map(u -> new FollowRecommendResponse(u.getId(), u.getNickname(), u.getImg(), u.getName(), storyService.isStory(u.getId())))
+                .map(u -> new FollowRecommendResponse(
+                        u.getId(),
+                        u.getNickname(),
+                        awsS3Util.getURL(u.getImg(), FileSize.IMAGE_128),  // ✅ 여기에서 가공
+                        u.getName(),
+                        storyService.isStory(u.getId())
+                ))
                 .collect(toList());
     }
 
