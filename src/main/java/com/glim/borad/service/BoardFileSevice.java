@@ -3,7 +3,6 @@ package com.glim.borad.service;
 import com.glim.borad.domain.BoardFiles;
 import com.glim.borad.domain.FileType;
 import com.glim.borad.dto.request.AddBoardFileRequest;
-import com.glim.borad.dto.request.UpdateBoardFileRequest;
 import com.glim.borad.repository.BoardFileRepository;
 import com.glim.borad.repository.BoardRepository;
 import com.glim.common.awsS3.domain.FileSize;
@@ -29,14 +28,6 @@ public class BoardFileSevice {
 //    public BoardFiles insert(AddBoardFileRequest request) {
 //        return boardFileRepository.save(new AddBoardFileRequest().toEntity(request));
 //    }
-
-    @Transactional
-    public BoardFiles update(Long id, UpdateBoardFileRequest request) {
-        BoardFiles boardFiles = boardFileRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
-        boardFiles.update(request);
-        boardFileRepository.save(boardFiles);
-        return boardFiles;
-    }
 
     @Transactional
     public void delete(Long id, Long boardId) {

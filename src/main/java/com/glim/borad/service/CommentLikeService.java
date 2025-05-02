@@ -1,9 +1,9 @@
 package com.glim.borad.service;
 
+import com.glim.borad.domain.CommentLikes;
 import com.glim.borad.dto.request.AddCommentLikeRequest;
 import com.glim.borad.repository.BoardRepository;
 import com.glim.borad.repository.CommentLikeRepository;
-import com.glim.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,18 +16,23 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentLikeService {
 
     private final CommentLikeRepository commentLikeRepository;
-    private final BoardRepository boardRepository;
-    private final CommentService commentService;
 
     @Transactional
-    public void insert(AddCommentLikeRequest request) {
-        commentLikeRepository.save(new AddCommentLikeRequest().toEntity(request));
+    public boolean insert(AddCommentLikeRequest request) {
+        if(!commentLikeRepository.existsByCommentIdAndUserId(request.getCommentId(),request.getUserId())) {
+            commentLikeRepository.save(new AddCommentLikeRequest().toEntity(request));
+            return true;
+        }
+        return false;
     }
 
     @Transactional
-    public void delete(Long commnetId, Long userId) {
-//        boardRepository.findById(commnetId).orElseThrow(ErrorCode::throwDummyNotFound);
-        commentService.updateLike(commnetId, -1);
-        commentLikeRepository.deleteById(commnetId);
+    public boolean delete(Long commnetId, Long userId) {
+        CommentLikes commentLike = commentLikeRepository.findByCommentIdAndUserId(commnetId,userId);
+        if(commentLike != null) {
+            commentLikeRepository.delete(commentLike);
+            return true;
+        }
+        return false;
     }
 }

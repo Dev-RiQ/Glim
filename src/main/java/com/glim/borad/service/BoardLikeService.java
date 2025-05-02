@@ -1,5 +1,6 @@
 package com.glim.borad.service;
 
+import com.glim.borad.domain.BoardLikes;
 import com.glim.borad.dto.request.AddBoardLikeRequest;
 import com.glim.borad.repository.BoardLikeRepository;
 import com.glim.borad.repository.BoardRepository;
@@ -19,14 +20,22 @@ public class BoardLikeService {
     private final BoardRepository boardRepository;
 
     @Transactional
-    public void insert(AddBoardLikeRequest request) {
-        boardLikeRepository.save(new AddBoardLikeRequest().toEntity(request));
+    public boolean insert(Long boardId, Long userId) {
+        if(!boardLikeRepository.existsByBoardIdAndUserId(boardId, userId)) {
+            boardLikeRepository.save(new AddBoardLikeRequest().toEntity(new AddBoardLikeRequest(boardId, userId)));
+            return true;
+        }
+        return false;
     }
 
     @Transactional
-    public void delete(Long boardId, Long userId) {
-        boardRepository.findById(boardId).orElseThrow(ErrorCode::throwDummyNotFound);
-        boardLikeRepository.deleteByBoardIdAndUserId(boardId, userId);
+    public boolean delete(Long boardId, Long userId) {
+        BoardLikes boardLikes = boardLikeRepository.findByBoardIdAndUserId(boardId,userId);
+        if(boardLikes != null){
+            boardLikeRepository.delete(boardLikes);
+            return true;
+        }
+        return false;
     }
 
     public Boolean isLike(Long boardId, Long userId) {

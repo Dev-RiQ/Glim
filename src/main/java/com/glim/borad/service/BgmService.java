@@ -35,7 +35,7 @@ public class BgmService {
     }
 
     public List<ViewBgmResponse> list() {
-        return bgmRepository.findAll().stream().map(bgm -> new ViewBgmResponse(bgm)).collect(Collectors.toList());
+        return bgmRepository.findAll().stream().map(ViewBgmResponse::new).collect(Collectors.toList());
     }
 
     public List<ViewBgmResponse> list(Long id, Long offset) {

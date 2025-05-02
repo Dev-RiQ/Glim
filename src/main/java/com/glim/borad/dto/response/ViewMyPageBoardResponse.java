@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -14,11 +15,12 @@ import java.util.List;
 public class ViewMyPageBoardResponse {
 
     private Long id;
-    private List<String> img = List.of();
+    private String img;
     private BoardType type;
 
-    public ViewMyPageBoardResponse(Boards board) {
+    public ViewMyPageBoardResponse(Boards board, String img) {
         this.id = board.getId();
         this.type = board.getBoardType();
+        this.img = img;
     }
 }

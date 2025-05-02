@@ -1,9 +1,11 @@
 package com.glim.stories.controller;
 
+import com.glim.borad.dto.response.ViewMyPageBoardResponse;
 import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.common.statusResponse.StatusResponseDTO;
 import com.glim.stories.domain.Stories;
 import com.glim.stories.dto.request.AddStoryRequest;
+import com.glim.stories.dto.response.ViewMyPageStoryResponse;
 import com.glim.stories.dto.response.ViewStoryResponse;
 import com.glim.stories.service.StoryService;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +24,16 @@ public class StoryController {
     private final StoryService storyService;
 
     @GetMapping({"/{userId}"})
-    public StatusResponseDTO getStoryList(@PathVariable Long userId) {
-        List<ViewStoryResponse> list = storyService.getStoryList(userId);
+    public StatusResponseDTO getStoryList(@PathVariable Long userId, @AuthenticationPrincipal SecurityUserDto user) {
+        List<ViewStoryResponse> list = storyService.getStoryList(userId,user.getId());
         return StatusResponseDTO.ok(list);
+    }
+
+
+    @GetMapping({"/my","/my/{offset}"})
+    public StatusResponseDTO getMyStoryList(@PathVariable(required = false) Long offset, @AuthenticationPrincipal SecurityUserDto user){
+        List<ViewMyPageStoryResponse> myStoryList = storyService.myPageStoryList(user.getId(),offset);
+        return StatusResponseDTO.ok(myStoryList);
     }
 
     @PostMapping({"", "/"})

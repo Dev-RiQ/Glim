@@ -16,11 +16,11 @@ public class BoardViewService {
     private final BoardViewRepository boardViewRepository;
 
     @Transactional
-    public void insert(AddBoardViewRequest request) {
-        if(boardViewRepository.findByUserIdAndBoardId(request.getUserId(), request.getBoardId()) != null) {
-            return;
+    public boolean insert(AddBoardViewRequest request) {
+        if(!boardViewRepository.existsByUserIdAndBoardId(request.getUserId(), request.getBoardId())) {
+            boardViewRepository.save(new AddBoardViewRequest().toEntity(request));
+            return true;
         };
-
-        boardViewRepository.save(new AddBoardViewRequest().toEntity(request));
+        return false;
     }
 }

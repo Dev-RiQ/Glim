@@ -1,5 +1,6 @@
 package com.glim.borad.repository;
 
+import com.glim.borad.domain.BoardSaves;
 import com.glim.borad.domain.BoardType;
 import com.glim.borad.domain.Boards;
 import org.springframework.data.domain.Limit;
@@ -57,5 +58,12 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
 
     List<Boards> findAllByOrderByIdDesc(Limit of);
 
+    List<Boards> findAllByTagUserIdsContainingOrderByIdDesc(String userId, Limit of);
+
+    List<Boards> findAllByTagUserIdsContainingAndIdLessThanOrderByIdDesc(String userId, Long offset, Limit of);
+
+    List<Boards> findAllByIdLessThanOrderByIdDesc(Long offset, Limit of);
+
+    List<Boards> findAllByIdIn(List<Long> saveList);
 }
 

@@ -1,6 +1,5 @@
 package com.glim.borad.domain;
 
-import com.glim.borad.dto.request.UpdateBoardFileRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,8 +29,4 @@ public class BoardFiles {
         this.fileType = fileType ? FileType.IMAGE : FileType.VIDEO;
     }
 
-    public void update(UpdateBoardFileRequest request) {
-        this.fileName = request.getFileName();
-        this.fileType = request.getFileType() ? FileType.IMAGE : FileType.VIDEO;
-    }
 }

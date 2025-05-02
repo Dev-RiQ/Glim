@@ -21,7 +21,6 @@ public class AddBoardRequest {
     private Long bgmId;
     private String boardType;
     private Boolean viewLikes;
-    private Boolean viewShares;
     private Boolean commentable;
 
 
@@ -35,7 +34,6 @@ public class AddBoardRequest {
                 .bgmId(addBoardRequest.getBgmId())
                 .boardType(addBoardRequest.getBoardType())
                 .viewLikes(addBoardRequest.getViewLikes())
-                .viewShares(addBoardRequest.getViewShares())
                 .commentable(addBoardRequest.getCommentable())
                 .build();
 

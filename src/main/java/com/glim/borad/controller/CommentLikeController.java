@@ -19,16 +19,19 @@ public class CommentLikeController {
     private final CommentLikeService commentLikeService;
     private final CommentService commentService;
 
-    @PostMapping({"","/"})
-    public StatusResponseDTO add(@RequestBody AddCommentLikeRequest request) {
-        commentLikeService.insert(request);
-        commentService.updateLike(request.getCommentId(), 1);
+    @PostMapping({"/{commentId}"})
+    public StatusResponseDTO add(@PathVariable Long commentId, @AuthenticationPrincipal SecurityUserDto user) {
+        if(commentLikeService.insert(new AddCommentLikeRequest(commentId, user.getId()))){
+            commentService.updateLike(commentId, 1);
+        }
         return StatusResponseDTO.ok("댓글 좋아요 완료");
     }
 
     @DeleteMapping("/{commentId}")
     public StatusResponseDTO delete(@PathVariable Long commentId, @AuthenticationPrincipal SecurityUserDto user) {
-        commentLikeService.delete(commentId, user.getId());
+        if(commentLikeService.delete(commentId, user.getId())){
+            commentService.updateLike(commentId, -1);
+        }
         return StatusResponseDTO.ok("댓글 좋아요 취소 완료");
     }
 }

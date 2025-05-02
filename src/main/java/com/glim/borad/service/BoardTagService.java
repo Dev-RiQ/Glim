@@ -2,7 +2,6 @@ package com.glim.borad.service;
 
 import com.glim.borad.domain.BoardTags;
 import com.glim.borad.dto.request.AddBoardTagRequest;
-import com.glim.borad.dto.request.UpdateBoardTagRequest;
 import com.glim.borad.repository.BoardRepository;
 import com.glim.borad.repository.BoardTagRepository;
 import com.glim.common.exception.ErrorCode;
@@ -24,14 +23,6 @@ public class BoardTagService {
 //    public void insert(AddBoardTagRequest request) {
 //        boardTagRepository.save(new AddBoardTagRequest().toEntity(request));
 //    }
-
-    @Transactional
-    public BoardTags update(Long id, UpdateBoardTagRequest request) {
-        BoardTags boardTag = boardTagRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
-        boardTag.update(request);
-        boardTagRepository.save(boardTag);
-        return boardTag;
-    }
 
     @Transactional
     public void delete(Long id) {

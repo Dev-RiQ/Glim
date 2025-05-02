@@ -11,4 +11,6 @@ public interface BoardFileRepository extends JpaRepository<BoardFiles, Long> {
     List<BoardFiles> findByBoardIdAndFileTypeOrderByBoardFileIdAsc(Long boardId, FileType type);
 
     List<BoardFiles> findAllByBoardId(Long boardId);
+
+    BoardFiles findOneByBoardId(Long id);
 }

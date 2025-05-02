@@ -12,7 +12,7 @@ public class AddBoardFileRequest {
 
     private Long boardId;
     private String fileName;
-    private Boolean fileType;
+    private String fileType;
 
     public BoardFiles toEntity(Long boardId, String fileName, String fileType) {
         return BoardFiles.builder()

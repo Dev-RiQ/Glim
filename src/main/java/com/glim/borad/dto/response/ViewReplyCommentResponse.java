@@ -13,7 +13,6 @@ import lombok.ToString;
 @ToString
 @Setter
 public class ViewReplyCommentResponse {
-    private UserRepository userRepository;
 
     private ViewBoardUserResponse user;
     private Long id;
@@ -23,8 +22,8 @@ public class ViewReplyCommentResponse {
     private Long replyCommentId;
     private Boolean isLike;
 
-    public ViewReplyCommentResponse(BoardComments boardComments) {
-        this.user = new ViewBoardUserResponse(userRepository.findUserById(boardComments.getUserId()));
+    public ViewReplyCommentResponse(BoardComments boardComments, ViewBoardUserResponse user) {
+        this.user = user;
         this.id = boardComments.getId();
         this.content = boardComments.getContent();
         this.likes = CountUtil.getCountString(boardComments.getLikes());

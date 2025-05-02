@@ -11,6 +11,9 @@ import lombok.*;
 @ToString()
 public class BoardViews {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "board_view_id", nullable = false)
+    private Long id;
     @Column(name = "board_id", nullable = false)
     private Long boardId;
     @Column(name = "user_id", nullable = false)

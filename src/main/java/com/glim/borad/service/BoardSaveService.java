@@ -20,17 +20,18 @@ import java.util.stream.Collectors;
 public class BoardSaveService {
 
     private final BoardSaveRepository boardSaveRepository;
-    private final BoardRepository boardRepository;
 
     @Transactional
-    public void insert(AddBoardSaveRequest request) {
-        boardSaveRepository.save(new AddBoardSaveRequest().toEntity(request));
+    public void insert(Long boardId, Long userId) {
+        boardSaveRepository.save(new AddBoardSaveRequest().toEntity(new AddBoardSaveRequest(boardId, userId)));
     }
 
     @Transactional
     public void delete(Long boardId, Long userId) {
-        boardRepository.findById(boardId).orElseThrow(ErrorCode::throwDummyNotFound);
-        boardSaveRepository.deleteByBoardIdAndUserId(boardId, userId);
+        BoardSaves boardSaves = boardSaveRepository.findByBoardIdAndUserId(boardId, userId);
+        if(boardSaves != null) {
+            boardSaveRepository.delete(boardSaves);
+        }
     }
 
     public List<Long> getSaveList(Long userId) {
@@ -39,4 +40,5 @@ public class BoardSaveService {
                 .map(BoardSaves::getBoardId) // boardId만 추출
                 .collect(Collectors.toList());
     }
+
 }

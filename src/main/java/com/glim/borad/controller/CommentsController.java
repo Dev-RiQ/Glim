@@ -1,7 +1,7 @@
 package com.glim.borad.controller;
 
+import com.glim.borad.domain.BoardComments;
 import com.glim.borad.dto.request.AddCommentsRequest;
-import com.glim.borad.dto.request.UpdateCommentsRequest;
 import com.glim.borad.dto.response.ViewCommentsResponse;
 import com.glim.borad.dto.response.ViewReplyCommentResponse;
 import com.glim.borad.service.BoardService;
@@ -25,8 +25,8 @@ public class CommentsController {
     private final BoardService boardService;
 
     @GetMapping({"/{boardId}","/{boardId}/{offset}"})
-    public StatusResponseDTO list(@PathVariable Long boardId, @PathVariable(required = false) Long offset) {
-        List<ViewCommentsResponse> board = commentService.list(boardId, offset);
+    public StatusResponseDTO list(@PathVariable Long boardId, @PathVariable(required = false) Long offset, @AuthenticationPrincipal SecurityUserDto user) {
+        List<ViewCommentsResponse> board = commentService.list(boardId, offset, user);
         return StatusResponseDTO.ok(board);
     }
 
@@ -38,14 +38,15 @@ public class CommentsController {
 
     @PostMapping({"","/"})
     public StatusResponseDTO add(@RequestBody AddCommentsRequest request, @AuthenticationPrincipal SecurityUserDto user) {
-        commentService.insert(request, user.getId());
+        BoardComments comment = commentService.insert(request, user.getId());
         boardService.updateComment(request.getBoardId(), 1);
-        return StatusResponseDTO.ok("댓글 추가 완료");
+        return StatusResponseDTO.ok(comment);
     }
 
-    @DeleteMapping("/{id}")
-    public StatusResponseDTO delete(@PathVariable Long id) {
-        commentService.delete(id);
+    @DeleteMapping("/{commentId}")
+    public StatusResponseDTO delete(@PathVariable Long commentId) {
+        Long boardId = commentService.delete(commentId);
+        boardService.updateComment(boardId, -1);
         return StatusResponseDTO.ok("댓글 삭제 완료");
     }
 }

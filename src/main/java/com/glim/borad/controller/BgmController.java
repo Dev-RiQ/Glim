@@ -22,10 +22,10 @@ public class BgmController {
     private final BgmService bgmService;
     private final BoardService boardService;
 
-    @GetMapping({"", "/{id}"})
-    public StatusResponseDTO list(@PathVariable Long id, @PathVariable(required = false) Long offset) {
-        List<ViewBgmResponse> board = bgmService.list(id, offset);
-        return StatusResponseDTO.ok(board);
+    @GetMapping({""})
+    public StatusResponseDTO list() {
+        List<ViewBgmResponse> bgm = bgmService.list();
+        return StatusResponseDTO.ok(bgm);
     }
 
     @PostMapping({"","/"})

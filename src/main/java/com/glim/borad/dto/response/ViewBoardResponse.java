@@ -31,10 +31,8 @@ public class ViewBoardResponse {
     private final String viewCount;
     private final String likeCount;
     private final String comment;
-    private final String share;
     private final String tagId;
     private final String createdAt;
-    private final String updatedAt;
     private ViewBgmResponse bgm;
     private Boolean isLike;
     private Boolean isSave;
@@ -51,11 +49,9 @@ public class ViewBoardResponse {
         this.viewCount = CountUtil.getCountString(board.getViews());
         this.likeCount = CountUtil.getCountString(board.getLikes());
         this.comment = CountUtil.getCountString(board.getComments());
-        this.share = CountUtil.getCountString(board.getShares());
         this.tagId = board.getTagUserIds();
         this.bgm = bgm;
         this.createdAt = DateTimeUtil.getDateTimeAgo(board.getCreatedAt());
-        this.updatedAt = DateTimeUtil.getDateTimeAgo(board.getUpdatedAt());
         this.boardType = board.getBoardType();
         this.img = new ArrayList<>();
         this.tags = new ArrayList<>();

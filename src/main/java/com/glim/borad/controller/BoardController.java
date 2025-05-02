@@ -1,13 +1,10 @@
 package com.glim.borad.controller;
 
-import com.glim.borad.domain.Boards;
 import com.glim.borad.dto.request.AddBoardRequest;
-import com.glim.borad.dto.request.UpdateBoardRequest;
 import com.glim.borad.dto.response.ViewBoardResponse;
 import com.glim.borad.dto.response.ViewMyPageBoardResponse;
 import com.glim.borad.service.BoardSaveService;
 import com.glim.borad.service.BoardService;
-import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.common.statusResponse.StatusResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -40,18 +37,18 @@ public class BoardController {
     }
 
     @GetMapping({"/my/{id}", "/my/{id}/{offset}"})
-    public StatusResponseDTO list(@PathVariable(required = false) Long offset, @AuthenticationPrincipal SecurityUserDto user) {
-        List<ViewMyPageBoardResponse> board = boardService.list(user.getId(), offset);
+    public StatusResponseDTO list(@PathVariable Long id, @PathVariable(required = false) Long offset) {
+        List<ViewMyPageBoardResponse> board = boardService.myPageBoardList(id, offset);
         return StatusResponseDTO.ok(board);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/show/{id}")
     public StatusResponseDTO show(@PathVariable Long id, @AuthenticationPrincipal SecurityUserDto user) {
         ViewBoardResponse board = boardService.getBoard(user.getId(), id);
         return StatusResponseDTO.ok(board);
     }
 
-    @GetMapping("/shorts/{id}")
+    @GetMapping("/shorts/show/{id}")
     public StatusResponseDTO shorts(@PathVariable Long id, @AuthenticationPrincipal SecurityUserDto user) {
         ViewBoardResponse shorts = boardService.getShorts(user.getId(), id);
         return StatusResponseDTO.ok(shorts);
@@ -64,28 +61,31 @@ public class BoardController {
     }
 
     @GetMapping({"/myShorts/{id}","/myShorts/{id}/{offset}"})
-    public StatusResponseDTO MyShortsList(@PathVariable(required = false) Long offset, @AuthenticationPrincipal SecurityUserDto user) {
-        List<ViewBoardResponse> list = boardService.getMyShortsList(offset, user.getId());
+    public StatusResponseDTO MyShortsList(@PathVariable Long id, @PathVariable(required = false) Long offset) {
+        List<ViewMyPageBoardResponse> list = boardService.myPageShortsList(id,offset);
         return StatusResponseDTO.ok(list);
+    }
+
+    @GetMapping({"/tag/{id}","/tag/{id}/{offset}"})
+    public StatusResponseDTO getTagList(@PathVariable Long id, @PathVariable(required = false) Long offset){
+        List<ViewMyPageBoardResponse> tagList = boardService.myPageTagsList(id,offset);
+        return StatusResponseDTO.ok(tagList);
     }
 
     @GetMapping({"/search","/search/{offset}"})
     public StatusResponseDTO search(@PathVariable(required = false) Long offset) {
-        List<ViewMyPageBoardResponse > list = boardService.allList(offset);
+        List<ViewMyPageBoardResponse> list = boardService.allList(offset);
         return StatusResponseDTO.ok(list);
     }
 
-//    @GetMapping("/tag")
-//    public StatusResponseDTO getTagList(@AuthenticationPrincipal SecurityUserDto user){
-//        List<ViewBoardResponse> tagList = boardService.getTagList(user.getId());
-//        return StatusResponseDTO.ok(tagList);
-//    }
+    @GetMapping({"/save","/save/{offset}"})
+    public StatusResponseDTO getSaveList(@PathVariable(required = false) Long offset, @AuthenticationPrincipal SecurityUserDto user) {
+        List<ViewMyPageBoardResponse> saveList = boardService.myPageSaveList(user.getId(),offset);
+        return StatusResponseDTO.ok(saveList);
+    }
 
     @PostMapping("")
     public StatusResponseDTO add(@RequestBody AddBoardRequest request, @AuthenticationPrincipal SecurityUserDto user) {
-        for(int i = 0; i < request.getImg().size(); i++) {
-
-        }
         request.setUserId(user.getId());
         boardService.insert(request);
         return StatusResponseDTO.ok("게시물 추가 완료");
