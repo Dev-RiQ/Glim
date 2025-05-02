@@ -47,9 +47,6 @@ public class ChatRoomService {
     public List<ViewChatRoomResponse> findChatRoomListByUserId() {
         SecurityUserDto user = SecurityUtil.getUser();
         List<ChatUser> chatUserList = chatUserRepository.findAllByUserId(user.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
-        if(chatUserList.isEmpty()) {
-            ErrorCode.throwDummyNotFound();
-        }
         return getViewChatRoomListByUserId(chatUserList);
     }
 
