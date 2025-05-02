@@ -80,7 +80,7 @@ public class OAuthAttributes {
                 .username(username)
                 .name(name)
                 .nickname(null)
-                .img(img != null ? img : "")
+                .img(img != null ? img : "userimages/user-default-image")
                 .role(Role.ROLE_USER)
                 .platForm(PlatForm.valueOf(registrationId.toUpperCase()))
                 .phone(phone != null ? phone : "")

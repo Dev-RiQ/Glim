@@ -1,9 +1,6 @@
 package com.glim.rankingBoard.service;
 
-import com.glim.borad.domain.BoardFiles;
-import com.glim.borad.domain.BoardType;
-import com.glim.borad.domain.Boards;
-import com.glim.borad.domain.FileType;
+import com.glim.borad.domain.*;
 import com.glim.borad.repository.BoardFileRepository;
 import com.glim.borad.repository.BoardRepository;
 import com.glim.common.awsS3.domain.FileSize;
@@ -117,10 +114,12 @@ public class RankingBoardService {
     private void saveRankingByCriteria(String period, BoardType boardType, LocalDateTime start, LocalDateTime now, String criteria) {
         List<Boards> boards;
 
+        // 조회수, 좋아요 순으로 상위 20개 가져오기
         if ("view".equals(criteria)) {
-            boards = boardRepository.findByCreatedAtBetweenAndBoardTypeOrderByViewsDescCreatedAtDesc(start, now, boardType, PageRequest.of(0, 20));
+            boards = boardRepository.findByCreatedAtBetweenAndBoardTypeOrderByViewsDescCreatedAtDesc(start, now, boardType, PageRequest.of(0, 100));
         } else if ("like".equals(criteria)) {
-            boards = boardRepository.findByCreatedAtBetweenAndBoardTypeOrderByLikesDescCreatedAtDesc(start, now, boardType, PageRequest.of(0, 20));
+            boards = boardRepository.findByCreatedAtBetweenAndBoardTypeAndViewLikesOrderByLikesDescCreatedAtDesc(
+                    start, now, boardType, Option.TRUE, PageRequest.of(0, 100));
         } else {
             throw new IllegalArgumentException("Invalid criteria: " + criteria);
         }

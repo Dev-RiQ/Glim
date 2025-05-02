@@ -3,6 +3,7 @@ package com.glim.borad.repository;
 import com.glim.borad.domain.BoardSaves;
 import com.glim.borad.domain.BoardType;
 import com.glim.borad.domain.Boards;
+import com.glim.borad.domain.Option;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,7 +27,8 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
     List<Boards> findByCreatedAtBetweenAndBoardTypeOrderByViewsDescCreatedAtDesc(LocalDateTime start, LocalDateTime end, BoardType type, Pageable pageable);
 
     // ✅ 조회 기간 + 타입별 좋아요 높은 게시글 Top 20 조회
-    List<Boards> findByCreatedAtBetweenAndBoardTypeOrderByLikesDescCreatedAtDesc(LocalDateTime start, LocalDateTime end, BoardType type, Pageable pageable);
+    List<Boards> findByCreatedAtBetweenAndBoardTypeAndViewLikesOrderByLikesDescCreatedAtDesc(
+            LocalDateTime start, LocalDateTime end, BoardType boardType, Option viewLikes, Pageable pageable);
 
     List<Boards> findByIdIn(List<Long> boardIdList);
 

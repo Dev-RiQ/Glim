@@ -108,10 +108,13 @@ public class UserService {
         }
         User user = request.toEntity();
 
-        // ✅ 이미지가 빈 문자열이거나 null이면 기본 이미지 적용
-        if (user.getImg() == null || user.getImg().isBlank()) {
-            user.setImg(awsS3Util.getURL("userimages/user-default-image",FileSize.IMAGE_128));
+        if (user.getImg() != null && user.getImg().startsWith("http")) {
+            user.setImg(user.getImg());
+        } else {
+            user.setImg(awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128));
         }
+
+
         user.encodePassword(passwordEncoder); // 비밀번호 암호화
         userRepository.save(user);
     }

@@ -12,6 +12,7 @@ import com.glim.common.security.oauth.OAuthAttributes;
 import com.glim.common.security.service.CustomUserService;
 import com.glim.common.security.util.SecurityUtil;
 import com.glim.stories.service.StoryService;
+import com.glim.tag.service.ViewTagService;
 import com.glim.user.domain.User;
 import com.glim.user.dto.request.*;
 import com.glim.user.dto.response.*;
@@ -35,6 +36,7 @@ public class AuthRestController {
     private final BoardService boardService;
     private final AwsS3Util awsS3Util;
     private final StoryService storyService;
+    private final ViewTagService viewTagService;
 
     // 로그인한 user 가져오는 api
     @GetMapping("/me")
@@ -224,8 +226,4 @@ public class AuthRestController {
         userService.updateImg(currentUserId, request.getImg());
         return ResponseEntity.ok("img 수정 완료");
     }
-
-
-
-
 }
