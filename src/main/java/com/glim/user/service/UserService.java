@@ -9,6 +9,7 @@ import com.glim.common.exception.ErrorCode;
 import com.glim.common.jwt.provider.JwtTokenProvider;
 import com.glim.common.jwt.refresh.domain.RefreshToken;
 import com.glim.common.jwt.refresh.service.RefreshTokenService;
+import com.glim.common.security.util.SecurityUtil;
 import com.glim.notification.service.NotificationService;
 import com.glim.stories.service.StoryService;
 import com.glim.tag.domain.ViewTag;
@@ -108,13 +109,6 @@ public class UserService {
         }
         User user = request.toEntity();
 
-        if (user.getImg() != null && user.getImg().startsWith("http")) {
-            user.setImg(user.getImg());
-        } else {
-            user.setImg(awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128));
-        }
-
-
         user.encodePassword(passwordEncoder); // 비밀번호 암호화
         userRepository.save(user);
     }
@@ -212,9 +206,10 @@ public class UserService {
     }
 
     public List<FollowRecommendResponse> searchUsersByNickname(String keyword) {
-        List<User> users = userRepository.findTop20ByNicknameContainingIgnoreCase(keyword);
+        Long currentUserId = SecurityUtil.getCurrentUserId();        List<User> users = userRepository.findTop20ByNicknameContainingIgnoreCase(keyword);
 
         return users.stream()
+                .filter(user -> !user.getId().equals(currentUserId))  // ✅ 본인 제외
                 .map(user -> {
                     boolean isStory = storyService.isStory(user.getId());
                     return FollowRecommendResponse.from(user,isStory); // ✅ user + boardCount 같이 넘김
@@ -279,7 +274,7 @@ public class UserService {
     // 업데이트 이미지
     public void updateImg(Long id, String img) {
         User user = getUserById(id);
-        user.updateImg(awsS3Util.getURL(img, FileSize.IMAGE_128));
+        user.updateImg(img);
         userRepository.save(user);
     }
 
