@@ -32,6 +32,7 @@ public class ChatUser {
         this.roomId = roomId;
         this.userId = userId;
         this.readMsgId = readMsgId;
+        this.outMsgId = 0L;
         this.valid = ChatUserValid.IN;
     }
 

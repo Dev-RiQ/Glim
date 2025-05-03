@@ -10,8 +10,11 @@ import java.util.Optional;
 
 public interface ChatMsgRepository extends MongoRepository<ChatMsg, Long> {
     List<ChatMsg> findAllByRoomIdOrderByMsgIdDesc(Long roomId, Limit limit);
-    List<ChatMsg> findAllByRoomIdAndMsgIdLessThanOrderByMsgIdDesc(Long roomId, Long MsgId, Limit limit);
     Optional<ChatMsg> findTop1ByOrderByMsgIdDesc();
 
     Optional<ChatMsg> findTop1ByRoomIdOrderByMsgIdDesc(Long roomId);
+
+    List<ChatMsg> findAllByRoomIdAndMsgIdGreaterThanOrderByMsgIdDesc(Long roomId, Long loadMin, Limit of);
+
+    List<ChatMsg> findAllByRoomIdAndMsgIdGreaterThanAndMsgIdLessThanOrderByMsgIdDesc(Long roomId, Long loadMin, Long offset, Limit of);
 }

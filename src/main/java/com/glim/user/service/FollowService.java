@@ -186,13 +186,14 @@ public class FollowService {
 
     public List<FollowUserResponse> getHasStoryList() {
         Long id = SecurityUtil.getCurrentUserId();
-        List<Follow> list = followRepository.findAllByFollowingUserId(id);
+        List<Follow> list = followRepository.findAllByFollowerUserId(id);
         if(list.isEmpty()) return Collections.emptyList();
         List<FollowUserResponse> responses = new ArrayList<>();
         for(Follow follow : list) {
             if(storyService.isStory(follow.getFollowingUserId())){
-                User user = userRepository.findById(follow.getFollowerUserId()).orElse(null);
+                User user = userRepository.findById(follow.getFollowingUserId()).orElse(null);
                 if(user == null) continue;
+                user.setImg(awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128));
                 responses.add(FollowUserResponse.from(user, true));
             }
         }
