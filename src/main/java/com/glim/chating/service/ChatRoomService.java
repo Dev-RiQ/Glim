@@ -12,24 +12,33 @@ import com.glim.chating.dto.response.ViewChatUserResponse;
 import com.glim.chating.repository.ChatMsgRepository;
 import com.glim.chating.repository.ChatRoomRepository;
 import com.glim.chating.repository.ChatUserRepository;
+import com.glim.common.awsS3.domain.FileSize;
+import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.ErrorCode;
 import com.glim.common.kafka.dto.Message;
 import com.glim.common.kafka.service.SendMessage;
 import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.common.utils.SecurityUtil;
+import com.glim.notification.domain.Notification;
+import com.glim.notification.dto.response.NotificationResponse;
+import com.glim.stories.service.StoryService;
 import com.glim.user.domain.User;
 import com.glim.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,8 +50,40 @@ public class ChatRoomService {
     private final ChatMsgRepository chatMsgRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatUserRepository chatUserRepository;
-//    private final UserService userService;
     private final UserRepository userRepository;
+    private final StoryService storyService;
+    private final AwsS3Util awsS3Util;
+    private static final Long DEFAULT_TIMEOUT = 3600000L;
+    private SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
+    private final ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
+
+    public SseEmitter getEmitter(final HttpServletResponse response) {
+        List<ViewChatRoomResponse> chatRoomList = findChatRoomListByUserId();
+        if(!chatRoomList.isEmpty()) {
+            emitter = new SseEmitter(DEFAULT_TIMEOUT);
+        }
+        response.setContentType("text/event-stream");
+        response.setCharacterEncoding("UTF-8");
+
+        sendNotification(chatRoomList);
+        return emitter;
+    }
+
+    private void sendNotification(Object data) {
+        taskExecutor.execute(() -> {
+            SseEmitter.SseEventBuilder event = SseEmitter.event();
+            event.name("chat")
+                    .data(data);
+            try{
+                emitter.send(event);
+                emitter.complete();
+                log.info("chat list sent successfully");
+            }catch (Exception e){
+                emitter.completeWithError(e);
+                log.error("chat list sent failed");
+            }
+        });
+    }
 
     public List<ViewChatRoomResponse> findChatRoomListByUserId() {
         SecurityUserDto user = SecurityUtil.getUser();
@@ -55,30 +96,56 @@ public class ChatRoomService {
         User user = null;
         for(ChatUser chatUser : chatUserList) {
             if(chatUser.getValid().toString().equals("OUT")) continue;
-            if(user == null) {
-                user = userRepository.findById(chatUser.getUserId()).orElseThrow(ErrorCode::throwDummyNotFound);
-            }
             ChatRoom chatRoom = chatRoomRepository.findById(chatUser.getRoomId()).orElseThrow(ErrorCode::throwDummyNotFound);
-            ChatMsg chatMsg = chatMsgRepository.findById(chatUser.getRoomId()).orElseThrow(ErrorCode::throwDummyNotFound);
+            ChatUser chatUserNotMe = chatUserRepository.findByRoomIdAndUserIdNot(chatRoom.getId(), chatUser.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
+            if(user == null) {
+                user = userRepository.findById(chatUserNotMe.getUserId()).orElseThrow(ErrorCode::throwDummyNotFound);
+            }
+            List<ChatMsg> chatMsgList = chatMsgRepository.findAllByRoomIdOrderByMsgIdDesc(chatUser.getRoomId(), Limit.of(1));
+            ChatMsg chatMsg = chatMsgList.isEmpty() ? null :chatMsgList.get(0);
             Long readId = chatUserRepository.findByRoomIdAndUserId(chatUser.getRoomId(), chatUser.getId()).orElseThrow(ErrorCode::throwDummyNotFound).getReadMsgId();
             Long lastId = chatMsgRepository.findTop1ByRoomIdOrderByMsgIdDesc(chatUser.getRoomId()).orElseThrow(ErrorCode::throwDummyNotFound).getMsgId();
             boolean hasRead = readId.equals(lastId);
-            chatRoomList.add(new ViewChatRoomResponse(chatRoom, chatMsg, user, hasRead));
+            boolean isStory = storyService.isStory(chatUser.getId());
+            ViewChatUserResponse userView = new ViewChatUserResponse(user, chatUser, isStory);
+            userView.setImg(awsS3Util.getURL(userView.getImg(), FileSize.IMAGE_128));
+            chatRoomList.add(new ViewChatRoomResponse(chatRoom, chatMsg, userView, hasRead));
         }
         return chatRoomList.stream().sorted(Comparator.comparing(ViewChatRoomResponse::getUpdatedAt)).toList();
     }
 
+    public Boolean hasNewChat(){
+        SecurityUserDto user = SecurityUtil.getUser();
+        List<ChatUser> chatUserList = chatUserRepository.findAllByUserId(user.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
+        for(ChatUser chatUser : chatUserList) {
+            if(chatUser.getValid().toString().equals("OUT")) continue;
+            List<ChatMsg> chatMsgList = chatMsgRepository.findAllByRoomIdOrderByMsgIdDesc(chatUser.getRoomId(), Limit.of(1));
+            Long readId = chatUserRepository.findByRoomIdAndUserId(chatUser.getRoomId(), chatUser.getId()).orElseThrow(ErrorCode::throwDummyNotFound).getReadMsgId();
+            Long lastId = chatMsgRepository.findTop1ByRoomIdOrderByMsgIdDesc(chatUser.getRoomId()).orElseThrow(ErrorCode::throwDummyNotFound).getMsgId();
+            boolean hasRead = readId.equals(lastId);
+            if(!hasRead) return true;
+        }
+        return false;
+    }
+
+
     @Transactional
     public ViewChatRoomResponse createChatRoom(Long joinUserId) {
-        ChatRoom chatRoom = new AddChatRoomRequest().toEntity();
         ChatRoom createdRoom = existsChatRoom(joinUserId);
         if(createdRoom == null) {
+            ChatRoom chatRoom = new AddChatRoomRequest().toEntity();
             createdRoom = chatRoomRepository.save(chatRoom);
             saveChatUser(createdRoom.getId(), joinUserId);
             chatRoomRepository.save(createdRoom);
         }
+        SecurityUserDto me = SecurityUtil.getUser();
         User user = userRepository.findById(joinUserId).orElseThrow(ErrorCode::throwDummyNotFound);
-        return new ViewChatRoomResponse(chatRoom, user);
+        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserIdNot(createdRoom.getId(), me.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
+        boolean isStory = storyService.isStory(chatUser.getId());
+        ViewChatUserResponse userView = new ViewChatUserResponse(user, chatUser, isStory);
+        userView.setImg(awsS3Util.getURL(userView.getImg(), FileSize.IMAGE_128));
+
+        return new ViewChatRoomResponse(createdRoom, userView);
     }
 
     private ChatRoom existsChatRoom(Long joinUserId) {

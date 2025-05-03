@@ -29,6 +29,7 @@ public class Notification {
     private Long linkId;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+    private Boolean isRead;
 
     public Notification(Long userId, Long sendUserId, String sendUserNickname, Type type, Long linkId) {
         this.userId = userId;
@@ -38,5 +39,10 @@ public class Notification {
         this.uri = type.getUri();
         this.linkId = linkId;
         this.createdAt = LocalDateTime.now();
+        this.isRead = false;
+    }
+
+    public void update(){
+        this.isRead = true;
     }
 }

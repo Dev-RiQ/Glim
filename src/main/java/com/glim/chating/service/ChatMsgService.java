@@ -40,13 +40,19 @@ public class ChatMsgService {
 
     private final ChatMsgRepository chatMsgRepository;
     private final ChatUserService chatUserService;
+    private final ChatUserRepository chatUserRepository;
     private final SendMessage sender;
     private final ChatUtil chatUtil;
 
     public List<ViewChatMsgResponse> findChatMsgListByRoomId(Long roomId, Long offset) {
+        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(roomId, SecurityUtil.getUser().getId()).orElseThrow(ErrorCode::throwDummyNotFound);
+        Long loadMin = 0L;
+        if(chatUser.getOutMsgId() != null && chatUser.getOutMsgId() != 0){
+            loadMin = chatUser.getOutMsgId();
+        }
         List<ChatMsg> chatMsgList = offset == null ?
-            chatMsgRepository.findAllByRoomIdOrderByMsgIdDesc(roomId, Limit.of(30))
-            : chatMsgRepository.findAllByRoomIdAndMsgIdLessThanOrderByMsgIdDesc(roomId, offset, Limit.of(30));
+            chatMsgRepository.findAllByRoomIdAndMsgIdGreaterThanOrderByMsgIdDesc(roomId, loadMin ,Limit.of(30))
+            : chatMsgRepository.findAllByRoomIdAndMsgIdGreaterThanAndMsgIdLessThanOrderByMsgIdDesc(roomId, loadMin,offset, Limit.of(30));
         if(chatMsgList == null || chatMsgList.isEmpty()) {
             return Collections.emptyList();
         }

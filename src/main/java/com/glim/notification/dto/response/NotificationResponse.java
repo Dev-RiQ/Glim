@@ -18,6 +18,7 @@ public class NotificationResponse {
     private String createdAt;
     private String userImg;
     private String linkImg;
+    private Boolean isRead;
 
     public NotificationResponse(Notification notification) {
         this.id = notification.getId();
@@ -26,5 +27,6 @@ public class NotificationResponse {
         this.message = notification.getMessage();
         this.uri = notification.getUri() + notification.getLinkId();
         this.createdAt = DateTimeUtil.getDateTimeAgo(notification.getCreatedAt());
+        this.isRead = notification.getIsRead();
     }
 }

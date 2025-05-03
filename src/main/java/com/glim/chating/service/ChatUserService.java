@@ -13,11 +13,15 @@ import com.glim.chating.dto.response.ViewChatUserResponse;
 import com.glim.chating.repository.ChatMsgRepository;
 import com.glim.chating.repository.ChatRoomRepository;
 import com.glim.chating.repository.ChatUserRepository;
+import com.glim.common.awsS3.domain.FileSize;
+import com.glim.common.awsS3.service.AwsS3Util;
+import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import com.glim.common.kafka.dto.Message;
 import com.glim.common.kafka.service.SendMessage;
 import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.common.utils.SecurityUtil;
+import com.glim.stories.service.StoryService;
 import com.glim.user.domain.User;
 import com.glim.user.repository.UserRepository;
 import com.glim.user.service.UserService;
@@ -42,12 +46,19 @@ public class ChatUserService {
     private final ChatUserRepository chatUserRepository;
     private final ChatUtil chatUtil;
     private final UserRepository userRepository;
-//    private final UserService userService;
+    private final StoryService storyService;
+    private final AwsS3Util awsS3Util;
 
     public ViewChatUserResponse findByRoomId(Long roomId) {
-        SecurityUserDto user = SecurityUtil.getUser();
-        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserIdNot(roomId, user.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
-        return new ViewChatUserResponse(userRepository.findById(chatUser.getUserId()).orElseThrow(ErrorCode::throwDummyNotFound), chatUser);
+        SecurityUserDto me = SecurityUtil.getUser();
+        if(!chatUserRepository.existsByRoomIdAndUserId(roomId, me.getId())){
+            throw new CustomException(ErrorCode.DUMMY_NOT_FOUND);
+        }
+        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserIdNot(roomId, me.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
+        User user = userRepository.findById(chatUser.getUserId()).orElseThrow(ErrorCode::throwDummyNotFound);
+        user.setImg(awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128));
+        boolean isStory = storyService.isStory(chatUser.getId());
+        return new ViewChatUserResponse(user, chatUser, isStory);
     }
 
     @Transactional

@@ -10,10 +10,14 @@ import com.glim.chating.service.ChatUserService;
 import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.common.statusResponse.StatusResponseDTO;
 import com.glim.common.utils.SecurityUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.Fetch;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,11 +33,16 @@ public class ChatController {
     private final ChatRoomService chatRoomService;
     private final ChatUserService chatUserService;
 
-    @GetMapping("")
-    public StatusResponseDTO getUserChatRoomList() {
-        List<ViewChatRoomResponse> userChatRoomList = chatRoomService.findChatRoomListByUserId();
-        return StatusResponseDTO.ok(userChatRoomList);
+    @GetMapping(value = "", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter connect(HttpServletResponse response, @AuthenticationPrincipal SecurityUserDto user) {
+        return chatRoomService.getEmitter(response);
     }
+
+//    @GetMapping("")
+//    public StatusResponseDTO getUserChatRoomList() {
+//        List<ViewChatRoomResponse> userChatRoomList = chatRoomService.findChatRoomListByUserId();
+//        return StatusResponseDTO.ok(userChatRoomList);
+//    }
 
     @GetMapping({"/{roomId}","/{roomId}/{offset}"})
     public StatusResponseDTO getRoomChatMsgList(@PathVariable Long roomId, @PathVariable(required = false) Long offset) {

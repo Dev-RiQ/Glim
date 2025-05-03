@@ -13,26 +13,24 @@ import java.time.LocalTime;
 @Getter
 @ToString
 public class ViewChatRoomResponse {
+
+    private ViewChatUserResponse user;
     private Long roomId;
-    private String img;
-    private String nickname;
     private String msg;
     private String updatedAt;
-    private boolean hasRead;
+    private Boolean hasRead;
 
-    public ViewChatRoomResponse(ChatRoom chatRoom, User user) {
+    public ViewChatRoomResponse(ChatRoom chatRoom, ViewChatUserResponse user) {
+        this.user = user;
         this.roomId = chatRoom.getId();
-        this.img = user.getImg();
-        this.nickname = user.getNickname();
         this.msg = "새로운 채팅방이 생성되었습니다.";
         this.updatedAt = DateTimeUtil.getDateTimeAgo(chatRoom.getCreatedAt());
     }
 
-    public ViewChatRoomResponse(ChatRoom chatRoom, ChatMsg chatMsg, User user, boolean hasRead) {
+    public ViewChatRoomResponse(ChatRoom chatRoom, ChatMsg chatMsg, ViewChatUserResponse user, boolean hasRead) {
+        this.user = user;
         this.roomId = chatRoom.getId();
-        this.img = user.getImg();
-        this.nickname = user.getNickname();
-        this.msg = chatMsg.getContent();
+        this.msg = chatMsg != null ? chatMsg.getContent() : "새로운 채팅방이 생성되었습니다.";
         this.updatedAt = DateTimeUtil.getDateTimeAgo(chatRoom.getCreatedAt());
         this.hasRead = hasRead;
     }

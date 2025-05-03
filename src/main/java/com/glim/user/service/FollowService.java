@@ -1,5 +1,7 @@
 package com.glim.user.service;
 
+import com.glim.common.awsS3.domain.FileSize;
+import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import com.glim.common.security.util.SecurityUtil;
@@ -29,16 +31,18 @@ public class FollowService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final StoryService storyService;
+    private final AwsS3Util awsS3Util;
 
     public FollowService(
             FollowRepository followRepository,
             UserRepository userRepository,
             @Lazy NotificationService notificationService,
-            StoryService storyService) {
+            StoryService storyService, AwsS3Util awsS3Util) {
         this.followRepository = followRepository;
         this.userRepository = userRepository;
         this.notificationService = notificationService;
         this.storyService = storyService;
+        this.awsS3Util = awsS3Util;
     }
 
     // ✅ 로그인한 사용자 기준 팔로우
@@ -170,13 +174,14 @@ public class FollowService {
 
     public List<FollowUserResponse> getHasStoryList() {
         Long id = SecurityUtil.getCurrentUserId();
-        List<Follow> list = followRepository.findAllByFollowingUserId(id);
+        List<Follow> list = followRepository.findAllByFollowerUserId(id);
         if(list.isEmpty()) return Collections.emptyList();
         List<FollowUserResponse> responses = new ArrayList<>();
         for(Follow follow : list) {
             if(storyService.isStory(follow.getFollowingUserId())){
-                User user = userRepository.findById(follow.getFollowerUserId()).orElse(null);
+                User user = userRepository.findById(follow.getFollowingUserId()).orElse(null);
                 if(user == null) continue;
+                user.setImg(awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128));
                 responses.add(FollowUserResponse.from(user, true));
             }
         }
