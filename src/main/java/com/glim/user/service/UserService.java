@@ -24,7 +24,6 @@ import com.glim.user.repository.FollowRepository;
 import com.glim.user.repository.UserRepository;
 import com.glim.verification.domain.AuthCodeDocument;
 import com.glim.verification.repository.AuthCodeRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -221,6 +220,7 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
+    @Transactional
     public List<FollowRecommendResponse> searchUsersByNickname(String keyword) {
         Long currentUserId = SecurityUtil.getCurrentUserId();
         List<User> users = userRepository.findTop20ByNicknameContainingIgnoreCase(keyword);
@@ -239,6 +239,7 @@ public class UserService {
         return userRepository.findAllByPhone(phone);
     }
 
+    @Transactional
     public void updatePassword(String username, String newPassword) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -253,12 +254,13 @@ public class UserService {
                 .getUsername();
     }
 
+    @Transactional
     public void updateReadAlarmId(Long id, Long readAlarmId) {
         User user = getUserById(id);   // 기존 메서드 사용해서 유저 찾고
         user.updateReadAlarmId(readAlarmId); // 새 필드 업데이트
         userRepository.save(user);    // 저장
     }
-
+    @Transactional
     public void updateReadBoardId(Long id, Long readBoardId) {
         User user = getUserById(id);
         user.updateReadBoardId(readBoardId);
@@ -283,6 +285,7 @@ public class UserService {
     }
 
     // 업데이트 소개글
+    @Transactional
     public void updateContent(Long id, String content) {
         User user = getUserById(id);
         user.updateContent(content);
@@ -290,6 +293,7 @@ public class UserService {
     }
 
     // 업데이트 이미지
+    @Transactional
     public void updateImg(Long id, String img) {
         User user = getUserById(id);
         user.updateImg(img);
@@ -297,6 +301,7 @@ public class UserService {
     }
 
     // 업데이트 구매등급
+    @Transactional
     public void updateRate(Long userId, Integer rate) {
         User user = getUserById(userId);
         user.updateRate(rate);

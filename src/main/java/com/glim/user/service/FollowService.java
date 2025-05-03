@@ -25,6 +25,8 @@ import java.util.*;
 import static java.util.stream.Collectors.*;
 
 @Service
+@Transactional(readOnly = true)
+
 public class FollowService {
 
     private final FollowRepository followRepository;
@@ -93,6 +95,9 @@ public class FollowService {
         User following = userRepository.findById(followingId).orElseThrow();
         follower.setFollowings(Math.max(0, follower.getFollowings() - 1));
         following.setFollowers(Math.max(0, following.getFollowers() - 1));
+
+        userRepository.save(follower);
+        userRepository.save(following);
     }
 
     // ✅ 로그인한 사용자가 특정 유저를 팔로우했는지

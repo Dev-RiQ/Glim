@@ -9,6 +9,7 @@ import com.glim.rankingBoard.domain.RankingBoardDocument;
 import com.glim.rankingBoard.dto.response.RankingBoardResponse;
 import com.glim.rankingBoard.repository.RankingBoardMongoRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
@@ -22,8 +23,10 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class RankingBoardService {
 
     private final RankingBoardMongoRepository rankingBoardMongoRepository;

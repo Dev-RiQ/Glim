@@ -3,6 +3,7 @@ package com.glim.user.service;
 
 import com.glim.user.domain.ResetToken;
 import com.glim.user.repository.ResetTokenRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,7 @@ import java.util.UUID;
 public class ResetTokenService {
 
     private final ResetTokenRepository tokenRepository;
-
+    @Transactional
     public String createResetToken(String username) {
         String token = UUID.randomUUID().toString();
 
@@ -32,7 +33,7 @@ public class ResetTokenService {
     public Optional<String> getUsernameByToken(String token) {
         return tokenRepository.findById(token).map(ResetToken::getUsername);
     }
-
+    @Transactional
     public void deleteToken(String token) {
         tokenRepository.deleteById(token);
     }
