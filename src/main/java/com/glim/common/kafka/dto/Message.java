@@ -1,6 +1,7 @@
 package com.glim.common.kafka.dto;
 
 import com.glim.chating.domain.ChatMsg;
+import com.glim.common.utils.DateTimeUtil;
 import lombok.*;
 
 import java.io.Serializable;
@@ -18,7 +19,7 @@ public class Message implements Serializable {
     private Long userId;
     private String content;
     private Long replyMsgId;
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     public Message(ChatMsg message) {
         this.id = message.getId();
@@ -27,6 +28,6 @@ public class Message implements Serializable {
         this.userId = message.getUserId();
         this.content = message.getContent();
         this.replyMsgId = message.getReplyMsgId();
-        this.createdAt = message.getCreatedAt();
+        this.createdAt = DateTimeUtil.getTime(message.getCreatedAt());
     }
 }

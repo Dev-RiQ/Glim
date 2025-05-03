@@ -220,7 +220,6 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
-    @Transactional
     public List<FollowRecommendResponse> searchUsersByNickname(String keyword) {
         Long currentUserId = SecurityUtil.getCurrentUserId();
         List<User> users = userRepository.findTop20ByNicknameContainingIgnoreCase(keyword);
@@ -345,7 +344,6 @@ public class UserService {
         user.updatePhone(request.getPhone());
     }
 
-    @Transactional
     public AccessTokenResponse refreshAccessToken(RefreshTokenRequest request) {
         // 1. refreshToken 존재 여부 확인
         RefreshToken refreshToken = refreshTokenService.findByToken(request.getRefreshToken())

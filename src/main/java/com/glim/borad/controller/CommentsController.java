@@ -38,7 +38,7 @@ public class CommentsController {
 
     @PostMapping({"","/"})
     public StatusResponseDTO add(@RequestBody AddCommentsRequest request, @AuthenticationPrincipal SecurityUserDto user) {
-        BoardComments comment = commentService.insert(request, user.getId());
+        ViewCommentsResponse comment = commentService.insert(request, user.getId());
         boardService.updateComment(request.getBoardId(), 1);
         return StatusResponseDTO.ok(comment);
     }

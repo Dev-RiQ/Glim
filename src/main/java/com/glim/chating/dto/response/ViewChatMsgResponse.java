@@ -2,6 +2,7 @@ package com.glim.chating.dto.response;
 
 import com.glim.chating.domain.ChatMsg;
 import com.glim.chating.domain.ChatRoom;
+import com.glim.common.utils.DateTimeUtil;
 import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.ToString;
@@ -17,13 +18,13 @@ public class ViewChatMsgResponse {
     private Long userId;
     private String content;
     private Long replyMsgId;
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     public ViewChatMsgResponse(ChatMsg chatMsg) {
         this.msgId = chatMsg.getMsgId();
         this.userId = chatMsg.getUserId();
         this.content = chatMsg.getContent();
         this.replyMsgId = chatMsg.getReplyMsgId();
-        this.createdAt = chatMsg.getCreatedAt();
+        this.createdAt = DateTimeUtil.getTime(chatMsg.getCreatedAt());
     }
 }

@@ -4,6 +4,23 @@ import java.time.*;
 
 public abstract class DateTimeUtil {
 
+    public static String getTime(LocalDateTime localDateTime) {
+        LocalDateTime now = LocalDateTime.now();
+
+        LocalDate saveDate = localDateTime.toLocalDate();
+        LocalDate nowDate = now.toLocalDate();
+        Period period = Period.between(saveDate, nowDate);
+
+        LocalTime saveTime = localDateTime.toLocalTime();
+        LocalTime nowTime = now.toLocalTime();
+        Duration duration = Duration.between(saveTime, nowTime);
+
+        String printDateAgo = getDateAgo(period);
+        if(printDateAgo == null || (period.getDays() == 1 && duration.getSeconds() < 0)) {
+            return localDateTime.toString().substring(11, 16);
+        }
+        return printDateAgo;
+    }
     public static String getDateTimeAgo(LocalDateTime localDateTime) {
         LocalDateTime now = LocalDateTime.now();
 

@@ -5,11 +5,13 @@ import com.glim.borad.dto.request.AddCommentsRequest;
 import com.glim.borad.dto.response.ViewCommentsResponse;
 import com.glim.borad.dto.response.ViewReplyCommentResponse;
 import com.glim.borad.repository.BoardCommentsRepository;
+import com.glim.borad.repository.CommentLikeRepository;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.ErrorCode;
 import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.stories.service.StoryService;
+import com.glim.user.domain.User;
 import com.glim.user.dto.response.ViewBoardUserResponse;
 import com.glim.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,10 +34,17 @@ public class CommentService {
     private final UserRepository userRepository;
     private final AwsS3Util awsS3Util;
     private final StoryService storyService;
+    private final CommentLikeRepository commentLikeRepository;
 
     @Transactional
-    public BoardComments insert(AddCommentsRequest request, Long userId) {
-        return boardCommentsRepository.save(new AddCommentsRequest().toEntity(request, userId));
+    public ViewCommentsResponse insert(AddCommentsRequest request, Long userId) {
+        BoardComments comment = boardCommentsRepository.save(new AddCommentsRequest().toEntity(request, userId));
+        User user = userRepository.findUserById(userId);
+        ViewBoardUserResponse viewBoardUserResponse = new ViewBoardUserResponse(user);
+        viewBoardUserResponse.setImg(awsS3Util.getURL(viewBoardUserResponse.getImg(), FileSize.IMAGE_128));
+        viewBoardUserResponse.setIsMine(true);
+        viewBoardUserResponse.setIsStory(storyService.isStory(userId));
+        return new ViewCommentsResponse(comment, viewBoardUserResponse);
     }
 
     public List<ViewCommentsResponse> list(Long id, Long offset, SecurityUserDto user) {
@@ -45,8 +54,10 @@ public class CommentService {
         // 커멘트아이디에 해당 댓글 번호 있는지 없는지
         List<ViewCommentsResponse> list = commentsList.stream().map(comment -> getCommentView(comment, user.getId())).collect(Collectors.toList());
         list.forEach(viewCommentsResponse -> {
-            BoardComments obj = boardCommentsRepository.findByReplyCommentId(viewCommentsResponse.getId()).orElse(null);
+            BoardComments obj = boardCommentsRepository.findByReplyCommentId(viewCommentsResponse.getId(), Limit.of(1)).orElse(null);
             viewCommentsResponse.setIsReply(obj != null);
+            Boolean isLike = commentLikeRepository.existsByCommentIdAndUserId(viewCommentsResponse.getId(), user.getId());
+            viewCommentsResponse.setIsLike(isLike);
         });
         return list;
     }
@@ -55,7 +66,12 @@ public class CommentService {
         List<BoardComments> commentsList = offset == null ?
                 boardCommentsRepository.findAllByReplyCommentIdOrderByIdAsc(replyCommentId, Limit.of(30)) :
                 boardCommentsRepository.findAllByReplyCommentIdAndIdGreaterThanOrderByIdAsc(replyCommentId, offset, Limit.of(30));
-        return commentsList.stream().map(comment -> getReplyView(comment, user.getId())).toList();
+        List<ViewReplyCommentResponse> list = commentsList.stream().map(comment -> getReplyView(comment, user.getId())).collect(Collectors.toList());
+        list.forEach(viewCommentsResponse -> {
+            Boolean isLike = commentLikeRepository.existsByCommentIdAndUserId(viewCommentsResponse.getId(), user.getId());
+            viewCommentsResponse.setIsLike(isLike);
+        });
+        return list;
     }
 
     private ViewCommentsResponse getCommentView(BoardComments comment, Long userId){
