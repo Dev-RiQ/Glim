@@ -19,8 +19,6 @@ public enum Type {
     BOARD_TAG("님의 게시글에 태그 되었습니다.", "/board/"),
     SHORTS_TAG("님의 숏츠에 태그 되었습니다.", "/shorts/"),
     STORY_TAG("님의 스토리에 태그 되었습니다.", "/story/"),
-    BOARD_COMMENT_TAG("님의 댓글에 태그 되었습니다.", "/board/"),
-    SHORTS_COMMENT_TAG("님의 댓글에 태그 되었습니다.", "/shorts/"),
 
     FOLLOW("님이 회원님을 팔로우했습니다.", "/user/");
 

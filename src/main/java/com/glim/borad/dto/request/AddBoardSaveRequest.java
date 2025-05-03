@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 @ToString
 public class AddBoardSaveRequest {
 
-    private Long userId;
     private Long boardId;
+    private Long userId;
 
     public BoardSaves toEntity(AddBoardSaveRequest addBoardSaveRequest) {
         return BoardSaves.builder()

@@ -76,7 +76,7 @@ public class NotificationService {
     }
 
     private List<NotificationResponse> getNewNotification(User user) {
-        List<NotificationResponse> notificationList = notificationRepository.findAllByUserIdAndIdGreaterThan(user.getId(), user.getReadAlarmId())
+        List<NotificationResponse> notificationList = notificationRepository.findAllByUserIdAndIdGreaterThan(user.getId(), user.getReadAlarmId()).orElseThrow(ErrorCode::throwDummyNotFound)
                 .stream().map(NotificationResponse::new).collect(Collectors.toList());
         setImg(notificationList, user);
         return notificationList;

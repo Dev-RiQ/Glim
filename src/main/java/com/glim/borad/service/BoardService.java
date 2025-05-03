@@ -99,7 +99,7 @@ public class BoardService {
     public List<ViewBoardResponse> getSubBoard(List<ViewBoardResponse> list, Long id) {
         list.forEach(viewBoardResponse -> {
             boolean isLike = boardLikeRepository.existsByBoardIdAndUserId(viewBoardResponse.getId(), id);
-            boolean isSave = boardLikeRepository.existsByBoardIdAndUserId(viewBoardResponse.getId(), id);
+            boolean isSave = boardSaveRepository.existsByBoardIdAndUserId(viewBoardResponse.getId(), id);
             List<BoardFiles> files = boardFileRepository.findAllByBoardId(viewBoardResponse.getId());
             for (BoardFiles file : files) {
                 switch (file.getFileType()) {
