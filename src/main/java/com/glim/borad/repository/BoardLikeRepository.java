@@ -8,4 +8,6 @@ public interface BoardLikeRepository extends JpaRepository<BoardLikes, Long> {
     Boolean existsByBoardIdAndUserId(Long boardId, Long userId);
 
     BoardLikes findByBoardIdAndUserId(Long boardId, Long userId);
+
+    void deleteByUserId(Long boardId);
 }

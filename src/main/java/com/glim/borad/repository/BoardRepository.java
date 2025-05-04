@@ -21,6 +21,7 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
 
     void deleteByUserId(Long userId);
 
+
     int countByUserId(Long userId);
 
     // ✅ 조회 기간 + 타입별 조회수 높은 게시글 Top 20 조회

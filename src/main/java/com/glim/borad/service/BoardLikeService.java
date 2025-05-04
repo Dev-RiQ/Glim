@@ -42,4 +42,9 @@ public class BoardLikeService {
         return boardLikeRepository.existsByBoardIdAndUserId(boardId, userId);
     }
 
+    @Transactional
+    public void deleteBoardLikesByUser(Long userId) {
+        boardLikeRepository.deleteByUserId(userId);
+    }
+
 }

@@ -66,8 +66,10 @@ public class FollowService {
                 .followingUserId(followingId)
                 .build());
 
-        User fromUser  = userRepository.findById(followerId).orElseThrow();
-        User toUser  = userRepository.findById(followingId).orElseThrow();
+        User fromUser = userRepository.findById(followerId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User toUser = userRepository.findById(followingId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         fromUser .setFollowings(fromUser.getFollowings() + 1);
         toUser .setFollowers(toUser .getFollowers() + 1);
 
@@ -91,8 +93,10 @@ public class FollowService {
 
         followRepository.deleteByFollowerUserIdAndFollowingUserId(followerId, followingId);
 
-        User follower = userRepository.findById(followerId).orElseThrow();
-        User following = userRepository.findById(followingId).orElseThrow();
+        User follower = userRepository.findById(followerId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User following = userRepository.findById(followingId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         follower.setFollowings(Math.max(0, follower.getFollowings() - 1));
         following.setFollowers(Math.max(0, following.getFollowers() - 1));
 
@@ -191,7 +195,8 @@ public class FollowService {
         List<FollowUserResponse> responses = new ArrayList<>();
         for(Follow follow : list) {
             if(storyService.isStory(follow.getFollowingUserId())){
-                User user = userRepository.findById(follow.getFollowingUserId()).orElse(null);
+                User user = userRepository.findById(follow.getFollowingUserId())
+                        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
                 if(user == null) continue;
                 user.setImg(awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128));
                 responses.add(FollowUserResponse.from(user, true));

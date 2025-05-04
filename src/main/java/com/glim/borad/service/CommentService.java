@@ -105,4 +105,9 @@ public class CommentService {
         boardCommentsRepository.save(boardComments);
     }
 
+    @Transactional
+    public void deleteBoardCommentsByUser(Long userId) {
+        boardCommentsRepository.deleteByUserId(userId);
+    }
+
 }

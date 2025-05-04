@@ -45,6 +45,9 @@ public class BoardService {
     private final FollowRepository followRepository;
     private final StoryService storyService;
     private final BoardSaveRepository boardSaveRepository;
+    private final CommentLikeService commentLikeService;
+    private final CommentService commentService;
+    private final BoardLikeService boardLikeService;
 
     @Transactional
     public void insert(AddBoardRequest request) {
@@ -183,12 +186,6 @@ public class BoardService {
         boardRepository.save(boards);
     }
 
-    // 회원 탈퇴시 해당 회원이 작성한 게시글 삭제
-    @Transactional
-    public void deleteBoardsByUser(Long userId) {
-        boardRepository.deleteByUserId(userId);
-    }
-
     // 해당 회원의 총 게시글 수
     public int countBoardsByUserId(Long userId) {
         return boardRepository.countByUserId(userId);
@@ -236,6 +233,15 @@ public class BoardService {
 
         return list;
     }
+
+    @Transactional
+    public void deleteBoardRelatedDataByUser(Long userId) {
+        boardLikeService.deleteBoardLikesByUser(userId);
+        commentService.deleteBoardCommentsByUser(userId);
+        commentLikeService.deleteCommentLikesByUser(userId);
+        boardRepository.deleteByUserId(userId);
+    }
+
 
 //    public List<ViewBoardResponse> getMyShortsList(Long offset, Long userId) {
 //        List<Boards> boardList = (offset == null)

@@ -182,8 +182,8 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long id) {
-        // 1. Board 삭제
-        boardService.deleteBoardsByUser(id);
+        // 1. Board 관련 삭제(좋아요, 댓글, 댓글 좋아요)
+        boardService.deleteBoardRelatedDataByUser(id);
 
         // 2. Follow 삭제
         followService.deleteFollowByUser(id);

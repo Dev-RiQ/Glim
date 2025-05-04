@@ -35,4 +35,9 @@ public class CommentLikeService {
         }
         return false;
     }
+
+    @Transactional
+    public void deleteCommentLikesByUser(Long userId) {
+        commentLikeRepository.deleteByUserId(userId);
+    }
 }
