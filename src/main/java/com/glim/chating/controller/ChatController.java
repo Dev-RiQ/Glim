@@ -68,19 +68,19 @@ public class ChatController {
     @PostMapping("/sendMsg")
     public StatusResponseDTO sendMessage(@RequestBody AddChatMsgRequest addChatMsgRequest) {
         chatMsgService.sendMessage(addChatMsgRequest);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("메시지 전송 성공");
     }
 
     @PutMapping("/user/{roomId}")
     public StatusResponseDTO readMsg(@PathVariable Long roomId) {
         chatUserService.updateChatUserReadMsg(roomId);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("메시지 읽음 처리");
     }
 
     @PutMapping("/exit/{roomId}")
     public StatusResponseDTO escapeChatRoom(@PathVariable Long roomId) {
         chatUserService.escapeChatRoom(roomId);
-        return StatusResponseDTO.ok();
+        return StatusResponseDTO.ok("채팅방 나가기 성공");
     }
 
 }

@@ -5,6 +5,8 @@ import com.glim.borad.repository.BoardFileRepository;
 import com.glim.borad.repository.BoardRepository;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
+import com.glim.common.exception.CustomException;
+import com.glim.common.exception.ErrorCode;
 import com.glim.rankingBoard.domain.RankingBoardDocument;
 import com.glim.rankingBoard.dto.response.RankingBoardResponse;
 import com.glim.rankingBoard.repository.RankingBoardMongoRepository;
@@ -37,7 +39,8 @@ public class RankingBoardService {
     @Cacheable(value = "rankingCache", key = "#period + '_' + #type.name() + '_' + #criteria", unless = "#period != 'realtime'")
     public List<RankingBoardResponse> getRankingList(String period, BoardType type, String criteria) {
         String finalPeriod = period + "_" + criteria;
-        List<RankingBoardDocument> documents = rankingBoardMongoRepository.findByPeriodAndTypeOrderByViewCountDesc(finalPeriod, type.name());
+        List<RankingBoardDocument> documents = rankingBoardMongoRepository.findByPeriodAndTypeOrderByViewCountDesc(finalPeriod, type.name())
+                .orElseThrow(() -> new CustomException(ErrorCode.RANKING_NOT_FOUND));
 
         return documents.stream()
                 .map(doc -> {

@@ -7,6 +7,7 @@ import com.glim.borad.repository.BoardFileRepository;
 import com.glim.borad.repository.BoardRepository;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
+import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +32,12 @@ public class BoardFileSevice {
 
     @Transactional
     public void delete(Long id, Long boardId) {
-        boardRepository.findById(boardId).orElseThrow(ErrorCode::throwDummyNotFound);
+        boardRepository.findById(boardId).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
         boardFileRepository.deleteById(id);
     }
 
     public String RankImgfindById(Long boardId) {
-        BoardFiles boardFiles = boardFileRepository.findById(boardId).orElseThrow(ErrorCode::throwDummyNotFound);
+        BoardFiles boardFiles = boardFileRepository.findById(boardId).orElseThrow(() -> new CustomException(ErrorCode.BOARDFILE_NOT_FOUND));
         return boardFiles.getFileType() == FileType.IMAGE ? awsS3Util.getURL(boardFiles.getFileName(), FileSize.IMAGE_512) :
                 awsS3Util.getURL(boardFiles.getFileName(), FileSize.VIDEO_THUMBNAIL);
     }

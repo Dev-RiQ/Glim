@@ -52,10 +52,12 @@ public class ChatUserService {
     public ViewChatUserResponse findByRoomId(Long roomId) {
         SecurityUserDto me = SecurityUtil.getUser();
         if(!chatUserRepository.existsByRoomIdAndUserId(roomId, me.getId())){
-            throw new CustomException(ErrorCode.DUMMY_NOT_FOUND);
+            throw new CustomException(ErrorCode.CHATROOM_NOT_FOUND);
         }
-        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserIdNot(roomId, me.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
-        User user = userRepository.findById(chatUser.getUserId()).orElseThrow(ErrorCode::throwDummyNotFound);
+        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserIdNot(roomId, me.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND));
+        User user = userRepository.findById(chatUser.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         user.setImg(awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128));
         boolean isStory = storyService.isStory(chatUser.getId());
         return new ViewChatUserResponse(user, chatUser, isStory);
@@ -64,7 +66,8 @@ public class ChatUserService {
     @Transactional
     public void updateChatUserReadMsg(Long roomId) {
         SecurityUserDto user = SecurityUtil.getUser();
-        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(roomId, user.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
+        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(roomId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND));
         chatUser.update(chatUtil.getNextMsgId() - 1);
         chatUserRepository.save(chatUser);
     }
@@ -72,7 +75,8 @@ public class ChatUserService {
     @Transactional
     public void escapeChatRoom(Long roomId) {
         SecurityUserDto user = SecurityUtil.getUser();
-        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(roomId, user.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
+        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(roomId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND));
         chatUser.escape();
         chatUserRepository.save(chatUser);
     }
@@ -84,7 +88,8 @@ public class ChatUserService {
 
     @Transactional
     public void checkUserValid(Long roomId) {
-        ChatUser chatUser = chatUserRepository.findById(roomId).orElseThrow(ErrorCode::throwDummyNotFound);
+        ChatUser chatUser = chatUserRepository.findById(roomId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND));
         if(chatUser.getValid() == ChatUserValid.OUT) {
             chatUser.reInvite();
             chatUserRepository.save(chatUser);

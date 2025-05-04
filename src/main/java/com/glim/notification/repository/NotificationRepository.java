@@ -11,9 +11,9 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     Optional<List<Notification>> findAllByUserIdAndIdGreaterThan(Long userId, Long id);
     void deleteByUserIdOrSendUserId(Long userId, Long sendUserId);
 
-    List<Notification> findAllByUserIdAndIdLessThanOrderByIdDesc(Long id, Long readAlarmId, Limit of);
+    Optional<List<Notification>> findAllByUserIdAndIdLessThanOrderByIdDesc(Long id, Long readAlarmId, Limit of);
 
-    List<Notification> findAllByUserIdAndIdLessThanAndIdLessThanOrderByIdDesc(Long id, Long readAlarmId, Long offset, Limit of);
+    Optional<List<Notification>> findAllByUserIdAndIdLessThanAndIdLessThanOrderByIdDesc(Long id, Long readAlarmId, Long offset, Limit of);
 
     Boolean existsByUserIdAndIdGreaterThan(Long userId, Long readAlarmId);
 }

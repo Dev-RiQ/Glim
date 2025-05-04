@@ -55,14 +55,16 @@ public class NotificationService {
     public List<NotificationResponse> getNotificationList(Long offset) {
         User user = userRepository.findById(SecurityUtil.getUser().getId()).orElseThrow(ErrorCode::throwDummyNotFound);
         List<Notification> list = offset == null ? notificationRepository.findAllByUserIdAndIdLessThanOrderByIdDesc(user.getId(),user.getReadAlarmId(), Limit.of(30))
-                :notificationRepository.findAllByUserIdAndIdLessThanAndIdLessThanOrderByIdDesc(user.getId(),user.getReadAlarmId(), offset, Limit.of(30));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOTIFICATION_NOT_FOUND))
+                :notificationRepository.findAllByUserIdAndIdLessThanAndIdLessThanOrderByIdDesc(user.getId(),user.getReadAlarmId(), offset, Limit.of(30))
+                .orElseThrow(() -> new CustomException(ErrorCode.NOTIFICATION_NO_MORE));
         List<NotificationResponse> notificationList = list.stream().map(NotificationResponse::new).collect(Collectors.toList());
         setImg(notificationList, user);
         return notificationList;
     }
 
     public SseEmitter getEmitter(final HttpServletResponse response, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(ErrorCode::throwDummyNotFound);
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         List<NotificationResponse> notifications = getNewNotification(user);
         if(!notifications.isEmpty()) {
             emitter = new SseEmitter(DEFAULT_TIMEOUT);
@@ -77,7 +79,7 @@ public class NotificationService {
 
     private List<NotificationResponse> getNewNotification(User user) {
         List<NotificationResponse> notificationList = notificationRepository.findAllByUserIdAndIdGreaterThan(user.getId(), user.getReadAlarmId())
-                .orElseThrow(() -> new CustomException(ErrorCode.DUMMY_NOT_FOUND))
+                .orElseThrow(() -> new CustomException(ErrorCode.NOTIFICATION_NO_CREATED))
                 .stream().map(NotificationResponse::new).collect(Collectors.toList());
         setImg(notificationList, user);
         return notificationList;
@@ -133,6 +135,7 @@ public class NotificationService {
 
     @Transactional
     public void delete(long id) {
+        notificationRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.DUPLICATE_NOTIFICATION_DELETE));
         notificationRepository.deleteById(id);
     }
 
@@ -143,7 +146,7 @@ public class NotificationService {
 
     @Transactional
     public void updateRead(Long id){
-        Notification notification = notificationRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
+        Notification notification = notificationRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOTIFICATION_NOT_FOUND));
         if(!notification.getIsRead()) {
             notification.update();
             notificationRepository.save(notification);

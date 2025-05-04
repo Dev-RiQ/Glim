@@ -14,6 +14,7 @@ import com.glim.chating.repository.ChatRoomRepository;
 import com.glim.chating.repository.ChatUserRepository;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
+import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import com.glim.common.kafka.dto.Message;
 import com.glim.common.kafka.service.SendMessage;
@@ -87,7 +88,8 @@ public class ChatRoomService {
 
     public List<ViewChatRoomResponse> findChatRoomListByUserId() {
         SecurityUserDto user = SecurityUtil.getUser();
-        List<ChatUser> chatUserList = chatUserRepository.findAllByUserId(user.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
+        List<ChatUser> chatUserList = chatUserRepository.findAllByUserId(user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NO_CREATED));
         return getViewChatRoomListByUserId(chatUserList);
     }
 
@@ -96,15 +98,20 @@ public class ChatRoomService {
         User user = null;
         for(ChatUser chatUser : chatUserList) {
             if(chatUser.getValid().toString().equals("OUT")) continue;
-            ChatRoom chatRoom = chatRoomRepository.findById(chatUser.getRoomId()).orElseThrow(ErrorCode::throwDummyNotFound);
-            ChatUser chatUserNotMe = chatUserRepository.findByRoomIdAndUserIdNot(chatRoom.getId(), chatUser.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
+            ChatRoom chatRoom = chatRoomRepository.findById(chatUser.getRoomId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
+            ChatUser chatUserNotMe = chatUserRepository.findByRoomIdAndUserIdNot(chatRoom.getId(), chatUser.getId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND));
             if(user == null) {
-                user = userRepository.findById(chatUserNotMe.getUserId()).orElseThrow(ErrorCode::throwDummyNotFound);
+                user = userRepository.findById(chatUserNotMe.getUserId())
+                    .orElse(null);
             }
             List<ChatMsg> chatMsgList = chatMsgRepository.findAllByRoomIdOrderByMsgIdDesc(chatUser.getRoomId(), Limit.of(1));
             ChatMsg chatMsg = chatMsgList.isEmpty() ? null :chatMsgList.get(0);
-            Long readId = chatUserRepository.findByRoomIdAndUserId(chatUser.getRoomId(), chatUser.getId()).orElseThrow(ErrorCode::throwDummyNotFound).getReadMsgId();
-            Long lastId = chatMsgRepository.findTop1ByRoomIdOrderByMsgIdDesc(chatUser.getRoomId()).orElseThrow(ErrorCode::throwDummyNotFound).getMsgId();
+            Long readId = chatUserRepository.findByRoomIdAndUserId(chatUser.getRoomId(), chatUser.getId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND)).getReadMsgId();
+            Long lastId = chatMsgRepository.findTop1ByRoomIdOrderByMsgIdDesc(chatUser.getRoomId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.CHATMSG_NOT_FOUND)).getMsgId();
             boolean hasRead = readId.equals(lastId);
             boolean isStory = storyService.isStory(chatUser.getId());
             ViewChatUserResponse userView = new ViewChatUserResponse(user, chatUser, isStory);
@@ -116,12 +123,14 @@ public class ChatRoomService {
 
     public Boolean hasNewChat(){
         SecurityUserDto user = SecurityUtil.getUser();
-        List<ChatUser> chatUserList = chatUserRepository.findAllByUserId(user.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
+        List<ChatUser> chatUserList = chatUserRepository.findAllByUserId(user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND));
         for(ChatUser chatUser : chatUserList) {
             if(chatUser.getValid().toString().equals("OUT")) continue;
-            List<ChatMsg> chatMsgList = chatMsgRepository.findAllByRoomIdOrderByMsgIdDesc(chatUser.getRoomId(), Limit.of(1));
-            Long readId = chatUserRepository.findByRoomIdAndUserId(chatUser.getRoomId(), chatUser.getId()).orElseThrow(ErrorCode::throwDummyNotFound).getReadMsgId();
-            Long lastId = chatMsgRepository.findTop1ByRoomIdOrderByMsgIdDesc(chatUser.getRoomId()).orElseThrow(ErrorCode::throwDummyNotFound).getMsgId();
+            Long readId = chatUserRepository.findByRoomIdAndUserId(chatUser.getRoomId(), chatUser.getId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND)).getReadMsgId();
+            Long lastId = chatMsgRepository.findTop1ByRoomIdOrderByMsgIdDesc(chatUser.getRoomId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.CHATMSG_NOT_FOUND)).getMsgId();
             boolean hasRead = readId.equals(lastId);
             if(!hasRead) return true;
         }
@@ -139,8 +148,10 @@ public class ChatRoomService {
             chatRoomRepository.save(createdRoom);
         }
         SecurityUserDto me = SecurityUtil.getUser();
-        User user = userRepository.findById(joinUserId).orElseThrow(ErrorCode::throwDummyNotFound);
-        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserIdNot(createdRoom.getId(), me.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
+        User user = userRepository.findById(joinUserId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserIdNot(createdRoom.getId(), me.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND));
         boolean isStory = storyService.isStory(chatUser.getId());
         ViewChatUserResponse userView = new ViewChatUserResponse(user, chatUser, isStory);
         userView.setImg(awsS3Util.getURL(userView.getImg(), FileSize.IMAGE_128));
@@ -151,12 +162,13 @@ public class ChatRoomService {
     private ChatRoom existsChatRoom(Long joinUserId) {
         SecurityUserDto user = SecurityUtil.getUser();
         List<ChatUser> userChatUserList = chatUserRepository.findAllByUserId(user.getId())
-                .orElseThrow(ErrorCode::throwDummyNotFound);
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND));
         for(ChatUser chatUser : userChatUserList) {
             Long roomId = chatUser.getRoomId();
             ChatUser joinUser = chatUserRepository.findByRoomIdAndUserIdNot(roomId,user.getId()).orElse(null);
             if(joinUser != null && joinUser.getUserId() == joinUserId) {
-                return chatRoomRepository.findById(roomId).orElseThrow(ErrorCode::throwDummyNotFound);
+                return chatRoomRepository.findById(roomId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
             }
         }
         return null;

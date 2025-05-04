@@ -1,5 +1,7 @@
 package com.glim.stories.service;
 
+import com.glim.common.exception.CustomException;
+import com.glim.common.exception.ErrorCode;
 import com.glim.stories.domain.StoryLikes;
 import com.glim.stories.dto.request.AddStoryLikeRequest;
 import com.glim.stories.repository.StoryLikeRepository;
@@ -23,7 +25,7 @@ public class StoryLikeService {
 
     @Transactional
     public void delete(Long storyId, Long userId) {
-        StoryLikes storyLike = storyLikeRepository.findByStoryIdAndUserId(storyId,userId);
+        StoryLikes storyLike = storyLikeRepository.findByStoryIdAndUserId(storyId,userId).orElseThrow(() -> new CustomException(ErrorCode.DUPLICATE_STORY_LIKE));
         storyLikeRepository.deleteById(storyLike.getId());
     }
 }

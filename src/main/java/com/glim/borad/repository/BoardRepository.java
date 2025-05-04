@@ -21,7 +21,6 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
 
     void deleteByUserId(Long userId);
 
-
     int countByUserId(Long userId);
 
     // ✅ 조회 기간 + 타입별 조회수 높은 게시글 Top 20 조회
@@ -33,12 +32,6 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
 
     List<Boards> findByIdIn(List<Long> boardIdList);
 
-    List<Boards> findAllByUserIdOrderByIdDesc(Long userId, Limit of);
-
-    List<Boards> findAllByUserIdAndIdLessThanOrderByIdDesc(Long userId, Long offset, Limit of);
-
-    List<Boards> boardType(BoardType boardType);
-
     List<Boards> findAllByUserIdInOrderByIdDesc(List<Long> followedUserIds, Limit of);
 
     List<Boards> findAllByUserIdInAndIdLessThanOrderByIdDesc(List<Long> followedUserIds, Long offset, Limit of);
@@ -47,26 +40,22 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
 
     List<Boards> findAllByIdNotInAndIdLessThanOrderByIdDesc(List<Long> excludeIds, Long offset, Limit of);
 
-
-
-    Boards findByBoardTypeAndId(BoardType boardType, Long id);
-
     List<Boards> findAllByBoardTypeOrderByIdDesc(BoardType boardType, Limit of);
 
     List<Boards> findAllByBoardTypeAndIdLessThanOrderByIdDesc(BoardType boardType, Long offset, Limit of);
 
-    List<Boards> findAllByUserIdAndBoardTypeOrderByIdDesc(Long id, BoardType boardType, Limit of);
+    Optional<List<Boards>> findAllByUserIdAndBoardTypeOrderByIdDesc(Long id, BoardType boardType, Limit of);
 
-    List<Boards> findAllByUserIdAndBoardTypeAndIdLessThanOrderByIdDesc(Long id, BoardType boardType, Long offset, Limit of);
+    Optional<List<Boards>> findAllByUserIdAndBoardTypeAndIdLessThanOrderByIdDesc(Long id, BoardType boardType, Long offset, Limit of);
 
-    List<Boards> findAllByOrderByIdDesc(Limit of);
+    Optional<List<Boards>> findAllByOrderByIdDesc(Limit of);
 
-    List<Boards> findAllByTagUserIdsContainingOrderByIdDesc(String userId, Limit of);
+    Optional<List<Boards>> findAllByTagUserIdsContainingOrderByIdDesc(String userId, Limit of);
 
-    List<Boards> findAllByTagUserIdsContainingAndIdLessThanOrderByIdDesc(String userId, Long offset, Limit of);
+    Optional<List<Boards>> findAllByTagUserIdsContainingAndIdLessThanOrderByIdDesc(String userId, Long offset, Limit of);
 
-    List<Boards> findAllByIdLessThanOrderByIdDesc(Long offset, Limit of);
+    Optional<List<Boards>> findAllByIdLessThanOrderByIdDesc(Long offset, Limit of);
 
-    List<Boards> findAllByIdIn(List<Long> saveList);
+    Optional<List<Boards>> findAllByIdIn(List<Long> saveList);
 }
 

@@ -6,6 +6,7 @@ import com.glim.borad.dto.response.ViewBgmResponse;
 import com.glim.borad.repository.BgmRepository;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
+import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ public class BgmService {
 
     @Transactional
     public void delete(Long id) {
-        bgmRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
+        bgmRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.BGM_NOT_FOUND));
         bgmRepository.deleteById(id);
     }
 

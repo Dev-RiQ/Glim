@@ -29,6 +29,12 @@ public class StoryController {
         return StatusResponseDTO.ok(list);
     }
 
+    @GetMapping({"/view/{storyId}"})
+    public StatusResponseDTO getStory(@PathVariable Long storyId, @AuthenticationPrincipal SecurityUserDto user) {
+        ViewStoryResponse list = storyService.getStory(storyId, user.getId());
+        return StatusResponseDTO.ok(list);
+    }
+
 
     @GetMapping({"/my","/my/{offset}"})
     public StatusResponseDTO getMyStoryList(@PathVariable(required = false) Long offset, @AuthenticationPrincipal SecurityUserDto user){

@@ -5,6 +5,7 @@ import com.glim.chating.service.ChatMsgService;
 import com.glim.chating.service.ChatRoomService;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
+import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.common.utils.SecurityUtil;
@@ -45,7 +46,7 @@ public class HeaderNotificationService {
 
 
     public SseEmitter getEmitter(final HttpServletResponse response, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(ErrorCode::throwDummyNotFound);
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Boolean hasAlarm = notificationRepository.existsByUserIdAndIdGreaterThan(userId, user.getReadAlarmId());
         Boolean hasChat = chatRoomService.hasNewChat();
         emitter = new SseEmitter(DEFAULT_TIMEOUT);

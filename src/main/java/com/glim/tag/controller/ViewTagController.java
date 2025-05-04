@@ -19,9 +19,7 @@ public class ViewTagController {
     @PostMapping("/view")
     public ResponseEntity<String> recordTags(@RequestBody List<String> tags) {
         Long userId = SecurityUtil.getCurrentUserId();
-
         viewTagService.saveAllViews(userId, tags);
-
         return ResponseEntity.ok("태그 상호작용 저장 완료");
     }
 }

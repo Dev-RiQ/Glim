@@ -8,6 +8,7 @@ import com.glim.borad.repository.BoardCommentsRepository;
 import com.glim.borad.repository.CommentLikeRepository;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
+import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.stories.service.StoryService;
@@ -39,7 +40,7 @@ public class CommentService {
     @Transactional
     public ViewCommentsResponse insert(AddCommentsRequest request, Long userId) {
         BoardComments comment = boardCommentsRepository.save(new AddCommentsRequest().toEntity(request, userId));
-        User user = userRepository.findUserById(userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         ViewBoardUserResponse viewBoardUserResponse = new ViewBoardUserResponse(user);
         viewBoardUserResponse.setImg(awsS3Util.getURL(viewBoardUserResponse.getImg(), FileSize.IMAGE_128));
         viewBoardUserResponse.setIsMine(true);
@@ -49,8 +50,10 @@ public class CommentService {
 
     public List<ViewCommentsResponse> list(Long id, Long offset, SecurityUserDto user) {
         List<BoardComments> commentsList = offset == null ?
-                boardCommentsRepository.findAllByBoardIdAndReplyCommentIdOrderByIdAsc(id, 0L, Limit.of(30)) :
-                boardCommentsRepository.findAllByBoardIdAndIdGreaterThanAndReplyCommentIdOrderByIdAsc(id, offset, 0L, Limit.of(30));
+                boardCommentsRepository.findAllByBoardIdAndReplyCommentIdOrderByIdAsc(id, 0L, Limit.of(30))
+                        .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NO_CREATED))
+                :boardCommentsRepository.findAllByBoardIdAndIdGreaterThanAndReplyCommentIdOrderByIdAsc(id, offset, 0L, Limit.of(30))
+                        .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NO_MORE));
         // 커멘트아이디에 해당 댓글 번호 있는지 없는지
         List<ViewCommentsResponse> list = commentsList.stream().map(comment -> getCommentView(comment, user.getId())).collect(Collectors.toList());
         list.forEach(viewCommentsResponse -> {
@@ -64,8 +67,10 @@ public class CommentService {
 
     public List<ViewReplyCommentResponse> replyList(Long replyCommentId, Long offset, SecurityUserDto user) {
         List<BoardComments> commentsList = offset == null ?
-                boardCommentsRepository.findAllByReplyCommentIdOrderByIdAsc(replyCommentId, Limit.of(30)) :
-                boardCommentsRepository.findAllByReplyCommentIdAndIdGreaterThanOrderByIdAsc(replyCommentId, offset, Limit.of(30));
+                boardCommentsRepository.findAllByReplyCommentIdOrderByIdAsc(replyCommentId, Limit.of(30))
+                        .orElseThrow(() -> new CustomException(ErrorCode.REPLY_COMMENT_NO_CREATED))
+                :boardCommentsRepository.findAllByReplyCommentIdAndIdGreaterThanOrderByIdAsc(replyCommentId, offset, Limit.of(30))
+                        .orElseThrow(() -> new CustomException(ErrorCode.REPLY_COMMENT_NO_CREATED));
         List<ViewReplyCommentResponse> list = commentsList.stream().map(comment -> getReplyView(comment, user.getId())).collect(Collectors.toList());
         list.forEach(viewCommentsResponse -> {
             Boolean isLike = commentLikeRepository.existsByCommentIdAndUserId(viewCommentsResponse.getId(), user.getId());
@@ -75,24 +80,26 @@ public class CommentService {
     }
 
     private ViewCommentsResponse getCommentView(BoardComments comment, Long userId){
-        ViewBoardUserResponse viewBoardUserResponse = new ViewBoardUserResponse(userRepository.findById(comment.getUserId()).orElseThrow(ErrorCode::throwDummyNotFound));
+        ViewBoardUserResponse viewBoardUserResponse = new ViewBoardUserResponse(userRepository.findById(comment.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)));
         viewBoardUserResponse.setImg(awsS3Util.getURL(viewBoardUserResponse.getImg(), FileSize.IMAGE_128));
         viewBoardUserResponse.setIsMine(Objects.equals(userId, comment.getUserId()));
         viewBoardUserResponse.setIsStory(storyService.isStory(comment.getUserId()));
         return new ViewCommentsResponse(comment, viewBoardUserResponse);
     }
     private ViewReplyCommentResponse getReplyView(BoardComments comment, Long userId){
-        ViewBoardUserResponse viewBoardUserResponse = new ViewBoardUserResponse(userRepository.findById(comment.getUserId()).orElseThrow(ErrorCode::throwDummyNotFound));
+        ViewBoardUserResponse viewBoardUserResponse = new ViewBoardUserResponse(userRepository.findById(comment.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)));
         viewBoardUserResponse.setImg(awsS3Util.getURL(viewBoardUserResponse.getImg(), FileSize.IMAGE_128));
         viewBoardUserResponse.setIsMine(Objects.equals(userId, comment.getUserId()));
         viewBoardUserResponse.setIsStory(storyService.isStory(comment.getUserId()));
         return new ViewReplyCommentResponse(comment, viewBoardUserResponse);
     }
 
-
     @Transactional
     public Long delete(Long commentId) {
-        BoardComments comments = boardCommentsRepository.findById(commentId).orElseThrow(ErrorCode::throwDummyNotFound);
+        BoardComments comments = boardCommentsRepository.findById(commentId)
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
         Long boardId = comments.getBoardId();
         boardCommentsRepository.delete(comments);
         return boardId;
@@ -100,7 +107,8 @@ public class CommentService {
 
     @Transactional
     public void updateLike(Long id, int like) {
-        BoardComments boardComments = boardCommentsRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
+        BoardComments boardComments = boardCommentsRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
         boardComments.setLikes(boardComments.getLikes() + like);
         boardCommentsRepository.save(boardComments);
     }

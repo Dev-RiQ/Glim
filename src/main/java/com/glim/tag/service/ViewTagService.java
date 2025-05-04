@@ -4,15 +4,18 @@ import com.glim.tag.domain.ViewTag;
 import com.glim.tag.repository.ViewTagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ViewTagService {
 
     private final ViewTagRepository viewTagRepository;
 
+    @Transactional
     public void saveAllViews(Long userId, List<String> tags) {
         for (String tag : tags) {
             ViewTag viewTag = viewTagRepository.findByUserIdAndTag(userId, tag)

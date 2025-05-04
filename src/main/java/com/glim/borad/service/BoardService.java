@@ -12,6 +12,7 @@ import com.glim.borad.dto.response.ViewMyPageBoardResponse;
 import com.glim.borad.repository.*;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
+import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import com.glim.stories.service.StoryService;
 import com.glim.user.domain.Follow;
@@ -63,7 +64,8 @@ public class BoardService {
     public List<ViewBoardResponse> getMainBoard(Long id, Long offset) {
         List<Follow> followList = followRepository.findAllByFollowerUserId(id);
         List<Long> followedUserIds = followList.stream().map(Follow::getFollowingUserId).collect(Collectors.toList());
-        List<Boards> boardList = (offset == null) ? boardRepository.findAllByUserIdInOrderByIdDesc(followedUserIds, Limit.of(10)) : boardRepository.findAllByUserIdInAndIdLessThanOrderByIdDesc(followedUserIds, offset, Limit.of(10));
+        List<Boards> boardList = (offset == null) ? boardRepository.findAllByUserIdInOrderByIdDesc(followedUserIds, Limit.of(10))
+                : boardRepository.findAllByUserIdInAndIdLessThanOrderByIdDesc(followedUserIds, offset, Limit.of(10));
         if (boardList.size() < 10) {
 //            User user = (User) userRepository.findAllById(Collections.singleton(id));
 //            System.out.println("userTag = " + user.getTags());
@@ -71,7 +73,8 @@ public class BoardService {
         if (boardList.size() < 10) {
             int remain = 10 - boardList.size();
             List<Long> excludeIds = boardList.stream().map(Boards::getId).collect(Collectors.toList());
-            List<Boards> fillBoards = (offset == null) ? boardRepository.findAllByIdNotInOrderByIdDesc(excludeIds, Limit.of(remain)) : boardRepository.findAllByIdNotInAndIdLessThanOrderByIdDesc(excludeIds, offset, Limit.of(remain));
+            List<Boards> fillBoards = (offset == null) ? boardRepository.findAllByIdNotInOrderByIdDesc(excludeIds, Limit.of(remain))
+                    : boardRepository.findAllByIdNotInAndIdLessThanOrderByIdDesc(excludeIds, offset, Limit.of(remain));
 
             boardList.addAll(fillBoards);
         }
@@ -87,13 +90,14 @@ public class BoardService {
     }
 
     private ViewBoardResponse getView(Boards board,Long id){
-        ViewBoardUserResponse viewBoardUserResponse = new ViewBoardUserResponse(userRepository.findById(board.getUserId()).orElseThrow(ErrorCode::throwDummyNotFound));
+        ViewBoardUserResponse viewBoardUserResponse = new ViewBoardUserResponse(userRepository.findById(board.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)));
         viewBoardUserResponse.setImg(awsS3Util.getURL(viewBoardUserResponse.getImg(), FileSize.IMAGE_128));
         viewBoardUserResponse.setIsMine(Objects.equals(id, board.getUserId()));
         viewBoardUserResponse.setIsStory(storyService.isStory(board.getUserId()));
         ViewBgmResponse viewBgmResponse = null;
         if(board.getBgmId() != 0){
-            Bgms bgm  = bgmRepository.findById(board.getBgmId()).orElseThrow(ErrorCode::throwDummyNotFound);
+            Bgms bgm  = bgmRepository.findById(board.getBgmId()).orElseThrow(() -> new CustomException(ErrorCode.BGM_NOT_FOUND));
             viewBgmResponse = new ViewBgmResponse(bgm, awsS3Util.getURL(bgm.getFileName(), FileSize.AUDIO));
         }
         return new ViewBoardResponse(board, viewBoardUserResponse, viewBgmResponse);
@@ -123,28 +127,39 @@ public class BoardService {
 
     public List<ViewMyPageBoardResponse> myPageBoardList(Long userId, Long offset) {
         List<Boards> boardList = offset == null ? boardRepository.findAllByUserIdAndBoardTypeOrderByIdDesc(userId,BoardType.BASIC, Limit.of(20))
-                : boardRepository.findAllByUserIdAndBoardTypeAndIdLessThanOrderByIdDesc(userId,BoardType.BASIC, offset, Limit.of(20));
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NO_CREATED))
+                : boardRepository.findAllByUserIdAndBoardTypeAndIdLessThanOrderByIdDesc(userId,BoardType.BASIC, offset, Limit.of(20))
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NO_MORE));
         return boardList.stream().map(this::getByPageBoard).collect(Collectors.toList());
     }
     public List<ViewMyPageBoardResponse> myPageShortsList(Long userId, Long offset) {
         List<Boards> boardList = offset == null ? boardRepository.findAllByUserIdAndBoardTypeOrderByIdDesc(userId,BoardType.SHORTS, Limit.of(20))
-                : boardRepository.findAllByUserIdAndBoardTypeAndIdLessThanOrderByIdDesc(userId,BoardType.SHORTS, offset, Limit.of(20));
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NO_CREATED))
+                : boardRepository.findAllByUserIdAndBoardTypeAndIdLessThanOrderByIdDesc(userId,BoardType.SHORTS, offset, Limit.of(20))
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NO_MORE));
         return boardList.stream().map(this::getByPageBoard).collect(Collectors.toList());
     }
     public List<ViewMyPageBoardResponse> myPageTagsList(Long userId, Long offset) {
         List<Boards> boardList = offset == null ? boardRepository.findAllByTagUserIdsContainingOrderByIdDesc(userId.toString(), Limit.of(20))
-                : boardRepository.findAllByTagUserIdsContainingAndIdLessThanOrderByIdDesc(userId.toString(), offset, Limit.of(20));
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NO_CREATED))
+                : boardRepository.findAllByTagUserIdsContainingAndIdLessThanOrderByIdDesc(userId.toString(), offset, Limit.of(20))
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NO_MORE));
         return boardList.stream().map(this::getByPageBoard).collect(Collectors.toList());
     }
     public List<ViewMyPageBoardResponse> allList(Long offset) {
         List<Boards> boardList = offset == null ? boardRepository.findAllByOrderByIdDesc(Limit.of(20))
-                : boardRepository.findAllByIdLessThanOrderByIdDesc(offset, Limit.of(20));
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NO_CREATED))
+                : boardRepository.findAllByIdLessThanOrderByIdDesc(offset, Limit.of(20))
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NO_MORE));
         return boardList.stream().map(this::getByPageBoard).collect(Collectors.toList());
     }
     public List<ViewMyPageBoardResponse> myPageSaveList(Long userId, Long offset) {
         List<BoardSaves> saveList = offset == null ? boardSaveRepository.findAllByUserIdOrderByIdDesc(userId, Limit.of(30))
-                : boardSaveRepository.findAllByUserIdAndIdLessThanOrderByIdDesc(userId, offset, Limit.of(30));
-        List<Boards> boardList = boardRepository.findAllByIdIn(saveList.stream().map(BoardSaves::getBoardId).toList());
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NO_CREATED))
+                : boardSaveRepository.findAllByUserIdAndIdLessThanOrderByIdDesc(userId, offset, Limit.of(30))
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NO_MORE));
+        List<Boards> boardList = boardRepository.findAllByIdIn(saveList.stream().map(BoardSaves::getBoardId).toList())
+                .orElseThrow(() -> new CustomException(ErrorCode.BOARDSAVE_NOT_FOUND));
         return boardList.stream().map(this::getByPageBoard).collect(Collectors.toList());
     }
 
@@ -167,21 +182,21 @@ public class BoardService {
 
     @Transactional
     public void updateLike(Long id, int like) {
-        Boards boards = boardRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
+        Boards boards = boardRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
         boards.setLikes(boards.getLikes() + like);
         boardRepository.save(boards);
     }
 
     @Transactional
     public void updateView(Long id, int view) {
-        Boards boards = boardRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
+        Boards boards = boardRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
         boards.setViews(boards.getViews() + view);
         boardRepository.save(boards);
     }
 
     @Transactional
     public void updateComment(Long id, int comment) {
-        Boards boards = boardRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
+        Boards boards = boardRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
         boards.setComments(boards.getComments() + comment);
         boardRepository.save(boards);
     }
@@ -199,23 +214,23 @@ public class BoardService {
         Advertisement ad = advertisementRepository.findRandomApprovedAdvertisement();
         if (ad != null) {
             Long id = ad.getBoardId();
-            return getView(boardRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound), userId);
+            return getView(boardRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND)), userId);
         }
         return null;
     }
 
     public boolean isLoginUser(Long id, Long userId) {
-        Boards boards = boardRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
+        Boards boards = boardRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
         return boards.getUserId().equals(userId);
     }
 
     public ViewBoardResponse getBoard(Long userId, Long id) {
-        ViewBoardResponse boardView = getView(boardRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound),userId);
+        ViewBoardResponse boardView = getView(boardRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND)),userId);
         return getSubBoard(List.of(boardView), userId).get(0);
     }
 
     public ViewBoardResponse getShorts(Long userId, Long id) {
-        ViewBoardResponse boardView = getView(boardRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound),userId);
+        ViewBoardResponse boardView = getView(boardRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND)),userId);
         return getSubBoard(List.of(boardView), userId).get(0);
     }
 

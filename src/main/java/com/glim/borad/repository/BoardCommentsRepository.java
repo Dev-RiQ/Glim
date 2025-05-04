@@ -7,21 +7,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BoardCommentsRepository extends JpaRepository<BoardComments, Long> {
-    List<BoardComments> findAllById(Long id);
-    List<BoardComments> findAllByBoardIdOrderByIdAsc(Long boardId, Limit limit);
-    List<BoardComments> findAllByBoardIdAndIdGreaterThanOrderByIdAsc(Long boardId, Long offset, Limit limit);
-
-    List<BoardComments> findAllByBoardIdAndReplyCommentIdOrderByIdAsc(Long id, long l, Limit of);
-
-    List<BoardComments> findAllByBoardIdAndIdGreaterThanAndReplyCommentIdOrderByIdAsc(Long id, Long offset, long l, Limit of);
-
-    List<BoardComments> findAllByReplyCommentIdOrderByIdAsc(Long commentId, Limit of);
-
-    List<BoardComments> findAllByReplyCommentIdAndIdGreaterThanOrderByIdAsc(Long commentId, Long offset, Limit of);
-
+    Optional<List<BoardComments>> findAllByBoardIdAndReplyCommentIdOrderByIdAsc(Long id, long l, Limit of);
+    Optional<List<BoardComments>> findAllByBoardIdAndIdGreaterThanAndReplyCommentIdOrderByIdAsc(Long id, Long offset, long l, Limit of);
+    Optional<List<BoardComments>> findAllByReplyCommentIdOrderByIdAsc(Long commentId, Limit of);
+    Optional<List<BoardComments>> findAllByReplyCommentIdAndIdGreaterThanOrderByIdAsc(Long commentId, Long offset, Limit of);
     Optional<BoardComments> findByReplyCommentId(Long id, Limit limit);
-
     void deleteBoardCommentsByReplyCommentId(Long replyCommentId, Limit limit);
-
     void deleteByUserId(Long userId);
 }
