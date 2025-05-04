@@ -29,8 +29,7 @@ public class BoardSaveController {
     @GetMapping("")
     public StatusResponseDTO getSaveList(@AuthenticationPrincipal SecurityUserDto user) {
         List<Long> boardIdList = boardSaveService.getSaveList(user.getId());
-        List<Boards> boardList = boardService.getSaveList(boardIdList);
-        return StatusResponseDTO.ok(boardList);
+        return StatusResponseDTO.ok(boardService.getSaveList(boardIdList));
     }
 
     @PostMapping("/{boardId}")

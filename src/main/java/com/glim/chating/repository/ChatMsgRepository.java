@@ -17,4 +17,6 @@ public interface ChatMsgRepository extends MongoRepository<ChatMsg, Long> {
     List<ChatMsg> findAllByRoomIdAndMsgIdGreaterThanOrderByMsgIdDesc(Long roomId, Long loadMin, Limit of);
 
     List<ChatMsg> findAllByRoomIdAndMsgIdGreaterThanAndMsgIdLessThanOrderByMsgIdDesc(Long roomId, Long loadMin, Long offset, Limit of);
+
+    List<ChatMsg> findAllByRoomIdAndMsgIdBetweenOrderByMsgIdDesc(Long roomId, Long loadMin, Long offset, Limit of);
 }
