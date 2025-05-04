@@ -52,7 +52,7 @@ public class ChatMsgService {
         }
         List<ChatMsg> chatMsgList = offset == null ?
             chatMsgRepository.findAllByRoomIdAndMsgIdGreaterThanOrderByMsgIdDesc(roomId, loadMin ,Limit.of(30))
-            : chatMsgRepository.findAllByRoomIdAndMsgIdGreaterThanAndMsgIdLessThanOrderByMsgIdDesc(roomId, loadMin,offset, Limit.of(30));
+            : chatMsgRepository.findAllByRoomIdAndMsgIdBetweenOrderByMsgIdDesc(roomId, loadMin, offset, Limit.of(30));
         if(chatMsgList == null || chatMsgList.isEmpty()) {
             return Collections.emptyList();
         }

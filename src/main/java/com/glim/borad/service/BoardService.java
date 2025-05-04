@@ -91,7 +91,7 @@ public class BoardService {
         ViewBgmResponse viewBgmResponse = null;
         if(board.getBgmId() != 0){
             Bgms bgm  = bgmRepository.findById(board.getBgmId()).orElseThrow(ErrorCode::throwDummyNotFound);
-            viewBgmResponse = new ViewBgmResponse(bgm,bgm.getFileName());
+            viewBgmResponse = new ViewBgmResponse(bgm, awsS3Util.getURL(bgm.getFileName(), FileSize.AUDIO));
         }
         return new ViewBoardResponse(board, viewBoardUserResponse, viewBgmResponse);
     }
@@ -194,8 +194,8 @@ public class BoardService {
         return boardRepository.countByUserId(userId);
     }
 
-    public List<Boards> getSaveList(List<Long> boardIdList) {
-        return boardRepository.findByIdIn(boardIdList);
+    public List<ViewMyPageBoardResponse> getSaveList(List<Long> boardIdList) {
+        return boardRepository.findByIdIn(boardIdList).stream().map(this::getByPageBoard).toList();
     }
 
     public ViewBoardResponse getRandomAdvertisement(Long userId) {
