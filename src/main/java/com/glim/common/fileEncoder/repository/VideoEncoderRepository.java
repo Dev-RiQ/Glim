@@ -54,7 +54,7 @@ public class VideoEncoderRepository {
                 .setAudioSampleRate(44100)
                 .setFormat("mp4")
                 .setVideoCodec("h264")
-                .setVideoBitRate(320000)
+                .setVideoBitRate(2500000)
                 .setVideoFrameRate(30)
                 .setVideoResolution(file.width, file.height)
                 .setStrict(FFmpegBuilder.Strict.EXPERIMENTAL)
