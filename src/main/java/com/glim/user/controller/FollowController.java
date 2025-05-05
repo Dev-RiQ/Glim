@@ -19,35 +19,21 @@ import java.util.List;
 public class FollowController {
 
     private final FollowService followService;
-    /**
-     * ➕ 팔로우 요청
-     * POST /api/v1/follow
-     * @param request (followingId만 포함)
-     * @return 팔로우 성공 메시지
-     */
+    // 팔로우 요청
     @PostMapping
     public ResponseEntity<FollowResponse> follow(@RequestBody FollowRequest request) {
         followService.follow(request.getFollowingId()); // followerId는 내부에서 처리
         return ResponseEntity.ok(new FollowResponse("팔로우 성공", true));
     }
 
-    /**
-     * ➖ 언팔로우 요청
-     * DELETE /api/v1/follow
-     * @param request (followingId만 포함)
-     * @return 언팔로우 성공 메시지
-     */
+    // 언팔로우 요청
     @DeleteMapping
     public ResponseEntity<FollowResponse> unfollow(@RequestBody FollowRequest request) {
         followService.unfollow(request.getFollowingId());
         return ResponseEntity.ok(new FollowResponse("언팔로우 성공", true));
     }
 
-    /**
-     * ❓ 팔로우 여부 확인
-     * GET /api/v1/follow/check?followingId=5
-     * @return true or false
-     */
+    // 팔로우 여부 확인
     @GetMapping("/check/{userId}")
     public ResponseEntity<Boolean> checkFollowing(@PathVariable("userId") Long followingId) {
         Long myId = SecurityUtil.getCurrentUserId();  // 🔐 현재 로그인한 유저 ID
@@ -55,10 +41,8 @@ public class FollowController {
         return ResponseEntity.ok(isFollowing);  // ✅ true 또는 false 응답
     }
 
-    /**
-     * 📄 내가 팔로우한 유저 목록
-     * GET /api/v1/follow/followings/{userId}
-     */
+
+    // 내가 팔로우한 유저 목록
     @GetMapping({"/followings/{userId}","/followings/{userId}/{offset}"})
     public StatusResponseDTO getFollowings(@PathVariable Long userId,
                                            @PathVariable(required = false) Long offset) {
@@ -66,10 +50,7 @@ public class FollowController {
         return StatusResponseDTO.ok(followings);
     }
 
-    /**
-     * 📄 나를 팔로우한 유저 목록
-     * GET /api/v1/follow/followers/{userId}
-     */
+    //  나를 팔로우한 유저 목록
     @GetMapping({"/followers/{userId}", "/followers/{userId}/{offset}"})
     public StatusResponseDTO getFollowers(
             @PathVariable Long userId,
@@ -79,16 +60,13 @@ public class FollowController {
         return StatusResponseDTO.ok(followers);
     }
 
-
-    /**
-     * 💡 맞팔 기반 추천
-     * GET /api/v1/follow/recommend
-     */
+    // 맞팔 기반 추천
     @GetMapping("/recommend")
     public ResponseEntity<List<FollowRecommendResponse>> getRecommendedUsers() {
         return ResponseEntity.ok(followService.getRecommendedUsers());
     }
 
+    // 스토리 리스트 조회
     @GetMapping("/story")
     public StatusResponseDTO getStory() {
         return StatusResponseDTO.ok(followService.getHasStoryList()); 
