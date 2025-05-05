@@ -129,9 +129,9 @@ public class ChatRoomService {
             if(chatUser.getValid().toString().equals("OUT")) continue;
             Long readId = chatUserRepository.findByRoomIdAndUserId(chatUser.getRoomId(), chatUser.getUserId())
                     .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND)).getReadMsgId();
-            Long lastId = chatMsgRepository.findTop1ByRoomIdOrderByMsgIdDesc(chatUser.getRoomId())
-                    .orElseThrow(() -> new CustomException(ErrorCode.CHATMSG_NOT_FOUND)).getMsgId();
-            boolean hasRead = readId.equals(lastId);
+            ChatMsg lastId = chatMsgRepository.findTop1ByRoomIdOrderByMsgIdDesc(chatUser.getRoomId())
+                    .orElse(null);
+            boolean hasRead = lastId == null || readId.equals(lastId.getMsgId());
             if(!hasRead) return true;
         }
         return false;
