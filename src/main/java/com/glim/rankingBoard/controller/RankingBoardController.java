@@ -4,12 +4,14 @@ import com.glim.rankingBoard.dto.request.RankingBoardRequest;
 import com.glim.rankingBoard.dto.response.RankingBoardResponse;
 import com.glim.rankingBoard.service.RankingBoardService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/ranking-board")
 @RequiredArgsConstructor
@@ -36,7 +38,7 @@ public class RankingBoardController {
     // 30초마다 실시간 랭킹 저장
     @Scheduled(cron = "*/30 * * * * *")
     public void saveRealtimeRanking() {
-        System.out.println("[SCHEDULE] ⏱ 실시간 랭킹 저장 실행됨");
+        log.info("[SCHEDULE] ⏱ 실시간 랭킹 저장 실행됨");
         rankingBoardService.saveRanking("realtime");
     }
 

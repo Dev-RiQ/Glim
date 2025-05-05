@@ -154,6 +154,6 @@ public class RankingBoardService {
     @Scheduled(cron = "*/30 * * * * *")
     @CacheEvict(value = "rankingCache", allEntries = true)
     public void clearRankingCache() {
-        System.out.println("랭킹 캐시 삭제 완료 30초 마다 갱신 확인용 로그");
+        log.info("랭킹 캐시 삭제 완료 30초 마다 갱신 확인용 로그");
     }
 }

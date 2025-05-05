@@ -2,6 +2,7 @@ package com.glim.verification.service;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 //import javax.annotation.PostConstruct;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CoolSmsService {
@@ -40,10 +42,9 @@ public class CoolSmsService {
 
         try {
             SingleMessageSentResponse response = messageService.sendOne(new SingleMessageSendingRequest(message));
-            System.out.println("✅ 문자 전송 성공: " + response);
+            log.info("✅ 문자 전송 성공: " + response);
         } catch (Exception e) {
-            System.out.println("❌ 문자 전송 실패");
-            e.printStackTrace();
+            log.error("❌ 문자 전송 실패");
         }
     }
 }

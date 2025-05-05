@@ -12,6 +12,7 @@ import com.glim.user.domain.Role;
 import com.glim.user.domain.User;
 import com.glim.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,6 +28,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomUserService implements UserDetailsService, OAuth2UserService<OAuth2UserRequest, OAuth2User> {
@@ -53,8 +55,7 @@ public class CustomUserService implements UserDetailsService, OAuth2UserService<
         try {
             oAuth2User = delegate.loadUser(userRequest);
         } catch (OAuth2AuthenticationException e) {
-            System.out.println("❌ OAuth2AuthenticationException 발생!");
-            e.printStackTrace();
+            log.error("❌ OAuth2AuthenticationException 발생!");
             throw e;
         }
 
@@ -67,10 +68,10 @@ public class CustomUserService implements UserDetailsService, OAuth2UserService<
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
         // 확인작업
-        System.out.println("=================================================");
-        System.out.println("🌈 registrationId: " + registrationId);
-        System.out.println("🔥 attributes: " + attributes);
-        System.out.println("=================================================");
+        log.info("=================================================");
+        log.info("🌈 registrationId: " + registrationId);
+        log.info("🔥 attributes: " + attributes);
+        log.info("=================================================");
 
         OAuthAttributes authAttributes = OAuthAttributes.of(registrationId, userNameAttributeName, attributes);
 

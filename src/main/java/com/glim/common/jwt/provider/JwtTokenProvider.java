@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider { // accessToken 발급, 검증
@@ -25,7 +27,7 @@ public class JwtTokenProvider { // accessToken 발급, 검증
 
     @PostConstruct
     protected void init() {
-        System.out.println("⚠️  [DEBUG] 읽어온 secretKey: " + secretKey);
+        log.debug("⚠️  [DEBUG] 읽어온 secretKey: {}", secretKey);
         key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
