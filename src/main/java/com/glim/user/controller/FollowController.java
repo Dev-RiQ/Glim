@@ -40,8 +40,8 @@ public class FollowController {
      * @return 언팔로우 성공 메시지
      */
     @DeleteMapping
-    public ResponseEntity<FollowResponse> unfollow(@RequestBody FollowRequest request) {
-        followService.unfollow(request.getFollowingId());
+    public ResponseEntity<FollowResponse> unfollow(@RequestBody FollowRequest request, @AuthenticationPrincipal SecurityUserDto user) {
+        followService.unfollow(request.getFollowingId(), user);
         return ResponseEntity.ok(new FollowResponse("언팔로우 성공", true));
     }
 

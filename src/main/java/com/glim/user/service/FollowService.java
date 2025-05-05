@@ -81,7 +81,7 @@ public class FollowService {
 
     // ✅ 로그인한 사용자 기준 언팔
     @Transactional
-    public void unfollow(Long followingId) {
+    public void unfollow(Long followingId, SecurityUserDto user) {
         Long followerId = SecurityUtil.getCurrentUserId();
 
         if (followerId.equals(followingId)) {
@@ -103,6 +103,8 @@ public class FollowService {
 
         userRepository.save(follower);
         userRepository.save(following);
+
+        notificationService.delete(followingId, Type.FOLLOW, user.getId(), user);
     }
 
     // ✅ 로그인한 사용자가 특정 유저를 팔로우했는지
