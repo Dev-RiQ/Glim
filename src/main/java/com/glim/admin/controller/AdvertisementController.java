@@ -28,7 +28,7 @@ public class AdvertisementController {
     //     특정 광고 하나 조회
     @GetMapping("/{id}")
     public Advertisement findRandomAdvertisement(@PathVariable String id) {
-        List<Advertisement> approvedAds = advertisementService.findByStatus(AdvertisementStatus.APPROVED);
+        List<Advertisement> approvedAds = advertisementService.findByStatus();
 
         if (approvedAds.isEmpty()) {
             throw new IllegalStateException("승인된 광고가 존재하지 않습니다.");
@@ -36,12 +36,6 @@ public class AdvertisementController {
 
         int randomIndex = random.nextInt(approvedAds.size()); // 랜덤 인덱스 선택
         return approvedAds.get(randomIndex);
-    }
-
-    //     새로운 광고 신청
-    @PostMapping
-    public Advertisement createAdvertisement(@RequestBody Advertisement advertisement) {
-        return advertisementService.create(advertisement);
     }
 
     //     광고 승인 처리
@@ -54,11 +48,5 @@ public class AdvertisementController {
     @PostMapping("/{id}/reject")
     public Advertisement rejectAdvertisement(@PathVariable Long id, @RequestParam String reason) {
         return advertisementService.reject(id, reason);
-    }
-
-    //     광고 삭제
-    @DeleteMapping("/{id}")
-    public void deleteAdvertisement(@PathVariable Long id) {
-        advertisementService.delete(id);
     }
 }

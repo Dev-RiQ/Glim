@@ -27,10 +27,6 @@ public class BoardController {
     @GetMapping({"","/{offset}"})
     public StatusResponseDTO getMainBoard(@AuthenticationPrincipal SecurityUserDto user, @PathVariable(required = false) Long offset){
         List<ViewBoardResponse> list = boardService.getMainBoard(user.getId(), offset);
-        ViewBoardResponse advertisement = boardService.getRandomAdvertisement(user.getId());
-        if(advertisement != null){
-            list.add(advertisement);
-        }
         return StatusResponseDTO.ok(list);
     }
 

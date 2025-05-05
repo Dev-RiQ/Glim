@@ -23,4 +23,10 @@ public class Advertisement {
     @Column(nullable = false)
     private String rejectionReason;
 
+    public Advertisement(Long boardId) {
+        this.boardId = boardId;
+        this.status = AdvertisementStatus.PENDING;
+        this.rejectionReason = "";
+    }
+
 }

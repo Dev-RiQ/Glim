@@ -13,4 +13,6 @@ public interface AdvertisementRepository extends JpaRepository<Advertisement, Lo
     List<Advertisement> findByStatus(AdvertisementStatus advertisementStatus);
     @Query(value = "SELECT * FROM advertisement WHERE status = 'APPROVED' ORDER BY RAND() LIMIT 1", nativeQuery = true)
     Advertisement findRandomApprovedAdvertisement();
+
+    void deleteByBoardId(Long id);
 }

@@ -2,6 +2,7 @@ package com.glim.borad.service;
 
 import com.glim.admin.domain.Advertisement;
 import com.glim.admin.repository.AdvertisementRepository;
+import com.glim.admin.service.AdvertisementService;
 import com.glim.borad.domain.*;
 import com.glim.borad.dto.request.AddBoardFileRequest;
 import com.glim.borad.dto.request.AddBoardRequest;
@@ -59,6 +60,7 @@ public class BoardService {
     private final BoardViewRepository boardViewRepository;
     private final BoardCommentsRepository boardCommentsRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final AdvertisementService advertisementService;
 
     @Transactional
     public void insert(AddBoardRequest request, SecurityUserDto user) {
@@ -70,46 +72,55 @@ public class BoardService {
             boardTagRepository.save(new AddBoardTagRequest().toEntity(board.getId(), request.getTags().get(i)));
         }
         if(board.getTagUserIds() != null){
-            String tagUserIds = board.getTagUserIds().substring(1, board.getTagUserIds().length() - 1);
-            String[] tags = tagUserIds.split(", ");
-            for(String id : tags){
-                try{
-                    Long notificationUserId = Long.parseLong(id);
-                    Type type = board.getBoardType().equals(BoardType.BASIC) ? Type.BOARD_TAG : Type.SHORTS_TAG;
-                    notificationService.send(notificationUserId, type, board.getId(), user);
-                }catch (Exception e){
-                    throw new CustomException(ErrorCode.TAG_NOT_FOUND);
-                }
-            }
+            sendNotificationInTagUsers(board, user);
+        }
+        if(board.getBoardType().equals(BoardType.ADVERTISEMENT)){
+            advertisementService.create(board.getId());
         }
 
     }
 
+    private void sendNotificationInTagUsers(Boards board, SecurityUserDto user){
+        String tagUserIds = board.getTagUserIds().substring(1, board.getTagUserIds().length() - 1);
+        String[] tags = tagUserIds.split(", ");
+        for(String id : tags){
+            try{
+                Long notificationUserId = Long.parseLong(id);
+                Type type = board.getBoardType().equals(BoardType.BASIC) ? Type.BOARD_TAG : Type.SHORTS_TAG;
+                notificationService.send(notificationUserId, type, board.getId(), user);
+            }catch (Exception e){
+                throw new CustomException(ErrorCode.TAG_NOT_FOUND);
+            }
+        }
+    }
+
     public List<ViewBoardResponse> getMainBoard(Long id, Long offset) {
-        List<Follow> followList = followRepository.findAllByFollowerUserId(id);
-        List<Long> followedUserIds = followList.stream().map(Follow::getFollowingUserId).collect(Collectors.toList());
-        List<Boards> boardList = (offset == null) ? boardRepository.findAllByUserIdInOrderByIdDesc(followedUserIds, Limit.of(10))
-                : boardRepository.findAllByUserIdInAndIdLessThanOrderByIdDesc(followedUserIds, offset, Limit.of(10));
-        if (boardList.size() < 10) {
-//            User user = (User) userRepository.findAllById(Collections.singleton(id));
-//            System.out.println("userTag = " + user.getTags());
-        }
-        if (boardList.size() < 10) {
-            int remain = 10 - boardList.size();
-            List<Long> excludeIds = boardList.stream().map(Boards::getId).collect(Collectors.toList());
-            List<Boards> fillBoards = (offset == null) ? boardRepository.findAllByIdNotInOrderByIdDesc(excludeIds, Limit.of(remain))
-                    : boardRepository.findAllByIdNotInAndIdLessThanOrderByIdDesc(excludeIds, offset, Limit.of(remain));
-
-            boardList.addAll(fillBoards);
-        }
-        // 테스트용
-        if (boardList.size() < 10) {
-          boardList = boardRepository.findAllByBoardTypeOrderByIdDesc(BoardType.BASIC, Limit.of(10));
-        }
-        //
+//        List<Follow> followList = followRepository.findAllByFollowerUserId(id);
+//        List<Long> followedUserIds = followList.stream().map(Follow::getFollowingUserId).collect(Collectors.toList());
+//        List<Boards> boardList = (offset == null) ? boardRepository.findAllByUserIdInOrderByIdDesc(followedUserIds, Limit.of(10))
+//                : boardRepository.findAllByUserIdInAndIdLessThanOrderByIdDesc(followedUserIds, offset, Limit.of(10));
+//        if (boardList.size() < 10) {
+////            User user = (User) userRepository.findAllById(Collections.singleton(id));
+////            System.out.println("userTag = " + user.getTags());
+//        }
+//        if (boardList.size() < 10) {
+//            int remain = 10 - boardList.size();
+//            List<Long> excludeIds = boardList.stream().map(Boards::getId).collect(Collectors.toList());
+//            List<Boards> fillBoards = (offset == null) ? boardRepository.findAllByIdNotInOrderByIdDesc(excludeIds, Limit.of(remain))
+//                    : boardRepository.findAllByIdNotInAndIdLessThanOrderByIdDesc(excludeIds, offset, Limit.of(remain));
+//
+//            boardList.addAll(fillBoards);
+//        }
+        List<Boards> boardList = offset == null ? boardRepository.findAllByBoardTypeOrderByIdDesc(BoardType.BASIC, Limit.of(10))
+                :boardRepository.findAllByBoardTypeAndIdLessThanOrderByIdDesc(BoardType.BASIC, offset, Limit.of(10));
         List<ViewBoardResponse> list = boardList.stream().map((board) -> getView(board, id)).collect(Collectors.toList());
-        list = getSubBoard(list, id);
 
+        ViewBoardResponse ad = getRandomAdvertisement(id);
+        if(ad != null){
+            list.add(5,ad);
+            list.add(getRandomAdvertisement(id));
+        }
+        list = getSubBoard(list, id);
         return list;
     }
 
@@ -223,6 +234,9 @@ public class BoardService {
         for (BoardComments comment : commentList) {
             commentLikeRepository.deleteAllByCommentId(comment.getId());
             boardCommentsRepository.delete(comment);
+        }
+        if(board.getBoardType().equals(BoardType.ADVERTISEMENT)){
+            advertisementRepository.deleteByBoardId(board.getId());
         }
         boardRepository.delete(board);
     }

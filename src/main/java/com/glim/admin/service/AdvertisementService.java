@@ -3,15 +3,18 @@ package com.glim.admin.service;
 import com.glim.admin.domain.Advertisement;
 import com.glim.admin.domain.AdvertisementStatus;
 import com.glim.admin.repository.AdvertisementRepository;
+import com.glim.borad.domain.Boards;
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AdvertisementService {
 
     private final AdvertisementRepository advertisementRepository;
@@ -27,12 +30,12 @@ public class AdvertisementService {
                 .orElseThrow(() -> new IllegalArgumentException("광고를 찾을 수 없습니다. id=" + id));
     }
 
-    public Advertisement create(Advertisement advertisement) {
-        advertisement.setStatus(AdvertisementStatus.PENDING);
-        advertisement.setRejectionReason(""); // 기본값은 빈 문자열
-        return advertisementRepository.save(advertisement);
+    @Transactional
+    public Advertisement create(Long boardId) {
+        return advertisementRepository.save(new Advertisement(boardId));
     }
 
+    @Transactional
     public Advertisement approve(Long id) {
         Advertisement advertisement = findById(id);
         advertisement.setStatus(AdvertisementStatus.APPROVED);
@@ -40,6 +43,7 @@ public class AdvertisementService {
         return advertisementRepository.save(advertisement);
     }
 
+    @Transactional
     public Advertisement reject(Long id, String reason) {
         Advertisement advertisement = findById(id);
         advertisement.setStatus(AdvertisementStatus.REJECTED);
@@ -47,12 +51,12 @@ public class AdvertisementService {
         return advertisementRepository.save(advertisement);
     }
 
+    @Transactional
     public void delete(Long id) {
         advertisementRepository.deleteById(id);
     }
 
-    public List<Advertisement> findByStatus(AdvertisementStatus advertisementStatus) {
-        List<Advertisement> list = advertisementRepository.findByStatus(AdvertisementStatus.APPROVED);
-        return list;
+    public List<Advertisement> findByStatus() {
+        return advertisementRepository.findByStatus(AdvertisementStatus.APPROVED);
     }
 }
