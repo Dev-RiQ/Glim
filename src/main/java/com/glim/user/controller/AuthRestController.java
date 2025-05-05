@@ -39,6 +39,21 @@ public class AuthRestController {
     private final StoryService storyService;
     private final ViewTagService viewTagService;
 
+    // 로그인한 user rate 확인
+    @GetMapping("/rate")
+    public StatusResponseDTO getCurrentUserRate() {
+        Long userId = SecurityUtil.getCurrentUserId();
+        User user = userService.getUserById(userId);
+        return StatusResponseDTO.ok(user.getRate());
+    }
+    @PostMapping("/rate")
+    public StatusResponseDTO updateCurrentUserRate() {
+        Long userId = SecurityUtil.getCurrentUserId();
+        User user = userService.getUserById(userId);
+        userService.updateRate(userId, user.getRate() == 0 ? 1 : 0);
+        return StatusResponseDTO.ok(user.getRate() == 0 ? "정기 구독 완료" : "정기 구독 취소 완료");
+    }
+
     // 로그인한 user role 확인
     @GetMapping("/role")
     public StatusResponseDTO getCurrentUserRole() {
