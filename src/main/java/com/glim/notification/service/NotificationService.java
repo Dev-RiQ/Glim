@@ -52,7 +52,7 @@ public class NotificationService {
 
 
     public List<NotificationResponse> getNotificationList(Long offset, SecurityUserDto me) {
-        User user = userRepository.findById(me.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
+        User user = userRepository.findById(me.getId()).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         List<Notification> list = offset == null ? notificationRepository.findAllByUserIdAndIdLessThanOrderByIdDesc(user.getId(),user.getReadAlarmId(), Limit.of(30))
                 .orElseThrow(() -> new CustomException(ErrorCode.NOTIFICATION_NOT_FOUND))
                 :notificationRepository.findAllByUserIdAndIdLessThanAndIdLessThanOrderByIdDesc(user.getId(),user.getReadAlarmId(), offset, Limit.of(30))
@@ -93,13 +93,13 @@ public class NotificationService {
                 String linkImg = null;
                 switch (notificationResponse.getUri().substring(0, notificationResponse.getUri().lastIndexOf("/") + 1)){
                     case "/board/" -> linkImg = awsS3Util.getURL(boardFileRepository.findById(notificationResponse.getLinkId())
-                            .orElseThrow(ErrorCode::throwDummyNotFound).getFileName(), FileSize.IMAGE_128);
+                            .orElseThrow(() -> new CustomException(ErrorCode.BOARDFILE_NOT_FOUND)).getFileName(), FileSize.IMAGE_128);
                     case "/shorts/" -> linkImg = awsS3Util.getURL(boardFileRepository.findById(notificationResponse.getLinkId())
-                            .orElseThrow(ErrorCode::throwDummyNotFound).getFileName(), FileSize.VIDEO_THUMBNAIL);
+                            .orElseThrow(() -> new CustomException(ErrorCode.BOARDFILE_NOT_FOUND)).getFileName(), FileSize.VIDEO_THUMBNAIL);
                     case "/story/" -> linkImg = awsS3Util.getURL(storyRepository.findById(notificationResponse.getLinkId())
-                            .orElseThrow(ErrorCode::throwDummyNotFound).getFileName(), FileSize.IMAGE_128);
+                            .orElseThrow(() -> new CustomException(ErrorCode.BOARDFILE_NOT_FOUND)).getFileName(), FileSize.IMAGE_128);
                     case "/user/" -> linkImg = awsS3Util.getURL(userRepository.findById(notificationResponse.getLinkId())
-                            .orElseThrow(ErrorCode::throwDummyNotFound).getImg(), FileSize.IMAGE_128);
+                            .orElseThrow(() -> new CustomException(ErrorCode.BOARDFILE_NOT_FOUND)).getImg(), FileSize.IMAGE_128);
                 }
                 notificationResponse.setLinkImg(linkImg);
             }
