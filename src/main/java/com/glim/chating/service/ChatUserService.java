@@ -48,6 +48,8 @@ public class ChatUserService {
     private final UserRepository userRepository;
     private final StoryService storyService;
     private final AwsS3Util awsS3Util;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatMsgRepository chatMsgRepository;
 
     public ViewChatUserResponse findByRoomId(Long roomId, SecurityUserDto me) {
         if(!chatUserRepository.existsByRoomIdAndUserId(roomId, me.getId())){
@@ -77,6 +79,14 @@ public class ChatUserService {
         ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(roomId, me.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND));
         chatUser.escape();
+        ChatUser chatUserNotMe = chatUserRepository.findByRoomIdAndUserIdNot(roomId, me.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND));
+        if(chatUserNotMe.getValid().equals(ChatUserValid.OUT)){
+            chatUserRepository.delete(chatUser);
+            chatUserRepository.delete(chatUserNotMe);
+            chatRoomRepository.deleteById(roomId);
+            chatMsgRepository.deleteAllByRoomId(roomId);
+        }
         chatUserRepository.save(chatUser);
     }
 

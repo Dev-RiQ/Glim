@@ -14,4 +14,12 @@ public interface BoardCommentsRepository extends JpaRepository<BoardComments, Lo
     Optional<BoardComments> findByReplyCommentId(Long id, Limit limit);
     void deleteBoardCommentsByReplyCommentId(Long replyCommentId, Limit limit);
     void deleteByUserId(Long userId);
+
+    List<BoardComments> findAllByBoardId(Long boardId);
+
+    void deleteAllByReplyCommentId(Long id);
+
+    List<BoardComments> findByReplyCommentId(Long id);
+
+    List<BoardComments> findAllByUserId(Long userId);
 }

@@ -10,4 +10,6 @@ public interface BoardLikeRepository extends JpaRepository<BoardLikes, Long> {
     BoardLikes findByBoardIdAndUserId(Long boardId, Long userId);
 
     void deleteByUserId(Long boardId);
+
+    void deleteAllByBoardId(Long boardId);
 }

@@ -23,8 +23,6 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
-    private final BoardSaveService boardSaveService;
-
 
     @GetMapping({"","/{offset}"})
     public StatusResponseDTO getMainBoard(@AuthenticationPrincipal SecurityUserDto user, @PathVariable(required = false) Long offset){
@@ -91,12 +89,7 @@ public class BoardController {
     }
 
     @DeleteMapping("/{id}")
-    public StatusResponseDTO delete(@PathVariable Long id, @AuthenticationPrincipal SecurityUserDto user) {
-        boolean isUser = boardService.isLoginUser(id, user.getId());
-        if(!isUser || !user.getNickname().equals("admin")) {
-            return null;
-        }
-        boardSaveService.delete(id, user.getId());
+    public StatusResponseDTO delete(@PathVariable Long id) {
         boardService.delete(id);
         return StatusResponseDTO.ok("게시물 삭제 완료");
     }

@@ -14,4 +14,5 @@ public interface ChatMsgRepository extends MongoRepository<ChatMsg, Long> {
     Optional<ChatMsg> findTop1ByRoomIdOrderByMsgIdDesc(Long roomId);
     Optional<List<ChatMsg>> findAllByRoomIdAndMsgIdGreaterThanOrderByMsgIdDesc(Long roomId, Long loadMin, Limit of);
     Optional<List<ChatMsg>> findAllByRoomIdAndMsgIdBetweenOrderByMsgIdDesc(Long roomId, Long loadMin, Long offset, Limit of);
+    void deleteAllByRoomId(Long roomId);
 }

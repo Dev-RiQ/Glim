@@ -11,6 +11,8 @@ import com.glim.borad.dto.response.ViewBoardResponse;
 import com.glim.borad.dto.response.ViewMyPageBoardResponse;
 import com.glim.borad.repository.*;
 import com.glim.common.awsS3.domain.FileSize;
+import com.glim.common.awsS3.domain.FileType;
+import com.glim.common.awsS3.service.AwsS3Service;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
@@ -53,6 +55,10 @@ public class BoardService {
     private final CommentService commentService;
     private final BoardLikeService boardLikeService;
     private final NotificationService notificationService;
+    private final AwsS3Service awsS3Service;
+    private final BoardViewRepository boardViewRepository;
+    private final BoardCommentsRepository boardCommentsRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     @Transactional
     public void insert(AddBoardRequest request, SecurityUserDto user) {
@@ -193,8 +199,32 @@ public class BoardService {
     }
 
     @Transactional
+    public void delete(Boards board) {
+        boardDataDelete(board);
+    }
+    @Transactional
     public void delete(Long id) {
-        boardRepository.deleteById(id);
+        Boards board = boardRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+        boardDataDelete(board);
+    }
+
+    private void boardDataDelete(Boards board) {
+        Long boardId = board.getId();
+        List<BoardFiles> fileList = boardFileRepository.findAllByBoardId(boardId);
+        for (BoardFiles file : fileList) {
+            awsS3Service.deleteFile(file.getFileName(), board.getBoardType().equals(BoardType.BASIC) ? FileType.IMAGE : FileType.VIDEO);
+            boardFileRepository.delete(file);
+        }
+        boardLikeRepository.deleteAllByBoardId(boardId);
+        boardSaveRepository.deleteAllByBoardId(boardId);
+        boardTagRepository.deleteAllByBoardId(boardId);
+        boardViewRepository.deleteAllByBoardId(boardId);
+        List<BoardComments> commentList = boardCommentsRepository.findAllByBoardId(boardId);
+        for (BoardComments comment : commentList) {
+            commentLikeRepository.deleteAllByCommentId(comment.getId());
+            boardCommentsRepository.delete(comment);
+        }
+        boardRepository.delete(board);
     }
 
 
@@ -269,10 +299,14 @@ public class BoardService {
 
     @Transactional
     public void deleteBoardRelatedDataByUser(Long userId) {
+        List<Boards> boardList = boardRepository.findAllByUserId(userId).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+        for (Boards board : boardList) {
+            delete(board);
+        }
+        boardSaveRepository.deleteAllByUserId(userId);
         boardLikeService.deleteBoardLikesByUser(userId);
         commentService.deleteBoardCommentsByUser(userId);
         commentLikeService.deleteCommentLikesByUser(userId);
-        boardRepository.deleteByUserId(userId);
     }
 
 

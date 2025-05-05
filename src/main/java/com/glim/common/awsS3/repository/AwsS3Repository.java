@@ -70,6 +70,7 @@ public class AwsS3Repository {
     public void delete(String filename, FileType fileType) {
         String filepath = fileType.getType() + "/" + filename;
         switch (fileType) {
+            case USER_IMAGE -> amazonS3Client.deleteObject(bucket, filepath + FileSize.IMAGE_128.getTypeAndSizeUri());
             case IMAGE -> deleteImage(filepath);
             case VIDEO -> deleteVideo(filepath);
             case AUDIO -> amazonS3Client.deleteObject(bucket, filepath + FileSize.AUDIO.getTypeAndSizeUri());

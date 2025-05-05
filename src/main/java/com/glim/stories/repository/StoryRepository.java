@@ -14,4 +14,6 @@ public interface StoryRepository extends JpaRepository<Stories, Long> {
     List<Stories> findByUserIdAndCreatedAtBetween(Long id, LocalDateTime yesterday, LocalDateTime now);
     Optional<List<Stories>> findAllByUserIdOrderByIdDesc(Long userId, Limit of);
     Optional<List<Stories>> findAllByUserIdAndIdLessThanOrderByIdDesc(Long userId, Long offset, Limit of);
+
+    List<Stories> findAllByUserId(Long userId);
 }

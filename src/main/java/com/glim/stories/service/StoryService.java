@@ -1,6 +1,9 @@
 package com.glim.stories.service;
 
+import com.glim.borad.domain.BoardType;
 import com.glim.common.awsS3.domain.FileSize;
+import com.glim.common.awsS3.domain.FileType;
+import com.glim.common.awsS3.service.AwsS3Service;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
@@ -34,6 +37,8 @@ public class StoryService {
     private final StoryLikeRepository storyLikeRepository;
     private final UserRepository userRepository;
     private final AwsS3Util awsS3Util;
+    private final StoryViewRepository storyViewRepository;
+    private final AwsS3Service awsS3Service;
 
     @Transactional
     public void insert(AddStoryRequest request) {
@@ -41,8 +46,20 @@ public class StoryService {
     }
 
     @Transactional
+    public void delete(Stories story) {
+        deleteStoryData(story);
+    }
+    @Transactional
     public void delete(Long id) {
-        storyRepository.deleteById(id);
+        Stories story = storyRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.STORY_NOT_FOUND));
+        deleteStoryData(story);
+    }
+
+    private void deleteStoryData(Stories story) {
+        storyLikeRepository.deleteAllByStoryId(story.getId());
+        storyViewRepository.deleteAllByStoryId(story.getId());
+        awsS3Service.deleteFile(story.getFileName(), FileType.IMAGE);
+        storyRepository.delete(story);
     }
 
     @Transactional
@@ -70,7 +87,10 @@ public class StoryService {
 
     @Transactional
     public void deleteStoriesByUser(Long userId) {
-        storyRepository.deleteByUserId(userId);
+        List<Stories> storyList = storyRepository.findAllByUserId(userId);
+        for (Stories story : storyList) {
+            delete(story);
+        }
     }
 
 

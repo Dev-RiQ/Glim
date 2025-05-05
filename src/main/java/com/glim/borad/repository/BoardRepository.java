@@ -57,5 +57,7 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
     Optional<List<Boards>> findAllByIdLessThanOrderByIdDesc(Long offset, Limit of);
 
     Optional<List<Boards>> findAllByIdIn(List<Long> saveList);
+
+    Optional<List<Boards>> findAllByUserId(Long userId);
 }
 

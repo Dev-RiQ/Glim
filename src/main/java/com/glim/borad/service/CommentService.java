@@ -120,6 +120,11 @@ public class CommentService {
         BoardComments comments = boardCommentsRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
         Long boardId = comments.getBoardId();
+        List<BoardComments> commentsList = boardCommentsRepository.findByReplyCommentId(comments.getId());
+        for (BoardComments comment : commentsList) {
+            commentLikeRepository.deleteAllByCommentId(comment.getId());
+            boardCommentsRepository.delete(comment);
+        }
         boardCommentsRepository.delete(comments);
 
         Boards board = boardRepository.findById(boardId).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
@@ -140,7 +145,11 @@ public class CommentService {
 
     @Transactional
     public void deleteBoardCommentsByUser(Long userId) {
-        boardCommentsRepository.deleteByUserId(userId);
+        List<BoardComments> commentsList = boardCommentsRepository.findAllByUserId(userId);
+        for (BoardComments comment : commentsList) {
+            commentLikeRepository.deleteAllByCommentId(comment.getId());
+            boardCommentsRepository.delete(comment);
+        }
     }
 
 }

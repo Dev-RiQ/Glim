@@ -20,4 +20,8 @@ public interface BoardSaveRepository extends JpaRepository<BoardSaves, Long> {
     Optional<List<BoardSaves>> findAllByUserIdAndIdLessThanOrderByIdDesc(Long userId, Long offset, Limit of);
 
     boolean existsByBoardIdAndUserId(Long id, Long id1);
+
+    void deleteAllByBoardId(Long boardId);
+
+    void deleteAllByUserId(Long userId);
 }

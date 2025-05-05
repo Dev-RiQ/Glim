@@ -9,4 +9,6 @@ public interface StoryLikeRepository extends JpaRepository<StoryLikes, Long> {
     boolean existsByStoryIdAndUserId(Long storyId, Long userId);
 
     Optional<StoryLikes> findByStoryIdAndUserId(Long storyId, Long userId);
+
+    void deleteAllByStoryId(Long id);
 }

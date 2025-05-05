@@ -3,6 +3,8 @@ package com.glim.user.service;
 import com.glim.borad.service.BoardService;
 import com.glim.chating.service.ChatUserService;
 import com.glim.common.awsS3.domain.FileSize;
+import com.glim.common.awsS3.domain.FileType;
+import com.glim.common.awsS3.service.AwsS3Service;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
@@ -52,6 +54,8 @@ public class UserService {
     private final RefreshTokenService refreshTokenService;
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomUserService customUserService;
+    private final AwsS3Service awsS3Service;
+
     public UserService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
@@ -62,7 +66,7 @@ public class UserService {
             StoryService storyService,
             ChatUserService chatUserService,
             AuthCodeRepository authCodeRepository,
-            ViewTagRepository viewTagRepository, RefreshTokenService refreshTokenService, JwtTokenProvider jwtTokenProvider, FollowRepository followRepository, CustomUserService customUserService) {
+            ViewTagRepository viewTagRepository, RefreshTokenService refreshTokenService, JwtTokenProvider jwtTokenProvider, FollowRepository followRepository, CustomUserService customUserService, AwsS3Service awsS3Service) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.awsS3Util = awsS3Util;
@@ -76,6 +80,7 @@ public class UserService {
         this.refreshTokenService = refreshTokenService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.customUserService = customUserService;
+        this.awsS3Service = awsS3Service;
     }
 
     // ✅ 현재 로그인한 사용자의 마이페이지 정보 가져오기
@@ -235,8 +240,14 @@ public class UserService {
         // 5. ChatUser 삭제
         chatUserService.deleteChatUsersByUser(id);
 
-        // 6. User 삭제
-        userRepository.deleteById(id);
+        // 6. User 이미지 파일
+        User user = userRepository.findUserById(id);
+        if(!user.getImg().equals("userimages/user-default-image")){
+            awsS3Service.deleteFile(user.getImg(), FileType.USER_IMAGE);
+        }
+
+        // 7. User 삭제
+        userRepository.delete(user);
     }
 
     // ✅ 비밀번호 변경
