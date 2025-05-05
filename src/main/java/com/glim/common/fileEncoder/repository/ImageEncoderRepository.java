@@ -28,12 +28,8 @@ public class ImageEncoderRepository {
         List<File> files = new ArrayList<>();
         for (MultipartFile multipartFile : multipartFiles) {
             String saveFileName = FileType.USER_IMAGE.getType() + "/" + awsS3Util.changedFileName(multipartFile.getOriginalFilename());
-            BufferedImage bi = ImageIO.read(multipartFile.getInputStream());
             int size = 128;
-            bi = resizeImage(bi,size,size);
-            File file = setNewFile(saveFileName, size);
-            ImageIO.write(bi,"jpg", file);
-            files.add(convertToWebp(file.getParentFile()+"/"+file.getName(), file));
+            files.add(getConvertImage(multipartFile, saveFileName, size));
         }
         return files;
     }
@@ -43,15 +39,19 @@ public class ImageEncoderRepository {
         for (MultipartFile multipartFile : multipartFiles) {
             String saveFileName = FileType.IMAGE.getType() + "/" + awsS3Util.changedFileName(multipartFile.getOriginalFilename());
             for(int i = 0 ; i < 2 ; i++){
-                BufferedImage bi = ImageIO.read(multipartFile.getInputStream());
                 int size = (int) (128 * Math.pow(4, i));
-                bi = resizeImage(bi,size,size);
-                File file = setNewFile(saveFileName, size);
-                ImageIO.write(bi,"jpg", file);
-                files.add(convertToWebp(file.getParentFile()+"/"+file.getName(), file));
+                files.add(getConvertImage(multipartFile, saveFileName, size));
             }
         }
         return files;
+    }
+
+    private File getConvertImage(MultipartFile multipartFile, String saveFileName, int size) throws Exception{
+        BufferedImage bi = ImageIO.read(multipartFile.getInputStream());
+        bi = resizeImage(bi,size,size);
+        File file = setNewFile(saveFileName, size);
+        ImageIO.write(bi,"jpg", file);
+        return convertToWebp(file.getParentFile()+"/"+file.getName(), file);
     }
 
     private File setNewFile(String name, int size){
@@ -69,7 +69,7 @@ public class ImageEncoderRepository {
                     .fromFile(originalFile)
                     .output(WebpWriter.CUSTOMWRITER, new File(filename.substring(0, filename.lastIndexOf(".")) + ".webp")); // 손실 압축 설정, fileName.webp로 파일 생성
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.DUMMY_BAD_REQUEST);
+            throw new CustomException(ErrorCode.UNSUCCESSFUL_WEBP_CHANGE);
         }
     }
 

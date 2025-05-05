@@ -5,23 +5,14 @@ import java.time.*;
 public abstract class DateTimeUtil {
 
     public static String getTime(LocalDateTime localDateTime) {
-        LocalDateTime now = LocalDateTime.now();
-
-        LocalDate saveDate = localDateTime.toLocalDate();
-        LocalDate nowDate = now.toLocalDate();
-        Period period = Period.between(saveDate, nowDate);
-
-        LocalTime saveTime = localDateTime.toLocalTime();
-        LocalTime nowTime = now.toLocalTime();
-        Duration duration = Duration.between(saveTime, nowTime);
-
-        String printDateAgo = getDateAgo(period);
-        if(printDateAgo == null || (period.getDays() == 1 && duration.getSeconds() < 0)) {
-            return localDateTime.toString().substring(11, 16);
-        }
-        return printDateAgo;
+        return getPrintDataAgo(localDateTime,"time");
     }
+
     public static String getDateTimeAgo(LocalDateTime localDateTime) {
+        return getPrintDataAgo(localDateTime, "ago");
+    }
+
+    private static String getPrintDataAgo(LocalDateTime localDateTime, String type){
         LocalDateTime now = LocalDateTime.now();
 
         LocalDate saveDate = localDateTime.toLocalDate();
@@ -34,7 +25,7 @@ public abstract class DateTimeUtil {
 
         String printDateAgo = getDateAgo(period);
         if(printDateAgo == null || (period.getDays() == 1 && duration.getSeconds() < 0)) {
-            printDateAgo = getTimeAgo(duration);
+            printDateAgo = type.equals("ago") ? getTimeAgo(duration) : localDateTime.toString().substring(11, 16);
         }
         return printDateAgo;
     }

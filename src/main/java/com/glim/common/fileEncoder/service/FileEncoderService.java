@@ -31,7 +31,7 @@ public class FileEncoderService {
                 case AUDIO -> files = audioEncoderRepository.audioEncoding(multipartFiles);
             }
         }catch (Exception e){
-            throw new CustomException(ErrorCode.DUMMY_BAD_REQUEST);
+            throw new CustomException(ErrorCode.UNSUCCESSFUL_FILE_UPLOAD);
         }
         return files;
     }

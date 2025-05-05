@@ -34,52 +34,46 @@ public class ChatController {
     private final ChatUserService chatUserService;
 
     @GetMapping(value = "", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter connect(HttpServletResponse response, @AuthenticationPrincipal SecurityUserDto user) {
+    public SseEmitter connect(HttpServletResponse response) {
         return chatRoomService.getEmitter(response);
     }
 
-//    @GetMapping("")
-//    public StatusResponseDTO getUserChatRoomList() {
-//        List<ViewChatRoomResponse> userChatRoomList = chatRoomService.findChatRoomListByUserId();
-//        return StatusResponseDTO.ok(userChatRoomList);
-//    }
-
     @GetMapping({"/{roomId}","/{roomId}/{offset}"})
-    public StatusResponseDTO getRoomChatMsgList(@PathVariable Long roomId, @PathVariable(required = false) Long offset) {
-        List<ViewChatMsgResponse> roomChatMsgList = chatMsgService.findChatMsgListByRoomId(roomId, offset);
+    public StatusResponseDTO getRoomChatMsgList(@PathVariable Long roomId, @PathVariable(required = false) Long offset, @AuthenticationPrincipal SecurityUserDto user) {
+        List<ViewChatMsgResponse> roomChatMsgList = chatMsgService.findChatMsgListByRoomId(roomId, offset, user);
         Map<String, Object> map = new HashMap<>();
         map.put("msgList", roomChatMsgList);
-        map.put("loginId", SecurityUtil.getUser().getId());
+        map.put("loginId", user.getId());
         return StatusResponseDTO.ok(map);
     }
 
     @GetMapping("/users/{roomId}")
-    public StatusResponseDTO getChatRoomUser(@PathVariable Long roomId) {
-        ViewChatUserResponse chatRoomUser = chatUserService.findByRoomId(roomId);
+    public StatusResponseDTO getChatRoomUser(@PathVariable Long roomId, @AuthenticationPrincipal SecurityUserDto user) {
+        ViewChatUserResponse chatRoomUser = chatUserService.findByRoomId(roomId, user);
         return StatusResponseDTO.ok(chatRoomUser);
     }
 
     @PostMapping("/room/{joinUserId}")
-    public StatusResponseDTO createChatRoom(@PathVariable Long joinUserId) {
-        ViewChatRoomResponse chatRoom = chatRoomService.createChatRoom(joinUserId);
+    public StatusResponseDTO createChatRoom(@PathVariable Long joinUserId, @AuthenticationPrincipal SecurityUserDto user) {
+        ViewChatRoomResponse chatRoom = chatRoomService.createChatRoom(joinUserId, user);
         return StatusResponseDTO.ok(chatRoom);
     }
 
     @PostMapping("/sendMsg")
-    public StatusResponseDTO sendMessage(@RequestBody AddChatMsgRequest addChatMsgRequest) {
-        chatMsgService.sendMessage(addChatMsgRequest);
+    public StatusResponseDTO sendMessage(@RequestBody AddChatMsgRequest addChatMsgRequest, @AuthenticationPrincipal SecurityUserDto user) {
+        chatMsgService.sendMessage(addChatMsgRequest, user);
         return StatusResponseDTO.ok("메시지 전송 성공");
     }
 
     @PutMapping("/user/{roomId}")
-    public StatusResponseDTO readMsg(@PathVariable Long roomId) {
-        chatUserService.updateChatUserReadMsg(roomId);
+    public StatusResponseDTO readMsg(@PathVariable Long roomId, @AuthenticationPrincipal SecurityUserDto user) {
+        chatUserService.updateChatUserReadMsg(roomId, user);
         return StatusResponseDTO.ok("메시지 읽음 처리");
     }
 
     @PutMapping("/exit/{roomId}")
-    public StatusResponseDTO escapeChatRoom(@PathVariable Long roomId) {
-        chatUserService.escapeChatRoom(roomId);
+    public StatusResponseDTO escapeChatRoom(@PathVariable Long roomId, @AuthenticationPrincipal SecurityUserDto user) {
+        chatUserService.escapeChatRoom(roomId, user);
         return StatusResponseDTO.ok("채팅방 나가기 성공");
     }
 

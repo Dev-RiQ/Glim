@@ -33,13 +33,13 @@ public class NotificationController {
     private final HeaderNotificationService headerNotificationService;
 
     @GetMapping({"/list","/list/{offset}"})
-    public StatusResponseDTO list(@PathVariable(required = false) Long offset) {
-        return StatusResponseDTO.ok(notificationService.getNotificationList(offset));
+    public StatusResponseDTO list(@PathVariable(required = false) Long offset, @AuthenticationPrincipal SecurityUserDto user) {
+        return StatusResponseDTO.ok(notificationService.getNotificationList(offset, user));
     }
 
     @GetMapping(value = "", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter connect(HttpServletResponse response, @AuthenticationPrincipal SecurityUserDto user) {
-        return notificationService.getEmitter(response, user.getId(), user);
+        return notificationService.getEmitter(response, user.getId());
     }
 
     @GetMapping(value = "/header", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

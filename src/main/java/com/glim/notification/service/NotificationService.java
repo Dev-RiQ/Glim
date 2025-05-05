@@ -51,8 +51,8 @@ public class NotificationService {
     private SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
 
-    public List<NotificationResponse> getNotificationList(Long offset) {
-        User user = userRepository.findById(SecurityUtil.getUser().getId()).orElseThrow(ErrorCode::throwDummyNotFound);
+    public List<NotificationResponse> getNotificationList(Long offset, SecurityUserDto me) {
+        User user = userRepository.findById(me.getId()).orElseThrow(ErrorCode::throwDummyNotFound);
         List<Notification> list = offset == null ? notificationRepository.findAllByUserIdAndIdLessThanOrderByIdDesc(user.getId(),user.getReadAlarmId(), Limit.of(30))
                 .orElseThrow(() -> new CustomException(ErrorCode.NOTIFICATION_NOT_FOUND))
                 :notificationRepository.findAllByUserIdAndIdLessThanAndIdLessThanOrderByIdDesc(user.getId(),user.getReadAlarmId(), offset, Limit.of(30))
@@ -63,13 +63,13 @@ public class NotificationService {
     }
 
     @Transactional
-    public SseEmitter getEmitter(final HttpServletResponse response, Long userId, SecurityUserDto user) {
-        User userInfo = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        List<NotificationResponse> notifications = getNewNotification(userInfo);
+    public SseEmitter getEmitter(final HttpServletResponse response, Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        List<NotificationResponse> notifications = getNewNotification(user);
         if(!notifications.isEmpty()) {
             emitter = new SseEmitter(DEFAULT_TIMEOUT);
-            userInfo.updateReadAlarmId(notifications.get(notifications.size() - 1).getId()); // 새 필드 업데이트
-            userRepository.save(userInfo);
+            user.updateReadAlarmId(notifications.get(notifications.size() - 1).getId()); // 새 필드 업데이트
+            userRepository.save(user);
         }
         response.setContentType("text/event-stream");
         response.setCharacterEncoding("UTF-8");

@@ -45,8 +45,8 @@ public class ChatMsgService {
     private final SendMessage sender;
     private final ChatUtil chatUtil;
 
-    public List<ViewChatMsgResponse> findChatMsgListByRoomId(Long roomId, Long offset) {
-        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(roomId, SecurityUtil.getUser().getId())
+    public List<ViewChatMsgResponse> findChatMsgListByRoomId(Long roomId, Long offset, SecurityUserDto me) {
+        ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(roomId, me.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Long loadMin = 0L;
         if(chatUser.getOutMsgId() != null && chatUser.getOutMsgId() != 0){
@@ -65,18 +65,16 @@ public class ChatMsgService {
     }
 
     @Transactional
-    public void sendMessage(AddChatMsgRequest request) {
-        ChatMsg message = setMessage(request);
-        log.info("send message : {}", message);
-        chatUserService.checkUserValid(request.getRoomId());
+    public void sendMessage(AddChatMsgRequest request, SecurityUserDto me) {
+        ChatMsg message = setMessage(request, me);
+        chatUserService.checkUserValid(request.getRoomId(), me);
         chatMsgRepository.save(message);
         sender.publishMessage(new Message(message));
     }
 
-    private ChatMsg setMessage(AddChatMsgRequest addChatMsgRequest) {
+    private ChatMsg setMessage(AddChatMsgRequest addChatMsgRequest, SecurityUserDto me) {
         ChatMsg message = new AddChatMsgRequest().toEntity(addChatMsgRequest);
-        SecurityUserDto user = SecurityUtil.getUser();
-        message.setUserId(user.getId());
+        message.setUserId(me.getId());
         message.setMsgId(chatUtil.getNextMsgId());
         message.setCreatedAt(LocalDateTime.now());
         return message;

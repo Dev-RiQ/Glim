@@ -24,7 +24,7 @@ public class AwsS3Service {
             return awsS3Repository.upload(multipartFiles, fileType); // s3 버킷에 images 디렉토리에 업로드
         }else{
             log.error("no multipartFile");
-            throw new CustomException(ErrorCode.DUMMY_BAD_REQUEST);
+            throw new CustomException(ErrorCode.UNSUCCESSFUL_AWS_UPLOAD);
         }
     }
 

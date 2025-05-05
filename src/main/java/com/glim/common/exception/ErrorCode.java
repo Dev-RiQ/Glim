@@ -13,7 +13,6 @@ import static org.springframework.http.HttpStatus.*;
 public enum ErrorCode {
 
     /* 400 BAD_REQUEST : 잘못된 요청 */
-    DUMMY_BAD_REQUEST(BAD_REQUEST,"잘못된 더미값이 존재합니다"),
     INVALID_PASSWORD(BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     INVALID_REFRESH_TOKEN(BAD_REQUEST, "유효하지 않은 리프레시 토큰입니다."),
     INVALID_VERIFICATION_CODE(BAD_REQUEST, "인증번호가 일치하지 않습니다."),
@@ -31,7 +30,6 @@ public enum ErrorCode {
     VALID_USER_ID(FORBIDDEN, "해당 정보에 접근 권한이 존재하지 않습니다."),
 
     /* 404 NOT_FOUND : 해당 정보 존재하지 않음 */
-    DUMMY_NOT_FOUND(NOT_FOUND, "해당 더미 정보를 찾을 수 없습니다."),
     USER_NOT_FOUND(NOT_FOUND, "해당 유저 정보를 찾을 수 없습니다."),
     STORY_NOT_FOUND(NOT_FOUND, "현재 업로드된 스토리가 없습니다."),
     STORY_NO_MORE(NOT_FOUND, "더 이상 불러올 스토리가 없습니다."),
@@ -73,8 +71,9 @@ public enum ErrorCode {
 
 
     /* 500 : */
-    UNSUCCESSFUL_DUMMY_INSERT(INTERNAL_SERVER_ERROR,"더미 업로드에 실패했습니다."),
-    UNSUCCESSFUL_DUMMY_UPDATE(INTERNAL_SERVER_ERROR,"해당 정보의 상태 변경에 실패했습니다."),
+    UNSUCCESSFUL_FILE_UPLOAD(INTERNAL_SERVER_ERROR,"파일 변환에 실패했습니다."),
+    UNSUCCESSFUL_AWS_UPLOAD(INTERNAL_SERVER_ERROR,"파일 업로드에 실패했습니다."),
+    UNSUCCESSFUL_WEBP_CHANGE(INTERNAL_SERVER_ERROR,"이미지 변환에 실패했습니다."),
 
     /* 탈퇴회원 */
     ALREADY_DELETED_USER(CONFLICT, "이미 탈퇴한 회원입니다.");
@@ -85,20 +84,8 @@ public enum ErrorCode {
     private final HttpStatus httpStatus;
     private final String detail;
 
-    public static CustomException throwDummyNotFound(){
-        throw new CustomException((DUMMY_NOT_FOUND));
-    }
-
     public List<String> getDetail() {
         return List.of(this.detail);
-    }
-
-    public static CustomException throwUserNotFound(){
-        throw new CustomException((USER_NOT_FOUND));
-    }
-
-    public static CustomException throwInvalidPassword(){
-        throw new CustomException((INVALID_PASSWORD));
     }
 
 }

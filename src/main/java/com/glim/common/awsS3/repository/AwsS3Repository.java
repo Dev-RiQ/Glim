@@ -30,7 +30,6 @@ public class AwsS3Repository {
     private final FileEncoderController fileEncoderController;
     private final AwsS3Util awsS3Util;
 
-    // MultipartFile을 전달받아 File로 전환한 후 S3에 업로드
     public List<String> upload(List<MultipartFile> multipartFiles, FileType fileType) {
         List<File> uploadFiles = fileEncoderController.fileEncoding(multipartFiles, fileType);
         return upload(uploadFiles, fileType.getType());
@@ -43,7 +42,6 @@ public class AwsS3Repository {
         return awsS3Util.getSaveFilenames(uploadUrl); // 업로드된 파일의 S3 URL 파일 이름 반환
     }
 
-    // 실질적인 s3 업로드 부분
     private List<String> putS3(List<AwsS3> uploadFile) {
         List<String> uploadUrl = new ArrayList<>();
         for (AwsS3 s3 : uploadFile) {
