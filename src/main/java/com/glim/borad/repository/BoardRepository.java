@@ -59,5 +59,7 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
     Optional<List<Boards>> findAllByIdIn(List<Long> saveList);
 
     Optional<List<Boards>> findAllByUserId(Long userId);
+
+    List<Boards> findAllByBgmId(Long id);
 }
 

@@ -1,9 +1,11 @@
 package com.glim.borad.service;
 
 import com.glim.borad.domain.Bgms;
+import com.glim.borad.domain.Boards;
 import com.glim.borad.dto.request.AddBgmRequest;
 import com.glim.borad.dto.response.ViewBgmResponse;
 import com.glim.borad.repository.BgmRepository;
+import com.glim.borad.repository.BoardRepository;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.CustomException;
@@ -24,6 +26,7 @@ public class BgmService {
 
     private final BgmRepository bgmRepository;
     private final AwsS3Util awsS3Util;
+    private final BoardRepository boardRepository;
 
     @Transactional
     public void insert(AddBgmRequest request) {
@@ -34,6 +37,11 @@ public class BgmService {
 
     @Transactional
     public void delete(Long id) {
+        List<Boards> boardList = boardRepository.findAllByBgmId(id);
+        for (Boards board : boardList) {
+            board.setBgmId(0L);
+            boardRepository.save(board);
+        }
         bgmRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.BGM_NOT_FOUND));
         bgmRepository.deleteById(id);
     }
