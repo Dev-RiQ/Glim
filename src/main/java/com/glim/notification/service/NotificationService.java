@@ -48,7 +48,6 @@ public class NotificationService {
     private final AwsS3Util awsS3Util;
     private final NotificationRepository notificationRepository;
     private final ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
-    private final UserService userService;
     private SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
 
@@ -63,12 +62,14 @@ public class NotificationService {
         return notificationList;
     }
 
-    public SseEmitter getEmitter(final HttpServletResponse response, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        List<NotificationResponse> notifications = getNewNotification(user);
+    @Transactional
+    public SseEmitter getEmitter(final HttpServletResponse response, Long userId, SecurityUserDto user) {
+        User userInfo = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        List<NotificationResponse> notifications = getNewNotification(userInfo);
         if(!notifications.isEmpty()) {
             emitter = new SseEmitter(DEFAULT_TIMEOUT);
-            userService.updateReadAlarmId(user.getId(), notifications.get(notifications.size() - 1).getId());
+            userInfo.updateReadAlarmId(notifications.get(notifications.size() - 1).getId()); // 새 필드 업데이트
+            userRepository.save(userInfo);
         }
         response.setContentType("text/event-stream");
         response.setCharacterEncoding("UTF-8");
@@ -122,21 +123,27 @@ public class NotificationService {
     }
 
     @Transactional
-    public void send(Long userId, String sendUserNickname, Type type){
-        send(userId, sendUserNickname, type, 0L);
+    public void send(Long userId, Type type, SecurityUserDto user){
+        send(userId, type, 0L, user);
     }
 
     @Transactional
-    public void send(Long userId, String sendUserNickname, Type type, Long linkId){
-        SecurityUserDto user = SecurityUtil.getUser();
-        Notification notification = new Notification(userId, user.getId(), sendUserNickname, type, linkId);
+    public void send(Long userId, Type type, Long linkId, SecurityUserDto user){
+        Notification notification = new Notification(userId, user.getId(), user.getNickname(), type, linkId);
         notificationRepository.save(notification);
     }
 
     @Transactional
-    public void delete(long id) {
+    public void delete(Long id) {
         notificationRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.DUPLICATE_NOTIFICATION_DELETE));
         notificationRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void delete(Long userId, Type type, Long linkId, SecurityUserDto user) {
+        Notification notification = notificationRepository.findByUserIdAndSendUserIdAndLinkIdAndType(userId, user.getId(), linkId, type)
+                .orElseThrow(() -> new CustomException(ErrorCode.DUPLICATE_NOTIFICATION_DELETE));
+        notificationRepository.delete(notification);
     }
 
     @Transactional
@@ -152,5 +159,4 @@ public class NotificationService {
             notificationRepository.save(notification);
         }
     }
-
 }

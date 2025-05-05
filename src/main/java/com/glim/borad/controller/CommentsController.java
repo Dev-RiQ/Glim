@@ -38,14 +38,14 @@ public class CommentsController {
 
     @PostMapping({"","/"})
     public StatusResponseDTO add(@RequestBody AddCommentsRequest request, @AuthenticationPrincipal SecurityUserDto user) {
-        ViewCommentsResponse comment = commentService.insert(request, user.getId());
+        ViewCommentsResponse comment = commentService.insert(request, user.getId(), user);
         boardService.updateComment(request.getBoardId(), 1);
         return StatusResponseDTO.ok(comment);
     }
 
     @DeleteMapping("/{commentId}")
-    public StatusResponseDTO delete(@PathVariable Long commentId) {
-        Long boardId = commentService.delete(commentId);
+    public StatusResponseDTO delete(@PathVariable Long commentId, @AuthenticationPrincipal SecurityUserDto user) {
+        Long boardId = commentService.delete(commentId, user);
         boardService.updateComment(boardId, -1);
         return StatusResponseDTO.ok("댓글 삭제 완료");
     }

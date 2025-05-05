@@ -100,19 +100,19 @@ public class ChatRoomService {
             if(chatUser.getValid().toString().equals("OUT")) continue;
             ChatRoom chatRoom = chatRoomRepository.findById(chatUser.getRoomId())
                     .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
-            ChatUser chatUserNotMe = chatUserRepository.findByRoomIdAndUserIdNot(chatRoom.getId(), chatUser.getId())
+            ChatUser chatUserNotMe = chatUserRepository.findByRoomIdAndUserIdNot(chatRoom.getId(), chatUser.getUserId())
                     .orElse(null);
-            if(user == null && chatUserNotMe != null) {
+            if(chatUserNotMe != null) {
                 user = userRepository.findById(chatUserNotMe.getUserId())
                     .orElse(null);
             }
             List<ChatMsg> chatMsgList = chatMsgRepository.findAllByRoomIdOrderByMsgIdDesc(chatUser.getRoomId(), Limit.of(1));
             ChatMsg chatMsg = chatMsgList.isEmpty() ? null :chatMsgList.get(0);
-            Long readId = chatUserRepository.findByRoomIdAndUserId(chatUser.getRoomId(), chatUser.getId())
+            Long readId = chatUserRepository.findByRoomIdAndUserId(chatUser.getRoomId(), chatUser.getUserId())
                     .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND)).getReadMsgId();
-            Long lastId = chatMsgRepository.findTop1ByRoomIdOrderByMsgIdDesc(chatUser.getRoomId())
-                    .orElseThrow(() -> new CustomException(ErrorCode.CHATMSG_NOT_FOUND)).getMsgId();
-            boolean hasRead = readId.equals(lastId);
+            ChatMsg lastId = chatMsgRepository.findTop1ByRoomIdOrderByMsgIdDesc(chatUser.getRoomId())
+                    .orElse(null);
+            boolean hasRead = lastId == null || readId.equals(lastId.getMsgId());
             boolean isStory = storyService.isStory(chatUser.getId());
             ViewChatUserResponse userView = user == null ? null : new ViewChatUserResponse(user, chatUser, isStory);
             if(userView != null ) userView.setImg(awsS3Util.getURL(userView.getImg(), FileSize.IMAGE_128));
@@ -127,7 +127,7 @@ public class ChatRoomService {
                 .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND));
         for(ChatUser chatUser : chatUserList) {
             if(chatUser.getValid().toString().equals("OUT")) continue;
-            Long readId = chatUserRepository.findByRoomIdAndUserId(chatUser.getRoomId(), chatUser.getId())
+            Long readId = chatUserRepository.findByRoomIdAndUserId(chatUser.getRoomId(), chatUser.getUserId())
                     .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND)).getReadMsgId();
             Long lastId = chatMsgRepository.findTop1ByRoomIdOrderByMsgIdDesc(chatUser.getRoomId())
                     .orElseThrow(() -> new CustomException(ErrorCode.CHATMSG_NOT_FOUND)).getMsgId();

@@ -22,14 +22,14 @@ public class StoryLikeController {
 
     @PostMapping({"/{storyId}"})
     public StatusResponseDTO add(@PathVariable Long storyId, @AuthenticationPrincipal SecurityUserDto user) {
-        storyLikeService.insert(new AddStoryLikeRequest(storyId, user.getId()));
+        storyLikeService.insert(new AddStoryLikeRequest(storyId, user.getId()), user);
         storyService.updateLike(storyId, 1);
         return StatusResponseDTO.ok("스토리 좋아요");
     }
 
     @DeleteMapping("/{storyId}")
     public StatusResponseDTO delete(@PathVariable Long storyId, @AuthenticationPrincipal SecurityUserDto user) {
-        storyLikeService.delete(storyId, user.getId());
+        storyLikeService.delete(storyId, user.getId(), user);
         storyService.updateLike(storyId, -1);
         return StatusResponseDTO.ok("스토리 좋아요 취소");
     }

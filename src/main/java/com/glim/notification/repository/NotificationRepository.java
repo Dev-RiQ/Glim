@@ -1,6 +1,7 @@
 package com.glim.notification.repository;
 
 import com.glim.notification.domain.Notification;
+import com.glim.notification.domain.Type;
 import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -16,4 +17,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     Optional<List<Notification>> findAllByUserIdAndIdLessThanAndIdLessThanOrderByIdDesc(Long id, Long readAlarmId, Long offset, Limit of);
 
     Boolean existsByUserIdAndIdGreaterThan(Long userId, Long readAlarmId);
+
+
+    Optional<Notification> findByUserIdAndSendUserIdAndLinkIdAndType(Long userId, Long id, Long linkId, Type type);
 }

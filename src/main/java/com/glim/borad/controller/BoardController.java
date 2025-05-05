@@ -86,8 +86,7 @@ public class BoardController {
 
     @PostMapping("")
     public StatusResponseDTO add(@RequestBody AddBoardRequest request, @AuthenticationPrincipal SecurityUserDto user) {
-        request.setUserId(user.getId());
-        boardService.insert(request);
+        boardService.insert(request, user);
         return StatusResponseDTO.ok("게시물 추가 완료");
     }
 

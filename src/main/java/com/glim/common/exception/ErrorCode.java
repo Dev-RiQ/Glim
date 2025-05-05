@@ -57,6 +57,7 @@ public enum ErrorCode {
     BOARD_NO_MORE(NOT_FOUND, "더 이상 불러올 게시글이 없습니다."),
     BOARDSAVE_NOT_FOUND(NOT_FOUND, "저장된 게시글이 없습니다."),
     ADVERTISEMENT_NOT_FOUND(NOT_FOUND, "신청된 광고가 없습니다."),
+    TAG_NOT_FOUND(NOT_FOUND, "유효하지 않은 유저가 태그되었습니다."),
 
 
     /* 409 CONFLICT : 중복 데이터 존재 */
