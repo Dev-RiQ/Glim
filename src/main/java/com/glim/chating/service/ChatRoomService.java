@@ -101,8 +101,8 @@ public class ChatRoomService {
             ChatRoom chatRoom = chatRoomRepository.findById(chatUser.getRoomId())
                     .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
             ChatUser chatUserNotMe = chatUserRepository.findByRoomIdAndUserIdNot(chatRoom.getId(), chatUser.getId())
-                    .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND));
-            if(user == null) {
+                    .orElse(null);
+            if(user == null && chatUserNotMe != null) {
                 user = userRepository.findById(chatUserNotMe.getUserId())
                     .orElse(null);
             }
@@ -114,8 +114,8 @@ public class ChatRoomService {
                     .orElseThrow(() -> new CustomException(ErrorCode.CHATMSG_NOT_FOUND)).getMsgId();
             boolean hasRead = readId.equals(lastId);
             boolean isStory = storyService.isStory(chatUser.getId());
-            ViewChatUserResponse userView = new ViewChatUserResponse(user, chatUser, isStory);
-            userView.setImg(awsS3Util.getURL(userView.getImg(), FileSize.IMAGE_128));
+            ViewChatUserResponse userView = user == null ? null : new ViewChatUserResponse(user, chatUser, isStory);
+            if(userView != null ) userView.setImg(awsS3Util.getURL(userView.getImg(), FileSize.IMAGE_128));
             chatRoomList.add(new ViewChatRoomResponse(chatRoom, chatMsg, userView, hasRead));
         }
         return chatRoomList.stream().sorted(Comparator.comparing(ViewChatRoomResponse::getUpdatedAt)).toList();

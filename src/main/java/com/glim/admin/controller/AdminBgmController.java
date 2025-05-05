@@ -17,24 +17,15 @@ import org.springframework.web.bind.annotation.*;
 public class AdminBgmController {
 
     private final BgmService bgmService;
-    private final BoardService boardService;
 
-    @PostMapping({"","/"})
-    public StatusResponseDTO add(@PathVariable Long id, @AuthenticationPrincipal SecurityUserDto user, @RequestBody AddBgmRequest request) {
-        boolean isUser = boardService.isLoginUser(id, user.getId());
-        if(!isUser || !user.getNickname().equals("admin")) {
-            return null;
-        }
+    @PostMapping({""})
+    public StatusResponseDTO add(@RequestBody AddBgmRequest request) {
         bgmService.insert(request);
         return StatusResponseDTO.ok("Bgm 추가 완료");
     }
 
     @DeleteMapping("/{id}")
-    public StatusResponseDTO delete(@PathVariable Long id, @AuthenticationPrincipal SecurityUserDto user) {
-        boolean isUser = boardService.isLoginUser(id, user.getId());
-        if(!isUser || !user.getNickname().equals("admin")) {
-            return null;
-        }
+    public StatusResponseDTO delete(@PathVariable Long id) {
         bgmService.delete(id);
         return StatusResponseDTO.ok("Bgm 삭제 완료");
     }

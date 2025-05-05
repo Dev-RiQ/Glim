@@ -3,9 +3,11 @@ package com.glim.admin.repository;
 import com.glim.admin.domain.Advertisement;
 import com.glim.admin.domain.AdvertisementStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AdvertisementRepository extends JpaRepository<Advertisement, Long> {
     List<Advertisement> findByStatus(AdvertisementStatus advertisementStatus);

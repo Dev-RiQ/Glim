@@ -3,6 +3,8 @@ package com.glim.admin.service;
 import com.glim.admin.domain.Advertisement;
 import com.glim.admin.domain.AdvertisementStatus;
 import com.glim.admin.repository.AdvertisementRepository;
+import com.glim.common.exception.CustomException;
+import com.glim.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,9 @@ public class AdvertisementService {
     private final AdvertisementRepository advertisementRepository;
 
     public List<Advertisement> findAll() {
-        return advertisementRepository.findAll();
+        List<Advertisement> list = advertisementRepository.findAll();
+        if(list.isEmpty()) throw new CustomException(ErrorCode.ADVERTISEMENT_NOT_FOUND);
+        return list;
     }
 
     public Advertisement findById(Long id) {
