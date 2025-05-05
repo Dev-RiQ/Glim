@@ -51,7 +51,7 @@ public class AuthRestController {
         Long userId = SecurityUtil.getCurrentUserId();
         User user = userService.getUserById(userId);
         userService.updateRate(userId, user.getRate() == 0 ? 1 : 0);
-        return StatusResponseDTO.ok(user.getRate() == 0 ? "정기 구독 완료" : "정기 구독 취소 완료");
+        return StatusResponseDTO.ok(user.getRate() == 1 ? "정기 구독 완료" : "정기 구독 취소 완료");
     }
 
     // 로그인한 user role 확인
