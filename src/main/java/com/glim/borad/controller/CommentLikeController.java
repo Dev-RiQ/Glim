@@ -21,7 +21,7 @@ public class CommentLikeController {
 
     @PostMapping({"/{commentId}"})
     public StatusResponseDTO add(@PathVariable Long commentId, @AuthenticationPrincipal SecurityUserDto user) {
-        if(commentLikeService.insert(new AddCommentLikeRequest(commentId, user.getId()))){
+        if(commentLikeService.insert(new AddCommentLikeRequest(commentId, user.getId()),user)){
             commentService.updateLike(commentId, 1);
         }
         return StatusResponseDTO.ok("댓글 좋아요 완료");
@@ -29,7 +29,7 @@ public class CommentLikeController {
 
     @DeleteMapping("/{commentId}")
     public StatusResponseDTO delete(@PathVariable Long commentId, @AuthenticationPrincipal SecurityUserDto user) {
-        if(commentLikeService.delete(commentId, user.getId())){
+        if(commentLikeService.delete(commentId, user.getId(), user)){
             commentService.updateLike(commentId, -1);
         }
         return StatusResponseDTO.ok("댓글 좋아요 취소 완료");

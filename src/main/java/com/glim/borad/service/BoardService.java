@@ -14,6 +14,9 @@ import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
+import com.glim.common.security.dto.SecurityUserDto;
+import com.glim.notification.domain.Type;
+import com.glim.notification.service.NotificationService;
 import com.glim.stories.service.StoryService;
 import com.glim.user.domain.Follow;
 import com.glim.user.dto.response.ViewBoardUserResponse;
@@ -49,9 +52,10 @@ public class BoardService {
     private final CommentLikeService commentLikeService;
     private final CommentService commentService;
     private final BoardLikeService boardLikeService;
+    private final NotificationService notificationService;
 
     @Transactional
-    public void insert(AddBoardRequest request) {
+    public void insert(AddBoardRequest request, SecurityUserDto user) {
         Boards board = boardRepository.save(new AddBoardRequest().toEntity(request));
         for (int i = 0; i < request.getImg().size(); i++) {
             boardFileRepository.save(new AddBoardFileRequest().toEntity(board.getId(), request.getImg().get(i), String.valueOf(board.getBoardType())));
@@ -59,6 +63,20 @@ public class BoardService {
         for (int i = 0; i < request.getTags().size(); i++) {
             boardTagRepository.save(new AddBoardTagRequest().toEntity(board.getId(), request.getTags().get(i)));
         }
+        if(board.getTagUserIds() != null){
+            String tagUserIds = board.getTagUserIds().substring(1, board.getTagUserIds().length() - 1);
+            String[] tags = tagUserIds.split(", ");
+            for(String id : tags){
+                try{
+                    Long notificationUserId = Long.parseLong(id);
+                    Type type = board.getBoardType().equals(BoardType.BASIC) ? Type.BOARD_TAG : Type.SHORTS_TAG;
+                    notificationService.send(notificationUserId, type, board.getId(), user);
+                }catch (Exception e){
+                    throw new CustomException(ErrorCode.TAG_NOT_FOUND);
+                }
+            }
+        }
+
     }
 
     public List<ViewBoardResponse> getMainBoard(Long id, Long offset) {

@@ -22,7 +22,7 @@ public class BoardLikeController {
 
     @PostMapping({"/{boardId}"})
     public StatusResponseDTO add(@PathVariable Long boardId, @AuthenticationPrincipal SecurityUserDto user) {
-        if(boardLikeService.insert(boardId, user.getId())){
+        if(boardLikeService.insert(boardId, user.getId(), user)){
             boardService.updateLike(boardId, 1);
         }
         return StatusResponseDTO.ok("좋아요 완료");
@@ -30,7 +30,7 @@ public class BoardLikeController {
 
     @DeleteMapping("/{boardId}")
     public StatusResponseDTO delete(@PathVariable Long boardId, @AuthenticationPrincipal SecurityUserDto user) {
-        if(boardLikeService.delete(boardId, user.getId())){
+        if(boardLikeService.delete(boardId, user.getId(), user)){
             boardService.updateLike(boardId, -1);
         }
         return StatusResponseDTO.ok("좋아요 취소 완료");

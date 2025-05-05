@@ -39,7 +39,7 @@ public class NotificationController {
 
     @GetMapping(value = "", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter connect(HttpServletResponse response, @AuthenticationPrincipal SecurityUserDto user) {
-        return notificationService.getEmitter(response, user.getId());
+        return notificationService.getEmitter(response, user.getId(), user);
     }
 
     @GetMapping(value = "/header", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

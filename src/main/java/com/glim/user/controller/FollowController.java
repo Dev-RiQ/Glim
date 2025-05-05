@@ -1,5 +1,6 @@
 package com.glim.user.controller;
 
+import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.common.security.util.SecurityUtil;
 import com.glim.common.statusResponse.StatusResponseDTO;
 import com.glim.user.dto.request.FollowRequest;
@@ -9,6 +10,7 @@ import com.glim.user.dto.response.FollowUserResponse;
 import com.glim.user.service.FollowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,8 +28,8 @@ public class FollowController {
      * @return 팔로우 성공 메시지
      */
     @PostMapping
-    public ResponseEntity<FollowResponse> follow(@RequestBody FollowRequest request) {
-        followService.follow(request.getFollowingId()); // followerId는 내부에서 처리
+    public ResponseEntity<FollowResponse> follow(@RequestBody FollowRequest request, @AuthenticationPrincipal SecurityUserDto user) {
+        followService.follow(request.getFollowingId(), user); // followerId는 내부에서 처리
         return ResponseEntity.ok(new FollowResponse("팔로우 성공", true));
     }
 

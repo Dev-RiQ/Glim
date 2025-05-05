@@ -4,6 +4,7 @@ import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
+import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.common.security.util.SecurityUtil;
 import com.glim.notification.domain.Type;
 import com.glim.notification.service.NotificationService;
@@ -50,7 +51,7 @@ public class FollowService {
 
     // ✅ 로그인한 사용자 기준 팔로우
     @Transactional
-    public void follow(Long followingId) {
+    public void follow(Long followingId, SecurityUserDto user) {
         Long followerId = SecurityUtil.getCurrentUserId();
 
         // 자기 자신 팔로우 할시
@@ -74,7 +75,7 @@ public class FollowService {
         toUser .setFollowers(toUser .getFollowers() + 1);
 
         // 알림 보내기
-        notificationService.send(toUser.getId(), fromUser.getNickname(), Type.FOLLOW);
+        notificationService.send(toUser.getId(), Type.FOLLOW, fromUser.getId(), user);
 
     }
 

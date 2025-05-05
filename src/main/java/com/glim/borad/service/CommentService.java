@@ -1,16 +1,21 @@
 package com.glim.borad.service;
 
 import com.glim.borad.domain.BoardComments;
+import com.glim.borad.domain.BoardType;
+import com.glim.borad.domain.Boards;
 import com.glim.borad.dto.request.AddCommentsRequest;
 import com.glim.borad.dto.response.ViewCommentsResponse;
 import com.glim.borad.dto.response.ViewReplyCommentResponse;
 import com.glim.borad.repository.BoardCommentsRepository;
+import com.glim.borad.repository.BoardRepository;
 import com.glim.borad.repository.CommentLikeRepository;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import com.glim.common.security.dto.SecurityUserDto;
+import com.glim.notification.domain.Type;
+import com.glim.notification.service.NotificationService;
 import com.glim.stories.service.StoryService;
 import com.glim.user.domain.User;
 import com.glim.user.dto.response.ViewBoardUserResponse;
@@ -36,15 +41,29 @@ public class CommentService {
     private final AwsS3Util awsS3Util;
     private final StoryService storyService;
     private final CommentLikeRepository commentLikeRepository;
+    private final BoardRepository boardRepository;
+    private final NotificationService notificationService;
 
     @Transactional
-    public ViewCommentsResponse insert(AddCommentsRequest request, Long userId) {
+    public ViewCommentsResponse insert(AddCommentsRequest request, Long userId, SecurityUserDto user) {
         BoardComments comment = boardCommentsRepository.save(new AddCommentsRequest().toEntity(request, userId));
-        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        ViewBoardUserResponse viewBoardUserResponse = new ViewBoardUserResponse(user);
+        User userInfo = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        ViewBoardUserResponse viewBoardUserResponse = new ViewBoardUserResponse(userInfo);
         viewBoardUserResponse.setImg(awsS3Util.getURL(viewBoardUserResponse.getImg(), FileSize.IMAGE_128));
         viewBoardUserResponse.setIsMine(true);
         viewBoardUserResponse.setIsStory(storyService.isStory(userId));
+
+        Boards board = boardRepository.findById(request.getBoardId()).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+        Long notificationUserId = board.getUserId();
+        Type type = board.getBoardType().equals(BoardType.BASIC) ? Type.BOARD_COMMENT : Type.SHORTS_COMMENT;
+        notificationService.send(notificationUserId, type, board.getId(), user);
+
+        if(request.getReplyId() != null && request.getReplyId() != 0L) {
+            notificationUserId = userRepository.findById(request.getReplyId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)).getId();
+            notificationService.send(notificationUserId, type, board.getId(), user);
+        }
+
         return new ViewCommentsResponse(comment, viewBoardUserResponse);
     }
 
@@ -97,11 +116,17 @@ public class CommentService {
     }
 
     @Transactional
-    public Long delete(Long commentId) {
+    public Long delete(Long commentId, SecurityUserDto user) {
         BoardComments comments = boardCommentsRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
         Long boardId = comments.getBoardId();
         boardCommentsRepository.delete(comments);
+
+        Boards board = boardRepository.findById(boardId).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+        Long notificationUserId = board.getUserId();
+        Type type = board.getBoardType().equals(BoardType.BASIC) ? Type.BOARD_COMMENT : Type.SHORTS_COMMENT;
+        notificationService.delete(notificationUserId, type, boardId, user);
+
         return boardId;
     }
 
