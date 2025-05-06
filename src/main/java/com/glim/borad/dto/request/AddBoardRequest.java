@@ -12,7 +12,6 @@ import java.util.List;
 @Setter
 @ToString
 public class AddBoardRequest {
-    private Long userId;
     private String location;
     private List<String> img;
     private String content;
@@ -25,9 +24,9 @@ public class AddBoardRequest {
 
 
 
-    public Boards toEntity(AddBoardRequest addBoardRequest) {
+    public Boards toEntity(AddBoardRequest addBoardRequest, Long userId) {
         return Boards.builder()
-                .userId(addBoardRequest.getUserId())
+                .userId(userId)
                 .location(addBoardRequest.getLocation())
                 .content(addBoardRequest.getContent())
                 .tagUserIds(addBoardRequest.getTagUserIds().toString())

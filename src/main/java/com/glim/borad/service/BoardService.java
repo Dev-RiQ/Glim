@@ -65,14 +65,14 @@ public class BoardService {
 
     @Transactional
     public void insert(AddBoardRequest request, SecurityUserDto user) {
-        Boards board = boardRepository.save(new AddBoardRequest().toEntity(request));
+        Boards board = boardRepository.save(new AddBoardRequest().toEntity(request, user.getId()));
         for (int i = 0; i < request.getImg().size(); i++) {
             boardFileRepository.save(new AddBoardFileRequest().toEntity(board.getId(), request.getImg().get(i), String.valueOf(board.getBoardType())));
         }
         for (int i = 0; i < request.getTags().size(); i++) {
             boardTagRepository.save(new AddBoardTagRequest().toEntity(board.getId(), request.getTags().get(i)));
         }
-        if(board.getTagUserIds() != null){
+        if(board.getTagUserIds() != null && board.getTagUserIds().length() > 2){
             sendNotificationInTagUsers(board, user);
         }
         if(board.getBoardType().equals(BoardType.ADVERTISEMENT)){
