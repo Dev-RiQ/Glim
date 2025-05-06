@@ -68,7 +68,6 @@ public class HeaderNotificationService {
                 log.info("notification sent successfully");
             }catch (Exception e){
                 emitter.completeWithError(e);
-                log.error("notification sent failed");
             }
         });
     }

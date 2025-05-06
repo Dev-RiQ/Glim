@@ -131,7 +131,7 @@ public class ChatRoomService {
                 .orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND)).getReadMsgId();
         ChatMsg lastId = chatMsgRepository.findTop1ByRoomIdOrderByMsgIdDesc(chatUser.getRoomId())
                 .orElse(null);
-        return lastId == null || readId.equals(lastId.getMsgId());
+        return lastId == null || readId >= lastId.getMsgId();
     }
 
     public Boolean hasNewChat(){

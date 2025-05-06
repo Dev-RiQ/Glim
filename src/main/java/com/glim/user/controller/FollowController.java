@@ -29,9 +29,9 @@ public class FollowController {
     }
 
     // 언팔로우 요청
-    @DeleteMapping
-    public ResponseEntity<FollowResponse> unfollow(@RequestBody FollowRequest request, @AuthenticationPrincipal SecurityUserDto user) {
-        followService.unfollow(request.getFollowingId(), user);
+    @DeleteMapping("/{followingId}")
+    public ResponseEntity<FollowResponse> unfollow(@PathVariable Long followingId, @AuthenticationPrincipal SecurityUserDto user) {
+        followService.unfollow(followingId, user);
         return ResponseEntity.ok(new FollowResponse("언팔로우 성공", true));
     }
 

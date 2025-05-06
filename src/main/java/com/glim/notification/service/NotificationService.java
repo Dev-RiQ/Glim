@@ -53,9 +53,9 @@ public class NotificationService {
 
     public List<NotificationResponse> getNotificationList(Long offset, SecurityUserDto me) {
         User user = userRepository.findById(me.getId()).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        List<Notification> list = offset == null ? notificationRepository.findAllByUserIdAndIdLessThanOrderByIdDesc(user.getId(),user.getReadAlarmId(), Limit.of(30))
+        List<Notification> list = offset == null ? notificationRepository.findAllByUserIdAndIdLessThanOrderByIdDesc(user.getId(),user.getReadAlarmId() + 1, Limit.of(30))
                 .orElseThrow(() -> new CustomException(ErrorCode.NOTIFICATION_NOT_FOUND))
-                :notificationRepository.findAllByUserIdAndIdLessThanAndIdLessThanOrderByIdDesc(user.getId(),user.getReadAlarmId(), offset, Limit.of(30))
+                :notificationRepository.findAllByUserIdAndIdLessThanAndIdLessThanOrderByIdDesc(user.getId(),user.getReadAlarmId() + 1, offset, Limit.of(30))
                 .orElseThrow(() -> new CustomException(ErrorCode.NOTIFICATION_NO_MORE));
         List<NotificationResponse> notificationList = list.stream().map(NotificationResponse::new).collect(Collectors.toList());
         setImg(notificationList, user);
@@ -117,7 +117,6 @@ public class NotificationService {
                 log.info("notification sent successfully");
             }catch (Exception e){
                 emitter.completeWithError(e);
-                log.error("notification sent failed");
             }
         });
     }
@@ -141,9 +140,14 @@ public class NotificationService {
 
     @Transactional
     public void delete(Long userId, Type type, Long linkId, SecurityUserDto user) {
+        if(type.toString().contains("COMMENT")){
+            return;
+        }
         Notification notification = notificationRepository.findByUserIdAndSendUserIdAndLinkIdAndType(userId, user.getId(), linkId, type)
-                .orElseThrow(() -> new CustomException(ErrorCode.DUPLICATE_NOTIFICATION_DELETE));
-        notificationRepository.delete(notification);
+                .orElse(null);
+        if(notification != null) {
+            notificationRepository.delete(notification);
+        }
     }
 
     @Transactional
