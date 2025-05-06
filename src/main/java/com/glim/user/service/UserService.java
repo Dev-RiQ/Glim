@@ -365,7 +365,8 @@ public class UserService {
 
     // ✅ 소셜로그인 최초 이용자 추가 정보 입력
     @Transactional
-    public void completeSocialInfo(Long userId, SocialInfoRequest request) {
+    public void completeSocialInfo(SocialInfoRequest request) {
+        Long userId = jwtTokenProvider.getUserId(request.getAccessToken());
         User user = getUserById(userId); // ✅ 기존 메서드 재사용
 
         // 닉네임 중복 검사

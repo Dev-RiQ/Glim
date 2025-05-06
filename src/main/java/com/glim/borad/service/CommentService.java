@@ -59,7 +59,9 @@ public class CommentService {
         notificationService.send(notificationUserId, type, board.getId(), user);
 
         if(request.getReplyId() != null && request.getReplyId() != 0L) {
-            notificationUserId = userRepository.findById(request.getReplyId())
+            type = board.getBoardType().equals(BoardType.BASIC) ? Type.BOARD_REPLY_COMMENT : Type.SHORTS_REPLY_COMMENT;
+            Long replyUserId = boardCommentsRepository.findById(request.getReplyId()).orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND)).getUserId();
+            notificationUserId = userRepository.findById(replyUserId)
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)).getId();
             notificationService.send(notificationUserId, type, board.getId(), user);
         }
@@ -119,6 +121,7 @@ public class CommentService {
     public Long delete(Long commentId, SecurityUserDto user) {
         BoardComments comments = boardCommentsRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+            commentLikeRepository.deleteAllByCommentId(comments.getId());
         Long boardId = comments.getBoardId();
         List<BoardComments> commentsList = boardCommentsRepository.findByReplyCommentId(comments.getId());
         for (BoardComments comment : commentsList) {
@@ -126,8 +129,11 @@ public class CommentService {
             boardCommentsRepository.delete(comment);
         }
         boardCommentsRepository.delete(comments);
+        int count = commentsList.size();
 
         Boards board = boardRepository.findById(boardId).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
+        board.setComments(board.getComments() - count);
+        boardRepository.save(board);
         Long notificationUserId = board.getUserId();
         Type type = board.getBoardType().equals(BoardType.BASIC) ? Type.BOARD_COMMENT : Type.SHORTS_COMMENT;
         notificationService.delete(notificationUserId, type, boardId, user);

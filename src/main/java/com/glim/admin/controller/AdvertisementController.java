@@ -39,14 +39,14 @@ public class AdvertisementController {
     }
 
     //     광고 승인 처리
-    @PostMapping("/{id}/approve")
+    @PostMapping("/approve/{id}")
     public Advertisement approveAdvertisement(@PathVariable Long id) {
         return advertisementService.approve(id);
     }
 
     //     광고 거절 처리
-    @PostMapping("/{id}/reject")
-    public Advertisement rejectAdvertisement(@PathVariable Long id, @RequestParam String reason) {
-        return advertisementService.reject(id, reason);
+    @PostMapping("/reject/{id}")
+    public Advertisement rejectAdvertisement(@PathVariable Long id) {
+        return advertisementService.reject(id);
     }
 }

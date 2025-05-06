@@ -31,7 +31,7 @@ public class ViewChatRoomResponse {
         this.user = user;
         this.roomId = chatRoom.getId();
         this.msg = chatMsg != null ? chatMsg.getContent() : "새로운 채팅방이 생성되었습니다.";
-        this.updatedAt = DateTimeUtil.getDateTimeAgo(chatRoom.getCreatedAt());
+        this.updatedAt = DateTimeUtil.getDateTimeAgo(chatRoom.getUpdatedAt());
         this.hasRead = hasRead;
     }
 }

@@ -40,6 +40,7 @@ public class ViewBoardResponse {
     private BoardType boardType;
     private boolean commentable;
     private boolean viewLikes;
+    private Boolean isAd;
 
     public ViewBoardResponse(Boards board, ViewBoardUserResponse user, ViewBgmResponse bgm) {
         this.user = user;

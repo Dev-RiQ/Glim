@@ -118,7 +118,7 @@ public class StoryService {
         List<Stories> stories = storyRepository.findByUserIdAndCreatedAtBetween(userId, yesterday, now);
         List<ViewStoryResponse> responses = stories.stream().map(ViewStoryResponse::new).collect(Collectors.toList());
         responses.forEach(viewStoryResponse -> {
-            boolean isLike = storyLikeRepository.existsByStoryIdAndUserId(viewStoryResponse.getId(), userId);
+            boolean isLike = storyLikeRepository.existsByStoryIdAndUserId(viewStoryResponse.getId(), loginId);
             viewStoryResponse.setIsLike(isLike);
             viewStoryResponse.setUser(user);
             viewStoryResponse.setImg(awsS3Util.getURL(viewStoryResponse.getImg(), FileSize.IMAGE_512));

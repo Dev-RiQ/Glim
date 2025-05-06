@@ -67,6 +67,7 @@ public enum ErrorCode {
     DUPLICATE_FOLLOWMINE(CONFLICT, "자기자신은 팔로우 할 수 없습니다."),
     DUPLICATE_STORY_LIKE(CONFLICT, "이미 좋아요 취소가 완료되었습니다."),
     DUPLICATE_NOTIFICATION_DELETE(CONFLICT, "이미 삭제한 알림입니다."),
+    DUPLICATE_STORY_LIKE_INSERT(CONFLICT, "이미 좋아요한 스토리입니다."),
 
 
 

@@ -50,7 +50,7 @@ public class ImageEncoderRepository {
         BufferedImage bi = ImageIO.read(multipartFile.getInputStream());
         bi = resizeImage(bi,size,size);
         File file = setNewFile(saveFileName, size);
-        ImageIO.write(bi,"jpg", file);
+        ImageIO.write(bi,"png", file);
         return convertToWebp(file.getParentFile()+"/"+file.getName(), file);
     }
 

@@ -120,8 +120,13 @@ public class BoardService {
         if(user != null && user.getRate() == 0){
             ViewBoardResponse ad = getRandomAdvertisement(id);
             if(ad != null){
+                ad.setIsAd(true);
                 list.add(5,ad);
-                list.add(getRandomAdvertisement(id));
+            }
+            ViewBoardResponse ad2 = getRandomAdvertisement(id);
+            if(ad2 != null){
+                ad2.setIsAd(true);
+                list.add(ad2);
             }
         }
         list = getSubBoard(list, id);

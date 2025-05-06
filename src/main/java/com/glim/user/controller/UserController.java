@@ -20,8 +20,7 @@ public class UserController {
     // ✅ UserController.java - 추가 정보 입력 API
     @PostMapping("/social-info")
     public ResponseEntity<String> completeSocialInfo(@RequestBody SocialInfoRequest request) {
-        Long userId = SecurityUtil.getCurrentUserId();
-        userService.completeSocialInfo(userId, request); // ✅ Service로 위임
+        userService.completeSocialInfo(request); // ✅ Service로 위임
         return ResponseEntity.ok("추가 정보 입력 완료!");
     }
 

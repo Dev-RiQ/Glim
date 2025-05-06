@@ -44,10 +44,10 @@ public class AdvertisementService {
     }
 
     @Transactional
-    public Advertisement reject(Long id, String reason) {
+    public Advertisement reject(Long id) {
         Advertisement advertisement = findById(id);
         advertisement.setStatus(AdvertisementStatus.REJECTED);
-        advertisement.setRejectionReason(reason);
+        advertisement.setRejectionReason("");
         return advertisementRepository.save(advertisement);
     }
 
