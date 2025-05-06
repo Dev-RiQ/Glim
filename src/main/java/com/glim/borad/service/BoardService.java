@@ -22,6 +22,7 @@ import com.glim.notification.domain.Type;
 import com.glim.notification.service.NotificationService;
 import com.glim.stories.service.StoryService;
 import com.glim.user.domain.Follow;
+import com.glim.user.domain.User;
 import com.glim.user.dto.response.ViewBoardUserResponse;
 import com.glim.user.repository.FollowRepository;
 import com.glim.user.repository.UserRepository;
@@ -115,10 +116,13 @@ public class BoardService {
                 :boardRepository.findAllByBoardTypeAndIdLessThanOrderByIdDesc(BoardType.BASIC, offset, Limit.of(10));
         List<ViewBoardResponse> list = boardList.stream().map((board) -> getView(board, id)).collect(Collectors.toList());
 
-        ViewBoardResponse ad = getRandomAdvertisement(id);
-        if(ad != null){
-            list.add(5,ad);
-            list.add(getRandomAdvertisement(id));
+        User user = userRepository.findById(id).orElse(null);
+        if(user != null && user.getRate() == 0){
+            ViewBoardResponse ad = getRandomAdvertisement(id);
+            if(ad != null){
+                list.add(5,ad);
+                list.add(getRandomAdvertisement(id));
+            }
         }
         list = getSubBoard(list, id);
         return list;
