@@ -15,6 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
@@ -27,29 +30,34 @@ public class PasswordResetController {
 
     // ✅ 아이디 찾기 - 본인인증 후 아이디 공개 ( 마스킹 )
     @PostMapping("/find-username")
-    public ResponseEntity<String> findUsername(@RequestBody FindUsernameRequest request) {
+    public ResponseEntity<List<String>> findUsername(
+            @RequestBody FindUsernameRequest request
+    ) {
+        // 1) SMS 인증 코드 확인
         verificationService.verifyCode(request.getPhone(), request.getCode());
 
-        String username = userService.findUsernameByPhone(request.getPhone());
+        // 2) LOCAL 계정 중 휴대폰 번호로 아이디 최대 2개 조회
+        List<String> usernames = userService.findLocalUsernamesByPhone(request.getPhone());
 
-        String maskedUsername = maskUsername(username);
+        // 3) 각 아이디에 대해 maskUsername 적용
+        List<String> masked = usernames.stream()
+                .map(this::maskUsername)
+                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(maskedUsername);
+        return ResponseEntity.ok(masked);
     }
 
-    // 마스킹 ex) knk0611 -> k*k06*1
     private String maskUsername(String username) {
-        if (username.length() <= 2) return "*";
+        List<Integer> positions = Arrays.asList(2, 3, 6);
 
-        StringBuilder masked = new StringBuilder();
-        for (int i = 0; i < username.length(); i++) {
-            if (i == 0 || i == username.length() - 1) {
-                masked.append(username.charAt(i));
-            } else {
-                masked.append("*");
+        StringBuilder sb = new StringBuilder(username);
+        for (Integer pos : positions) {
+            int idx = pos - 1;               // 0-base index 로 변환
+            if (idx >= 0 && idx < sb.length()) {
+                sb.setCharAt(idx, '*');      // 해당 위치를 '*' 로 대체
             }
         }
-        return masked.toString();
+        return sb.toString();
     }
 
     // ✅ 비밀번호 찾기 - 본인인증 후 resetToken 발급
