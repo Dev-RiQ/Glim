@@ -8,4 +8,5 @@ import lombok.Setter;
 public class SocialInfoRequest {
     private String nickname;
     private String phone;
+    private String accessToken;
 }

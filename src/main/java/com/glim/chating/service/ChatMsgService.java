@@ -44,6 +44,8 @@ public class ChatMsgService {
     private final ChatUserRepository chatUserRepository;
     private final SendMessage sender;
     private final ChatUtil chatUtil;
+    private final ChatRoomService chatRoomService;
+    private final ChatRoomRepository chatRoomRepository;
 
     public List<ViewChatMsgResponse> findChatMsgListByRoomId(Long roomId, Long offset, SecurityUserDto me) {
         ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(roomId, me.getId())
@@ -68,7 +70,11 @@ public class ChatMsgService {
     public void sendMessage(AddChatMsgRequest request, SecurityUserDto me) {
         ChatMsg message = setMessage(request, me);
         chatUserService.checkUserValid(request.getRoomId(), me);
-        chatMsgRepository.save(message);
+        ChatMsg saveMsg = chatMsgRepository.save(message);
+        ChatRoom chatRoom = chatRoomRepository.findById(saveMsg.getRoomId()).orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
+        chatRoom.update();
+        chatRoomRepository.save(chatRoom);
+        chatUserService.updateChatUserReadMsg(chatRoom.getId(), me);
         sender.publishMessage(new Message(message));
     }
 

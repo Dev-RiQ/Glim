@@ -88,13 +88,14 @@ public class NotificationService {
 
     private void setImg(List<NotificationResponse> notificationList, User user) {
         for (NotificationResponse notificationResponse : notificationList) {
-            notificationResponse.setUserImg(awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128));
+            String userImg = userRepository.findById(notificationResponse.getSendUserId()).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)).getImg();
+            notificationResponse.setUserImg(awsS3Util.getURL(userImg, FileSize.IMAGE_128));
             if (notificationResponse.getLinkId() != null && notificationResponse.getLinkId() != 0L) {
                 String linkImg = null;
                 switch (notificationResponse.getUri().substring(0, notificationResponse.getUri().lastIndexOf("/") + 1)){
-                    case "/board/" -> linkImg = awsS3Util.getURL(boardFileRepository.findById(notificationResponse.getLinkId())
+                    case "/board/" -> linkImg = awsS3Util.getURL(boardFileRepository.findByBoardId(notificationResponse.getLinkId() ,Limit.of(1))
                             .orElseThrow(() -> new CustomException(ErrorCode.BOARDFILE_NOT_FOUND)).getFileName(), FileSize.IMAGE_128);
-                    case "/shorts/" -> linkImg = awsS3Util.getURL(boardFileRepository.findById(notificationResponse.getLinkId())
+                    case "/shorts/" -> linkImg = awsS3Util.getURL(boardFileRepository.findByBoardId(notificationResponse.getLinkId())
                             .orElseThrow(() -> new CustomException(ErrorCode.BOARDFILE_NOT_FOUND)).getFileName(), FileSize.VIDEO_THUMBNAIL);
                     case "/story/" -> linkImg = awsS3Util.getURL(storyRepository.findById(notificationResponse.getLinkId())
                             .orElseThrow(() -> new CustomException(ErrorCode.BOARDFILE_NOT_FOUND)).getFileName(), FileSize.IMAGE_128);

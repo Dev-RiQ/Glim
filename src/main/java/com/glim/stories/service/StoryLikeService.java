@@ -29,6 +29,8 @@ public class StoryLikeService {
 
     @Transactional
     public void insert(AddStoryLikeRequest request, SecurityUserDto user) {
+        StoryLikes like = storyLikeRepository.findByStoryIdAndUserId(request.getStoryId(), user.getId()).orElse(null);
+        if(like != null) { throw new CustomException(ErrorCode.DUPLICATE_STORY_LIKE_INSERT); }
         storyLikeRepository.save(new AddStoryLikeRequest().toEntity(request));
         Long notificationUserId = storyRepository.findById(request.getStoryId()).orElseThrow(() -> new CustomException(ErrorCode.STORY_DELETED)).getUserId();
         notificationService.send(notificationUserId, Type.STORY_LIKE, request.getStoryId(), user);

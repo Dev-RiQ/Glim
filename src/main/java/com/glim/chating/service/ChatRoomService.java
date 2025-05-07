@@ -81,7 +81,6 @@ public class ChatRoomService {
                 log.info("chat list sent successfully");
             }catch (Exception e){
                 emitter.completeWithError(e);
-                log.error("chat list sent failed");
             }
         });
     }
@@ -90,22 +89,30 @@ public class ChatRoomService {
         SecurityUserDto user = SecurityUtil.getUser();
         List<ChatUser> chatUserList = chatUserRepository.findAllByUserId(user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NO_CREATED));
-        return getViewChatRoomListByUserId(chatUserList);
+        return getViewChatRoomListByUserId(chatUserList, user.getId());
     }
 
-    private List<ViewChatRoomResponse> getViewChatRoomListByUserId(List<ChatUser> chatUserList) {
-        List<ViewChatRoomResponse> chatRoomList = new ArrayList<>();
+    private List<ViewChatRoomResponse> getViewChatRoomListByUserId(List<ChatUser> chatUserList, Long userId) {
+        List<ChatRoom> list = new ArrayList<>();
         for(ChatUser chatUser : chatUserList) {
             if(chatUser.getValid().toString().equals("OUT")) continue;
             ChatRoom chatRoom = chatRoomRepository.findById(chatUser.getRoomId())
                     .orElseThrow(() -> new CustomException(ErrorCode.CHATROOM_NOT_FOUND));
+            list.add(chatRoom);
+        }
+        list = list.stream().sorted(Comparator.comparing(ChatRoom::getUpdatedAt).reversed()).toList();
+
+        List<ViewChatRoomResponse> chatRoomList = new ArrayList<>();
+        for(ChatRoom chatRoom : list) {
+            ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(chatRoom.getId(), userId).orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND));
             ViewChatUserResponse userView = getViewChatUser(chatRoom, chatUser);
-            List<ChatMsg> chatMsgList = chatMsgRepository.findAllByRoomIdOrderByMsgIdDesc(chatUser.getRoomId(), Limit.of(1));
+            List<ChatMsg> chatMsgList = chatMsgRepository.findAllByRoomIdOrderByMsgIdDesc(chatRoom.getId(), Limit.of(1));
             ChatMsg chatMsg = chatMsgList.isEmpty() ? null :chatMsgList.get(0);
             boolean hasRead = hasRead(chatUser);
             chatRoomList.add(new ViewChatRoomResponse(chatRoom, chatMsg, userView, hasRead));
         }
-        return chatRoomList.stream().sorted(Comparator.comparing(ViewChatRoomResponse::getUpdatedAt)).toList();
+
+        return chatRoomList;
     }
 
     private ViewChatUserResponse getViewChatUser(ChatRoom chatRoom, ChatUser chatUser) {

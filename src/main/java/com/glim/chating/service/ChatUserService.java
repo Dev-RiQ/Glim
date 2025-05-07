@@ -62,7 +62,7 @@ public class ChatUserService {
         User user = userRepository.findById(chatUser.getUserId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         user.setImg(awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128));
-        boolean isStory = storyService.isStory(chatUser.getId());
+        boolean isStory = storyService.isStory(chatUser.getUserId());
         return new ViewChatUserResponse(user, chatUser, isStory);
     }
 
@@ -86,8 +86,9 @@ public class ChatUserService {
             chatUserRepository.delete(chatUserNotMe);
             chatRoomRepository.deleteById(roomId);
             chatMsgRepository.deleteAllByRoomId(roomId);
+        }else{
+            chatUserRepository.save(chatUser);
         }
-        chatUserRepository.save(chatUser);
     }
 
     @Transactional
