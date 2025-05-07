@@ -12,8 +12,7 @@ public class FollowRecommendResponse {
     private String nickname;
     private String img;
     private String name;
-    @JsonProperty("isStory")
-    private boolean story;
+    private Boolean isStory;
 
     // ✅ 정적 팩토리 메서드 추가
     public static FollowRecommendResponse from(User user, boolean story) {

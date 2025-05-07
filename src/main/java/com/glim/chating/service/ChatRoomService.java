@@ -106,6 +106,7 @@ public class ChatRoomService {
         for(ChatRoom chatRoom : list) {
             ChatUser chatUser = chatUserRepository.findByRoomIdAndUserId(chatRoom.getId(), userId).orElseThrow(() -> new CustomException(ErrorCode.CHATUSER_NOT_FOUND));
             ViewChatUserResponse userView = getViewChatUser(chatRoom, chatUser);
+            userView.setIsStory(storyService.isStory(userView.getId()));
             List<ChatMsg> chatMsgList = chatMsgRepository.findAllByRoomIdOrderByMsgIdDesc(chatRoom.getId(), Limit.of(1));
             ChatMsg chatMsg = chatMsgList.isEmpty() ? null :chatMsgList.get(0);
             boolean hasRead = hasRead(chatUser);

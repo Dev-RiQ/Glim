@@ -48,6 +48,7 @@ public class NotificationService {
     private final AwsS3Util awsS3Util;
     private final NotificationRepository notificationRepository;
     private final ExecutorService taskExecutor = Executors.newSingleThreadExecutor();
+    private final StoryService storyService;
     private SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
 
@@ -59,6 +60,7 @@ public class NotificationService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOTIFICATION_NO_MORE));
         List<NotificationResponse> notificationList = list.stream().map(NotificationResponse::new).collect(Collectors.toList());
         setImg(notificationList, user);
+        setHasStory(notificationList);
         return notificationList;
     }
 
@@ -83,6 +85,7 @@ public class NotificationService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOTIFICATION_NO_CREATED))
                 .stream().map(NotificationResponse::new).collect(Collectors.toList());
         setImg(notificationList, user);
+        setHasStory(notificationList);
         return notificationList;
     }
 
@@ -104,6 +107,13 @@ public class NotificationService {
                 }
                 notificationResponse.setLinkImg(linkImg);
             }
+        }
+    }
+
+    private void setHasStory(List<NotificationResponse> notificationList) {
+        for (NotificationResponse notificationResponse : notificationList) {
+            boolean isStory = storyService.isStory(notificationResponse.getSendUserId());
+            notificationResponse.setIsStory(isStory);
         }
     }
 

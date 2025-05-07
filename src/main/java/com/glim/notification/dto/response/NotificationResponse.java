@@ -20,6 +20,7 @@ public class NotificationResponse {
     private String userImg;
     private String linkImg;
     private Boolean isRead;
+    private Boolean isStory;
 
     public NotificationResponse(Notification notification) {
         this.id = notification.getId();
