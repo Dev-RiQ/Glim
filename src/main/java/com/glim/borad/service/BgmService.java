@@ -33,8 +33,6 @@ public class BgmService {
         bgmRepository.save(new AddBgmRequest().toEntity(request));
     }
 
-
-
     @Transactional
     public void delete(Long id) {
         List<Boards> boardList = boardRepository.findAllByBgmId(id);
@@ -60,5 +58,4 @@ public class BgmService {
                 bgmRepository.findFirst10FromOffset(id, offset);
         return bgmsList.stream().map(this::getURL).collect(Collectors.toList());
     }
-
 }

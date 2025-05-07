@@ -25,11 +25,6 @@ public class BoardFileSevice {
     private final BoardFileRepository boardFileRepository;
     private final BoardRepository boardRepository;
 
-//    @Transactional
-//    public BoardFiles insert(AddBoardFileRequest request) {
-//        return boardFileRepository.save(new AddBoardFileRequest().toEntity(request));
-//    }
-
     @Transactional
     public void delete(Long id, Long boardId) {
         boardRepository.findById(boardId).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));

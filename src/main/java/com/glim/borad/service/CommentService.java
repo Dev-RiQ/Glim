@@ -47,22 +47,17 @@ public class CommentService {
     @Transactional
     public ViewCommentsResponse insert(AddCommentsRequest request, Long userId, SecurityUserDto user) {
         BoardComments comment = boardCommentsRepository.save(new AddCommentsRequest().toEntity(request, userId));
-        User userInfo = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        ViewBoardUserResponse viewBoardUserResponse = new ViewBoardUserResponse(userInfo);
-        viewBoardUserResponse.setImg(awsS3Util.getURL(viewBoardUserResponse.getImg(), FileSize.IMAGE_128));
-        viewBoardUserResponse.setIsMine(true);
-        viewBoardUserResponse.setIsStory(storyService.isStory(userId));
+        ViewBoardUserResponse viewBoardUserResponse = createUserResponse(userId);
 
         Boards board = boardRepository.findById(request.getBoardId()).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
         Long notificationUserId = board.getUserId();
         Type type = board.getBoardType().equals(BoardType.BASIC) ? Type.BOARD_COMMENT : Type.SHORTS_COMMENT;
         notificationService.send(notificationUserId, type, board.getId(), user);
 
-        if(request.getReplyId() != null && request.getReplyId() != 0L) {
+        if (request.getReplyId() != null && request.getReplyId() != 0L) {
             type = board.getBoardType().equals(BoardType.BASIC) ? Type.BOARD_REPLY_COMMENT : Type.SHORTS_REPLY_COMMENT;
             Long replyUserId = boardCommentsRepository.findById(request.getReplyId()).orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND)).getUserId();
-            notificationUserId = userRepository.findById(replyUserId)
-                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)).getId();
+            notificationUserId = userRepository.findById(replyUserId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)).getId();
             notificationService.send(notificationUserId, type, board.getId(), user);
         }
 
@@ -71,69 +66,67 @@ public class CommentService {
 
     public List<ViewCommentsResponse> list(Long id, Long offset, SecurityUserDto user) {
         List<BoardComments> commentsList = offset == null ?
-                boardCommentsRepository.findAllByBoardIdAndReplyCommentIdOrderByIdAsc(id, 0L, Limit.of(30))
-                        .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NO_CREATED))
-                :boardCommentsRepository.findAllByBoardIdAndIdGreaterThanAndReplyCommentIdOrderByIdAsc(id, offset, 0L, Limit.of(30))
-                        .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NO_MORE));
-        // 커멘트아이디에 해당 댓글 번호 있는지 없는지
-        List<ViewCommentsResponse> list = commentsList.stream().map(comment -> getCommentView(comment, user.getId())).collect(Collectors.toList());
-        list.forEach(viewCommentsResponse -> {
-            BoardComments obj = boardCommentsRepository.findByReplyCommentId(viewCommentsResponse.getId(), Limit.of(1)).orElse(null);
-            viewCommentsResponse.setIsReply(obj != null);
-            Boolean isLike = commentLikeRepository.existsByCommentIdAndUserId(viewCommentsResponse.getId(), user.getId());
-            viewCommentsResponse.setIsLike(isLike);
-        });
-        return list;
+                boardCommentsRepository.findAllByBoardIdAndReplyCommentIdOrderByIdAsc(id, 0L, Limit.of(30)).orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NO_CREATED)) :
+                boardCommentsRepository.findAllByBoardIdAndIdGreaterThanAndReplyCommentIdOrderByIdAsc(id, offset, 0L, Limit.of(30)).orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NO_MORE));
+
+        return commentsList.stream().map(comment -> {
+            ViewCommentsResponse view = getCommentView(comment, user.getId());
+            view.setIsReply(boardCommentsRepository.findByReplyCommentId(view.getId(), Limit.of(1)) != null);
+            view.setIsLike(commentLikeRepository.existsByCommentIdAndUserId(view.getId(), user.getId()));
+            return view;
+        }).collect(Collectors.toList());
     }
 
     public List<ViewReplyCommentResponse> replyList(Long replyCommentId, Long offset, SecurityUserDto user) {
         List<BoardComments> commentsList = offset == null ?
-                boardCommentsRepository.findAllByReplyCommentIdOrderByIdAsc(replyCommentId, Limit.of(30))
-                        .orElseThrow(() -> new CustomException(ErrorCode.REPLY_COMMENT_NO_CREATED))
-                :boardCommentsRepository.findAllByReplyCommentIdAndIdGreaterThanOrderByIdAsc(replyCommentId, offset, Limit.of(30))
-                        .orElseThrow(() -> new CustomException(ErrorCode.REPLY_COMMENT_NO_CREATED));
-        List<ViewReplyCommentResponse> list = commentsList.stream().map(comment -> getReplyView(comment, user.getId())).collect(Collectors.toList());
-        list.forEach(viewCommentsResponse -> {
-            Boolean isLike = commentLikeRepository.existsByCommentIdAndUserId(viewCommentsResponse.getId(), user.getId());
-            viewCommentsResponse.setIsLike(isLike);
-        });
-        return list;
+                boardCommentsRepository.findAllByReplyCommentIdOrderByIdAsc(replyCommentId, Limit.of(30)).orElseThrow(() -> new CustomException(ErrorCode.REPLY_COMMENT_NO_CREATED)) :
+                boardCommentsRepository.findAllByReplyCommentIdAndIdGreaterThanOrderByIdAsc(replyCommentId, offset, Limit.of(30)).orElseThrow(() -> new CustomException(ErrorCode.REPLY_COMMENT_NO_CREATED));
+
+        return commentsList.stream().map(comment -> {
+            ViewReplyCommentResponse view = getReplyView(comment, user.getId());
+            view.setIsLike(commentLikeRepository.existsByCommentIdAndUserId(view.getId(), user.getId()));
+            return view;
+        }).collect(Collectors.toList());
     }
 
-    private ViewCommentsResponse getCommentView(BoardComments comment, Long userId){
-        ViewBoardUserResponse viewBoardUserResponse = new ViewBoardUserResponse(userRepository.findById(comment.getUserId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)));
-        viewBoardUserResponse.setImg(awsS3Util.getURL(viewBoardUserResponse.getImg(), FileSize.IMAGE_128));
+    private ViewBoardUserResponse createUserResponse(Long userId) {
+        User userInfo = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        ViewBoardUserResponse response = new ViewBoardUserResponse(userInfo);
+        response.setImg(awsS3Util.getURL(response.getImg(), FileSize.IMAGE_128));
+        response.setIsMine(true);
+        response.setIsStory(storyService.isStory(userId));
+        return response;
+    }
+
+    private ViewCommentsResponse getCommentView(BoardComments comment, Long userId) {
+        ViewBoardUserResponse viewBoardUserResponse = createUserResponse(comment.getUserId());
         viewBoardUserResponse.setIsMine(Objects.equals(userId, comment.getUserId()));
-        viewBoardUserResponse.setIsStory(storyService.isStory(comment.getUserId()));
         return new ViewCommentsResponse(comment, viewBoardUserResponse);
     }
-    private ViewReplyCommentResponse getReplyView(BoardComments comment, Long userId){
-        ViewBoardUserResponse viewBoardUserResponse = new ViewBoardUserResponse(userRepository.findById(comment.getUserId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)));
-        viewBoardUserResponse.setImg(awsS3Util.getURL(viewBoardUserResponse.getImg(), FileSize.IMAGE_128));
+
+    private ViewReplyCommentResponse getReplyView(BoardComments comment, Long userId) {
+        ViewBoardUserResponse viewBoardUserResponse = createUserResponse(comment.getUserId());
         viewBoardUserResponse.setIsMine(Objects.equals(userId, comment.getUserId()));
-        viewBoardUserResponse.setIsStory(storyService.isStory(comment.getUserId()));
         return new ViewReplyCommentResponse(comment, viewBoardUserResponse);
     }
 
     @Transactional
     public Long delete(Long commentId, SecurityUserDto user) {
-        BoardComments comments = boardCommentsRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
-            commentLikeRepository.deleteAllByCommentId(comments.getId());
-        Long boardId = comments.getBoardId();
-        List<BoardComments> commentsList = boardCommentsRepository.findByReplyCommentId(comments.getId());
-        for (BoardComments comment : commentsList) {
-            commentLikeRepository.deleteAllByCommentId(comment.getId());
-            boardCommentsRepository.delete(comment);
+        BoardComments comment = boardCommentsRepository.findById(commentId).orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+        commentLikeRepository.deleteAllByCommentId(comment.getId());
+        Long boardId = comment.getBoardId();
+
+        List<BoardComments> replies = boardCommentsRepository.findByReplyCommentId(comment.getId());
+        for (BoardComments reply : replies) {
+            commentLikeRepository.deleteAllByCommentId(reply.getId());
+            boardCommentsRepository.delete(reply);
         }
-        boardCommentsRepository.delete(comments);
-        int count = commentsList.size();
+        boardCommentsRepository.delete(comment);
 
         Boards board = boardRepository.findById(boardId).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
-        board.setComments(board.getComments() - count);
+        board.setComments(board.getComments() - replies.size());
         boardRepository.save(board);
+
         Long notificationUserId = board.getUserId();
         Type type = board.getBoardType().equals(BoardType.BASIC) ? Type.BOARD_COMMENT : Type.SHORTS_COMMENT;
         notificationService.delete(notificationUserId, type, boardId, user);
@@ -143,10 +136,9 @@ public class CommentService {
 
     @Transactional
     public void updateLike(Long id, int like) {
-        BoardComments boardComments = boardCommentsRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
-        boardComments.setLikes(boardComments.getLikes() + like);
-        boardCommentsRepository.save(boardComments);
+        BoardComments comment = boardCommentsRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+        comment.setLikes(comment.getLikes() + like);
+        boardCommentsRepository.save(comment);
     }
 
     @Transactional
@@ -157,5 +149,4 @@ public class CommentService {
             boardCommentsRepository.delete(comment);
         }
     }
-
 }
