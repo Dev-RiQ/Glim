@@ -86,8 +86,9 @@ public class ChatUserService {
             chatUserRepository.delete(chatUserNotMe);
             chatRoomRepository.deleteById(roomId);
             chatMsgRepository.deleteAllByRoomId(roomId);
+        }else{
+            chatUserRepository.save(chatUser);
         }
-        chatUserRepository.save(chatUser);
     }
 
     @Transactional
