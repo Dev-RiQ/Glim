@@ -158,6 +158,11 @@ public class UserService {
     // ✅ 회원가입 처리
     @Transactional
     public void registerUser(AddUserRequest request) {
+        long existing = userRepository.countByPhoneAndPlatForm(request.getPhone(), PlatForm.LOCAL);
+        
+        if (existing >= 2) {
+            throw new CustomException(ErrorCode.PHONE_ACCOUNT_LIMIT);
+        }
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new CustomException(ErrorCode.DUPLICATE_USERNAME);
         }

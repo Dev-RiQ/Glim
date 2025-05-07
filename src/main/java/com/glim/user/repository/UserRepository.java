@@ -22,4 +22,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findAllByPhoneAndPlatForm(String phone, PlatForm platForm);
 
+    long countByPhoneAndPlatForm(String phone, PlatForm platForm);
+
 }

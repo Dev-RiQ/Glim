@@ -20,6 +20,7 @@ public enum ErrorCode {
     SELF_UNFOLLOW_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "자기 자신을 언팔로우할 수 없습니다."),
     EXPIRED_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "인증번호가 만료되었습니다."),
     INVALID_RESET_TOKEN(BAD_REQUEST, "유효하지 않은 리셋 토큰입니다."),
+    PHONE_ACCOUNT_LIMIT(BAD_REQUEST, "같은 전화번호로 LOCAL 회원은 최대 2개까지 가입할 수 있습니다."),
 
 
     /* 401 UNAUTHORIZED : 인증 실패 */
