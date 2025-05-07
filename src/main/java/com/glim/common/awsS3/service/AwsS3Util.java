@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class AwsS3Util {
@@ -20,12 +21,12 @@ public class AwsS3Util {
     }
 
     public List<String> getSaveFilenames(List<String> originalFilenames){
-        Set<String> saveFilenames = new HashSet<>();
+        List<String> saveFilenames = new ArrayList<>();
         for (String originalFilename : originalFilenames){
             String saveFilename = originalFilename.substring(originalFilename.indexOf(bucket) + bucket.length() + 1 ,originalFilename.lastIndexOf("_"));
             saveFilenames.add(saveFilename);
         }
-        return saveFilenames.stream().toList();
+        return saveFilenames.stream().distinct().collect(Collectors.toList());
     }
 
     // 랜덤 파일 이름 메서드 (파일 이름 중복 방지)

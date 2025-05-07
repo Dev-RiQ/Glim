@@ -377,6 +377,7 @@ public class UserService {
         // 추가 정보 저장
         user.setNickname(request.getNickname());
         user.setPhone(request.getPhone());
+        user.setImg("userimages/user-default-image");
         userRepository.save(user);
     }
 
