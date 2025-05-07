@@ -1,6 +1,5 @@
 package com.glim.stories.service;
 
-import com.glim.borad.domain.BoardType;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.domain.FileType;
 import com.glim.common.awsS3.service.AwsS3Service;
@@ -49,6 +48,7 @@ public class StoryService {
     public void delete(Stories story) {
         deleteStoryData(story);
     }
+
     @Transactional
     public void delete(Long id) {
         Stories story = storyRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.STORY_NOT_FOUND));
@@ -63,19 +63,17 @@ public class StoryService {
     }
 
     @Transactional
-    public Stories updateLike(Long id, int like) {
+    public void updateLike(Long id, int like) {
         Stories stories = storyRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.STORY_DELETED));
         stories.setLikes(stories.getLikes() + like);
         storyRepository.save(stories);
-        return stories;
     }
 
     @Transactional
-    public Stories updateView(Long id, int view) {
+    public void updateView(Long id, int view) {
         Stories stories = storyRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.STORY_DELETED));
         stories.setViews(stories.getViews() + view);
         storyRepository.save(stories);
-        return stories;
     }
 
     public Boolean isStory(Long userId) {
@@ -92,7 +90,6 @@ public class StoryService {
             delete(story);
         }
     }
-
 
     public ViewStoryResponse getStory(Long storyId, Long id) {
         Stories story = storyRepository.findById(storyId).orElseThrow(() -> new CustomException(ErrorCode.STORY_DELETED));
@@ -137,5 +134,3 @@ public class StoryService {
         return storyList.stream().map(ViewMyPageStoryResponse::new).collect(Collectors.toList());
     }
 }
-
-

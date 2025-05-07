@@ -11,7 +11,6 @@ import com.glim.common.exception.ErrorCode;
 import com.glim.common.security.dto.SecurityUserDto;
 import com.glim.notification.domain.Type;
 import com.glim.notification.service.NotificationService;
-import com.glim.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -52,10 +51,6 @@ public class BoardLikeService {
             return true;
         }
         return false;
-    }
-
-    public Boolean isLike(Long boardId, Long userId) {
-        return boardLikeRepository.existsByBoardIdAndUserId(boardId, userId);
     }
 
     @Transactional

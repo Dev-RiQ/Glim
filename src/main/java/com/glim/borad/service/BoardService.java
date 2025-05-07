@@ -78,7 +78,6 @@ public class BoardService {
         if(board.getBoardType().equals(BoardType.ADVERTISEMENT)){
             advertisementService.create(board.getId());
         }
-
     }
 
     private void sendNotificationInTagUsers(Boards board, SecurityUserDto user){
@@ -96,22 +95,6 @@ public class BoardService {
     }
 
     public List<ViewBoardResponse> getMainBoard(Long id, Long offset) {
-//        List<Follow> followList = followRepository.findAllByFollowerUserId(id);
-//        List<Long> followedUserIds = followList.stream().map(Follow::getFollowingUserId).collect(Collectors.toList());
-//        List<Boards> boardList = (offset == null) ? boardRepository.findAllByUserIdInOrderByIdDesc(followedUserIds, Limit.of(10))
-//                : boardRepository.findAllByUserIdInAndIdLessThanOrderByIdDesc(followedUserIds, offset, Limit.of(10));
-//        if (boardList.size() < 10) {
-////            User user = (User) userRepository.findAllById(Collections.singleton(id));
-////            System.out.println("userTag = " + user.getTags());
-//        }
-//        if (boardList.size() < 10) {
-//            int remain = 10 - boardList.size();
-//            List<Long> excludeIds = boardList.stream().map(Boards::getId).collect(Collectors.toList());
-//            List<Boards> fillBoards = (offset == null) ? boardRepository.findAllByIdNotInOrderByIdDesc(excludeIds, Limit.of(remain))
-//                    : boardRepository.findAllByIdNotInAndIdLessThanOrderByIdDesc(excludeIds, offset, Limit.of(remain));
-//
-//            boardList.addAll(fillBoards);
-//        }
         List<Boards> boardList = offset == null ? boardRepository.findAllByBoardTypeOrderByIdDesc(BoardType.BASIC, Limit.of(10))
                 :boardRepository.findAllByBoardTypeAndIdLessThanOrderByIdDesc(BoardType.BASIC, offset, Limit.of(10));
         List<ViewBoardResponse> list = boardList.stream().map((board) -> getView(board, id)).collect(Collectors.toList());
@@ -331,33 +314,4 @@ public class BoardService {
         commentService.deleteBoardCommentsByUser(userId);
         commentLikeService.deleteCommentLikesByUser(userId);
     }
-
-
-//    public List<ViewBoardResponse> getMyShortsList(Long offset, Long userId) {
-//        List<Boards> boardList = (offset == null)
-//                ? boardRepository.findAllByUserIdAndBoardTypeOrderByIdDesc(userId, BoardType.SHORTS, Limit.of(20))
-//                : boardRepository.findAllByUserIdAndBoardTypeAndIdLessThanOrderByIdDesc(userId, BoardType.SHORTS, offset, Limit.of(20));
-//
-//        List<ViewBoardResponse> list = boardList.stream()
-//                .map((board) -> getView(board, userId))
-//                .collect(Collectors.toList());
-//
-//
-//        return list;
-//    }
-
-//    public List<ViewBoardResponse> getTagList(Long id) {
-//        List<Boards> list = boardRepository.findAllByUserId(id);
-//        list.forEach(lists -> {
-//
-//        });
-////
-////    @Transactional
-////    public Boards update(Long id, UpdateBoardRequest request) {
-////        Boards boards = boardRepository.findById(id).orElseThrow(ErrorCode::throwDummyNotFound);
-////        boards.update(request);
-////        boardRepository.save(boards);
-////        return boards;
-////    }
-//    }
 }

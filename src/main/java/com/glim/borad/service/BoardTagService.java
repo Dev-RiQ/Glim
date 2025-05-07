@@ -20,11 +20,6 @@ public class BoardTagService {
     private final BoardTagRepository boardTagRepository;
     private final BoardRepository boardRepository;
 
-//    @Transactional
-//    public void insert(AddBoardTagRequest request) {
-//        boardTagRepository.save(new AddBoardTagRequest().toEntity(request));
-//    }
-
     @Transactional
     public void delete(Long id) {
         boardRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
