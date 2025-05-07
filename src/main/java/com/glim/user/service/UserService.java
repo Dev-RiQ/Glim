@@ -19,6 +19,7 @@ import com.glim.notification.service.NotificationService;
 import com.glim.stories.service.StoryService;
 import com.glim.tag.domain.ViewTag;
 import com.glim.tag.repository.ViewTagRepository;
+import com.glim.user.domain.PlatForm;
 import com.glim.user.domain.User;
 import com.glim.user.dto.request.*;
 import com.glim.user.dto.response.*;
@@ -35,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -443,6 +445,17 @@ public class UserService {
                 UserResponse.from(user, boardCount, isStory, img),
                 false
         );
+    }    /**
+     * 해당 휴대폰으로 가입된 LOCAL 계정의 username을 최대 2개까지 반환
+     */
+    public List<String> findLocalUsernamesByPhone(String phone) {
+        return userRepository
+                // platForm 필드로 LOCAL 계정만 조회
+                .findAllByPhoneAndPlatForm(phone, PlatForm.LOCAL)
+                .stream()
+                .map(User::getUsername)
+                .limit(2)
+                .collect(Collectors.toList());
     }
 
 }

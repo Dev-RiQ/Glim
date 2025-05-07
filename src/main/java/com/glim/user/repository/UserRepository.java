@@ -1,5 +1,6 @@
 package com.glim.user.repository;
 
+import com.glim.user.domain.PlatForm;
 import com.glim.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -18,4 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByPhone(String phone);
 
     Optional<User> findByPhone(String phone);
+
+    List<User> findAllByPhoneAndPlatForm(String phone, PlatForm platForm);
+
 }
