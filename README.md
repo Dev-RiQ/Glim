@@ -41,42 +41,19 @@ Glim 서비스는 SNS 플랫폼으로 가입된 회원들과 일상과 관심사
   <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
 </div>
 
----
 
-## 🔧 Use API / Library
-- 💰 **결제**  
-  - PortOne  
-- 📱 **문자 인증**  
-  - CoolSMS  
-- ☁️ **스토리지**  
-  - AWS S3 (버킷 연동)  
-- 🔐 **인증**  
-  - JWT (토큰)  
-  - Google, Naver, Kakao Login (소셜 로그인)  
-- 🎥 **미디어 처리**  
-  - ffmpeg (비디오, 오디오 인코딩)  
-  - imgscalr (이미지 리사이징)  
-  - scrimage (이미지 WebP 변환)  
-- ⚡ **실시간 처리**  
-  - Kafka (웹소켓 실시간 채팅 외부 브로커)  
-- 🕵 **로깅/모니터링**  
-  - p6spy (JPA request log 뷰어)  
-- 🗄 **데이터베이스**  
-  - MySQL, MongoDB
 
 ---
 
-## 🔗 REST API Docs
-[Glim API 문서](https://greenyeonmi.notion.site/Glim-API-1e0e74df681080ce8c96c67df0d17b80?pvs=4)
----
-## 🔗 Glim React 
-[Glim React GitHub](https://github.com/Dev-RiQ/Glim_React)
----
-## 🔗 Glim Architecture
-![Image](https://github.com/user-attachments/assets/1f7a7c17-18f7-4e51-b836-766b5bbde01f)
----
-## 🔗 Glim ERD
-![Image](https://github.com/user-attachments/assets/7b8260be-e17b-4e0f-a51a-47ffea30354d)
 
+🔗 Links
+제목	링크
+📄 API 문서	Glim API 문서
+💻 Glim React (Front-End)	Glim React GitHub
+
+🖥️ Architecture
+<div align="center"> <img src="https://github.com/user-attachments/assets/1f7a7c17-18f7-4e51-b836-766b5bbde01f" width="700"/> </div>
+🗂️ ERD
+<div align="center"> <img src="https://github.com/user-attachments/assets/7b8260be-e17b-4e0f-a51a-47ffea30354d" width="700"/> </div>
 
 
