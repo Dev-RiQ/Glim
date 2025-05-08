@@ -1,5 +1,6 @@
 package com.glim.user.service;
 
+import com.glim.borad.domain.BoardType;
 import com.glim.borad.service.BoardService;
 import com.glim.chating.service.ChatUserService;
 import com.glim.common.awsS3.domain.FileSize;
@@ -88,7 +89,7 @@ public class UserService {
     // ✅ 현재 로그인한 사용자의 마이페이지 정보 가져오기
     public UserResponse getCurrentUserInfo(Long userId) {
         User foundUser = getUserById(userId);
-        int boardCount = boardService.countBoardsByUserId(userId);
+        int boardCount = boardService.countBoardsByUserId(userId, BoardType.SHORTS);
         boolean isStory = storyService.isStory(userId);
         String url = awsS3Util.getURL(foundUser.getImg(), FileSize.IMAGE_128);
         return UserResponse.from(foundUser, boardCount, isStory, url);
@@ -97,7 +98,7 @@ public class UserService {
     // ✅ 특정 사용자 프로필 정보 가져오기
     public UserProfileResponse getUserProfile(Long requesterId, Long targetUserId) {
         User targetUser = getUserById(targetUserId);
-        int boardCount = boardService.countBoardsByUserId(targetUserId);
+        int boardCount = boardService.countBoardsByUserId(targetUserId, BoardType.SHORTS);
         boolean isFollowing = followService.isFollowing(requesterId, targetUserId);  // 여기!
         boolean isStory = storyService.isStory(targetUserId);
         String img = awsS3Util.getURL(targetUser.getImg(), FileSize.IMAGE_128);
@@ -110,7 +111,7 @@ public class UserService {
         String accessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
         boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
-        int boardCount = boardService.countBoardsByUserId(user.getId());
+        int boardCount = boardService.countBoardsByUserId(user.getId(), BoardType.SHORTS);
         boolean isStory = storyService.isStory(user.getId());
         String img = awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128);
 
@@ -147,7 +148,7 @@ public class UserService {
         User user = customUserService.saveOrUpdate(oauthAttributes, provider);
         String accessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
-        int boardCount = boardService.countBoardsByUserId(user.getId());
+        int boardCount = boardService.countBoardsByUserId(user.getId(), BoardType.SHORTS);
         boolean isStory = storyService.isStory(user.getId());
         boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
         String img = awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128);
@@ -213,7 +214,7 @@ public class UserService {
 
         // ✅ 프로필 이미지 수정
         if (request.getImg() != null) {
-            String resizedImgUrl = awsS3Util.getURL(request.getImg(), FileSize.IMAGE_128);
+            String resizedImgUrl = request.getImg();
             user.setImg(resizedImgUrl);
         }
 
@@ -442,7 +443,7 @@ public class UserService {
         String accessToken = jwtTokenProvider.createToken(user.getId(), user.getRole().name());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        int boardCount = boardService.countBoardsByUserId(user.getId());
+        int boardCount = boardService.countBoardsByUserId(user.getId(), BoardType.SHORTS);
         boolean isStory = storyService.isStory(user.getId());
         String img = awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128);
 

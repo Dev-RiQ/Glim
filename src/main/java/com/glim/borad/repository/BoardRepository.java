@@ -61,5 +61,11 @@ public interface BoardRepository extends JpaRepository<Boards, Long> {
     Optional<List<Boards>> findAllByUserId(Long userId);
 
     List<Boards> findAllByBgmId(Long id);
+
+    int countByUserIdAndBoardTypeNot(Long userId, BoardType boardType);
+
+    Optional<List<Boards>> findAllByUserIdAndBoardTypeNotOrderByIdDesc(Long userId, BoardType boardType, Limit of);
+
+    Optional<List<Boards>> findAllByUserIdAndBoardTypeNotAndIdLessThanOrderByIdDesc(Long userId, BoardType boardType, Long offset, Limit of);
 }
 

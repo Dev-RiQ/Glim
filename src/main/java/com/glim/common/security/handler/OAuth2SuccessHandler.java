@@ -41,9 +41,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         if((user.getNickname() == null || user.getNickname().isBlank())
                 && (user.getPhone() == null || user.getPhone().isBlank())) {
-            response.sendRedirect("http://localhost:3000/login/" + accessToken + "/noPhone");
+            response.sendRedirect("http://ec2-3-35-165-204.ap-northeast-2.compute.amazonaws.com/login/" + accessToken + "/noPhone");
         }else{
-            response.sendRedirect("http://localhost:3000/login/" + accessToken);
+            response.sendRedirect("http://ec2-3-35-165-204.ap-northeast-2.compute.amazonaws.com/login/" + accessToken);
         }
     }
 }

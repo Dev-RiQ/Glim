@@ -26,7 +26,7 @@ public class BoardFiles {
     public BoardFiles(Long boardId, String fileName, Boolean fileType) {
         this.boardId = boardId;
         this.fileName = fileName;
-        this.fileType = fileType ? FileType.IMAGE : FileType.VIDEO;
+        this.fileType = fileType ? FileType.VIDEO : FileType.IMAGE;
     }
 
 }

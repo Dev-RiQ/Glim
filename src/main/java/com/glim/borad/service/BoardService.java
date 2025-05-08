@@ -100,11 +100,13 @@ public class BoardService {
         List<ViewBoardResponse> list = boardList.stream().map((board) -> getView(board, id)).collect(Collectors.toList());
 
         User user = userRepository.findById(id).orElse(null);
-        if(user != null && user.getRate() == 0 && list.size() == 10){
-            ViewBoardResponse ad = getRandomAdvertisement(id);
-            if(ad != null){
-                ad.setIsAd(true);
-                list.add(5,ad);
+        if(user != null && user.getRate() == 0){
+            if(list.size() == 10){
+                ViewBoardResponse ad = getRandomAdvertisement(id);
+                if(ad != null){
+                    ad.setIsAd(true);
+                    list.add(5,ad);
+                }
             }
             ViewBoardResponse ad2 = getRandomAdvertisement(id);
             if(ad2 != null){
@@ -153,9 +155,9 @@ public class BoardService {
     }
 
     public List<ViewMyPageBoardResponse> myPageBoardList(Long userId, Long offset) {
-        List<Boards> boardList = offset == null ? boardRepository.findAllByUserIdAndBoardTypeOrderByIdDesc(userId,BoardType.BASIC, Limit.of(20))
+        List<Boards> boardList = offset == null ? boardRepository.findAllByUserIdAndBoardTypeNotOrderByIdDesc(userId,BoardType.SHORTS, Limit.of(20))
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NO_CREATED))
-                : boardRepository.findAllByUserIdAndBoardTypeAndIdLessThanOrderByIdDesc(userId,BoardType.BASIC, offset, Limit.of(20))
+                : boardRepository.findAllByUserIdAndBoardTypeNotAndIdLessThanOrderByIdDesc(userId,BoardType.SHORTS, offset, Limit.of(20))
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NO_MORE));
         return boardList.stream().map(this::getByPageBoard).collect(Collectors.toList());
     }
@@ -256,8 +258,8 @@ public class BoardService {
     }
 
     // 해당 회원의 총 게시글 수
-    public int countBoardsByUserId(Long userId) {
-        return boardRepository.countByUserId(userId);
+    public int countBoardsByUserId(Long userId ,BoardType boardType) {
+        return boardRepository.countByUserIdAndBoardTypeNot(userId, boardType);
     }
 
     public List<ViewMyPageBoardResponse> getSaveList(List<Long> boardIdList) {

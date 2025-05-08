@@ -1,6 +1,7 @@
 package com.glim.common.jwt.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.glim.borad.domain.BoardType;
 import com.glim.borad.service.BoardService;
 import com.glim.common.awsS3.domain.FileSize;
 import com.glim.common.awsS3.service.AwsS3Util;
@@ -40,7 +41,7 @@ public class AuthUserUtil {
     public void writeLoginResponse(HttpServletResponse response, User user, String accessToken) throws IOException {
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
         boolean isFirstLogin = (user.getNickname() == null || user.getPhone() == null);
-        int boardCount = boardService.countBoardsByUserId(user.getId());
+        int boardCount = boardService.countBoardsByUserId(user.getId(), BoardType.SHORTS);
         boolean isStory = storyService.isStory(user.getId());
         String img = awsS3Util.getURL(user.getImg(), FileSize.IMAGE_128);
 
