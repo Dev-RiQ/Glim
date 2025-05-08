@@ -69,9 +69,8 @@ Glim 서비스는 SNS 플랫폼으로 가입된 회원들과 일상과 관심사
 
 
 
-
 🖥️ Architecture
-<div align="center"> <img src="https://github.com/user-attachments/assets/1f7a7c17-18f7-4e51-b836-766b5bbde01f" width="700"/> </div>
+<div align="center"> <img src="https://github.com/user-attachments/assets/8708f9ee-95d0-4487-8084-6885f646add0" width="700"/> </div>
 🗂️ ERD
 <div align="center"> <img src="https://github.com/user-attachments/assets/7b8260be-e17b-4e0f-a51a-47ffea30354d" width="700"/> </div>
 
