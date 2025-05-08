@@ -27,7 +27,7 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     database: mysql
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
 
     # JDBC TimeZone Setting
     properties:

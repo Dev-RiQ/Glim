@@ -14,13 +14,16 @@ import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
 import org.imgscalr.Scalr;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,16 +34,19 @@ public class AudioEncoderRepository {
     private final FFmpeg ffmpeg;
     private final FFprobe ffprobe;
     private final AwsS3Util awsS3Util;
-    private final String path = System.getProperty("user.dir");
+    @Value("${file.path}")
+    private String path;
 
     public List<File> audioEncoding(List<MultipartFile> multipartFiles) throws Exception {
         List<File> files = new ArrayList<>();
+        Path paths = Paths.get(path + FileType.AUDIO.getType());
+        Files.createDirectories(paths);
         for (MultipartFile multipartFile : multipartFiles) {
             String saveFileName = FileType.AUDIO.getType() + "/" + awsS3Util.changedFileName(multipartFile.getOriginalFilename());
-            File file = new File(saveFileName);
+            File file = new File(path + saveFileName);
             Path filePath = file.toPath();
             multipartFile.transferTo(filePath);
-            FFmpegProbeResult ffmpegProbeResult = ffprobe.probe(path +"\\"+ saveFileName);
+            FFmpegProbeResult ffmpegProbeResult = ffprobe.probe(path + saveFileName);
             files.add(new File(convertAudio(ffmpegProbeResult, saveFileName)));
         }
         return files;
@@ -50,7 +56,7 @@ public class AudioEncoderRepository {
         String filename = saveFileName.substring(0, saveFileName.lastIndexOf(".")) + "_encoded.mp3";
         FFmpegBuilder builder = new FFmpegBuilder()
                 .setInput(probeResult)
-                .addOutput(path + "\\" + filename.replace("/","\\"))
+                .addOutput(path + filename.replace("/","\\"))
 //                .addExtraArgs("-ss","00:01:00") // 시작시간
 //                .addExtraArgs("-to","00:01:30") // 종료시간
                 .setAudioBitRate(128000)

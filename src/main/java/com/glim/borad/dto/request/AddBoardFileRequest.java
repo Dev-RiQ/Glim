@@ -18,7 +18,7 @@ public class AddBoardFileRequest {
         return BoardFiles.builder()
                 .boardId(boardId)
                 .fileName(fileName)
-                .fileType(fileType.equals("BASIC"))
+                .fileType(fileType.equals("SHORTS"))
                 .build();
     }
 }
