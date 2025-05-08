@@ -9,11 +9,14 @@ import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,19 +28,22 @@ public class VideoEncoderRepository {
     private final FFprobe ffprobe;
     private final AwsS3Util awsS3Util;
     private final ImageEncoderRepository imageEncoderRepository;
-    private final String path = System.getProperty("user.dir");
+    @Value("${file.path}")
+    private String path;
 
     public List<File> videoEncoding(List<MultipartFile> multipartFiles) throws Exception {
         List<File> files = new ArrayList<>();
+        Path paths = Paths.get(path + FileType.VIDEO.getType());
+        Files.createDirectories(paths);
         for (MultipartFile multipartFile : multipartFiles) {
             String saveFileName = FileType.VIDEO.getType() + "/" + awsS3Util.changedFileName(multipartFile.getOriginalFilename());
-            File file = new File(saveFileName);
+            File file = new File(path + saveFileName);
             Path filePath = file.toPath();
             multipartFile.transferTo(filePath);
-            FFmpegProbeResult ffmpegProbeResult = ffprobe.probe(path +"\\"+ saveFileName);
+            FFmpegProbeResult ffmpegProbeResult = ffprobe.probe(path + saveFileName);
             files.add(new File(convertVideo(ffmpegProbeResult, saveFileName)));
             String thumbnailName = getThumbnail(ffmpegProbeResult, saveFileName);
-            files.add(imageEncoderRepository.convertToWebp(thumbnailName,new File(thumbnailName)));
+            files.add(imageEncoderRepository.convertToWebp(thumbnailName,new File(path + thumbnailName)));
         }
         return files;
     }
@@ -47,7 +53,7 @@ public class VideoEncoderRepository {
         String filename = saveFileName.substring(0, saveFileName.lastIndexOf(".")) + "_encoded.mp4";
         FFmpegBuilder builder = new FFmpegBuilder()
                 .setInput(probeResult)
-                .addOutput(path + "\\" + filename.replace("/","\\"))
+                .addOutput(path + filename.replace("/","\\"))
                 .setAudioCodec("aac")
                 .setAudioBitRate(128000)
                 .setAudioChannels(2)
@@ -71,7 +77,7 @@ public class VideoEncoderRepository {
         String filename = saveFileName.substring(0, saveFileName.lastIndexOf(".")) + "_thumbnail.jpg";
         FFmpegBuilder builder = new FFmpegBuilder()
                 .setInput(probeResult)
-                .addOutput(path + "\\" + filename.replace("/","\\"))
+                .addOutput(path + filename.replace("/","\\"))
                 .addExtraArgs("-ss","00:00:00")
                 .addExtraArgs("-vframes","1")
                 .setVideoResolution(file.width, file.height)

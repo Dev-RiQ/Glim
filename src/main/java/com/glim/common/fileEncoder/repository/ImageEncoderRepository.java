@@ -5,16 +5,21 @@ import com.glim.common.awsS3.repository.AwsS3Repository;
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
+import com.glim.common.fileEncoder.config.FFmpegConfig;
 import com.glim.common.fileEncoder.config.WebpWriter;
 import com.sksamuel.scrimage.ImmutableImage;
 import lombok.RequiredArgsConstructor;
 import org.imgscalr.Scalr;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,9 +28,13 @@ import java.util.List;
 public class ImageEncoderRepository {
 
     private final AwsS3Util awsS3Util;
+    @Value("${file.path}")
+    private String path;
 
     public List<File> userImageEncoding(List<MultipartFile> multipartFiles) throws Exception {
         List<File> files = new ArrayList<>();
+        Path paths = Paths.get(path + FileType.USER_IMAGE.getType());
+        Files.createDirectories(paths);
         for (MultipartFile multipartFile : multipartFiles) {
             String saveFileName = FileType.USER_IMAGE.getType() + "/" + awsS3Util.changedFileName(multipartFile.getOriginalFilename());
             int size = 128;
@@ -36,6 +45,8 @@ public class ImageEncoderRepository {
 
     public List<File> imageEncoding(List<MultipartFile> multipartFiles) throws Exception {
         List<File> files = new ArrayList<>();
+        Path paths = Paths.get(path + FileType.IMAGE.getType());
+        Files.createDirectories(paths);
         for (MultipartFile multipartFile : multipartFiles) {
             String saveFileName = FileType.IMAGE.getType() + "/" + awsS3Util.changedFileName(multipartFile.getOriginalFilename());
             for(int i = 0 ; i < 2 ; i++){
@@ -56,7 +67,7 @@ public class ImageEncoderRepository {
 
     private File setNewFile(String name, int size){
         int index = name.lastIndexOf(".");
-        return new File(name.substring(0, index)+"_"+size+"x"+size + name.substring(index));
+        return new File(path+name.substring(0, index)+"_"+size+"x"+size + name.substring(index));
     }
 
     private BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
@@ -67,7 +78,7 @@ public class ImageEncoderRepository {
         try {
             return ImmutableImage.loader()// 라이브러리 객체 생성
                     .fromFile(originalFile)
-                    .output(WebpWriter.CUSTOMWRITER, new File(filename.substring(0, filename.lastIndexOf(".")) + ".webp")); // 손실 압축 설정, fileName.webp로 파일 생성
+                    .output(WebpWriter.CUSTOMWRITER, new File(path+filename.substring(0, filename.lastIndexOf(".")) + ".webp")); // 손실 압축 설정, fileName.webp로 파일 생성
         } catch (Exception e) {
             throw new CustomException(ErrorCode.UNSUCCESSFUL_WEBP_CHANGE);
         }

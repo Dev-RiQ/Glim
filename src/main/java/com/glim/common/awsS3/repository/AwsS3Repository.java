@@ -29,6 +29,8 @@ public class AwsS3Repository {
     private final AmazonS3Client amazonS3Client;
     private final FileEncoderController fileEncoderController;
     private final AwsS3Util awsS3Util;
+    @Value("${file.path}")
+    private String path;
 
     public List<String> upload(List<MultipartFile> multipartFiles, FileType fileType) {
         List<File> uploadFiles = fileEncoderController.fileEncoding(multipartFiles, fileType);
@@ -56,7 +58,7 @@ public class AwsS3Repository {
     }
 
     private void removeNewFile(String fileType) {
-        File[] files = new File(System.getProperty("user.dir") + "/" + fileType).listFiles();
+        File[] files = new File(path + fileType).listFiles();
         if(files == null) return;
         for(File file : files) {
             if(file.delete()){
