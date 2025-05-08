@@ -100,7 +100,7 @@ public class BoardService {
         List<ViewBoardResponse> list = boardList.stream().map((board) -> getView(board, id)).collect(Collectors.toList());
 
         User user = userRepository.findById(id).orElse(null);
-        if(user != null && user.getRate() == 0){
+        if(user != null && user.getRate() == 0 && list.size() == 10){
             ViewBoardResponse ad = getRandomAdvertisement(id);
             if(ad != null){
                 ad.setIsAd(true);
