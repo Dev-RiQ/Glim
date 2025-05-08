@@ -85,6 +85,7 @@ dependencies {
     implementation "com.sksamuel.scrimage:scrimage-core:4.0.32"
     implementation "com.sksamuel.scrimage:scrimage-webp:4.0.32"
 
+
     // Image Resizing
     implementation group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
 

@@ -9,6 +9,12 @@ import com.glim.common.fileEncoder.config.FFmpegConfig;
 import com.glim.common.fileEncoder.config.WebpWriter;
 import com.sksamuel.scrimage.ImmutableImage;
 import lombok.RequiredArgsConstructor;
+import net.bramp.ffmpeg.FFmpeg;
+import net.bramp.ffmpeg.FFmpegExecutor;
+import net.bramp.ffmpeg.FFprobe;
+import net.bramp.ffmpeg.builder.FFmpegBuilder;
+import net.bramp.ffmpeg.job.FFmpegJob;
+import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
@@ -28,6 +34,8 @@ import java.util.List;
 public class ImageEncoderRepository {
 
     private final AwsS3Util awsS3Util;
+    private final FFmpeg ffmpeg;
+    private final FFprobe ffprobe;
     @Value("${file.path}")
     private String path;
 
@@ -62,7 +70,7 @@ public class ImageEncoderRepository {
         bi = resizeImage(bi,size,size);
         File file = setNewFile(saveFileName, size);
         ImageIO.write(bi,"png", file);
-        return convertToWebp(file.getParentFile()+"/"+file.getName(), file);
+        return new File(convertToWebp(file.getParentFile()+"/"+file.getName()));
     }
 
     private File setNewFile(String name, int size){
@@ -74,14 +82,19 @@ public class ImageEncoderRepository {
         return Scalr.resize(originalImage, Scalr.Method.AUTOMATIC, Scalr.Mode.AUTOMATIC, targetWidth, targetHeight, Scalr.OP_ANTIALIAS);
     }
 
-    public File convertToWebp(String filename, File originalFile) {
-        try {
-            return ImmutableImage.loader()// 라이브러리 객체 생성
-                    .fromFile(originalFile)
-                    .output(WebpWriter.CUSTOMWRITER, new File(path+filename.substring(0, filename.lastIndexOf(".")) + ".webp")); // 손실 압축 설정, fileName.webp로 파일 생성
-        } catch (Exception e) {
-            throw new CustomException(ErrorCode.UNSUCCESSFUL_WEBP_CHANGE);
-        }
+    public String convertToWebp(String filename) throws Exception {
+        FFmpegProbeResult ffmpegProbeResult = ffprobe.probe(filename);
+        String name = filename.substring(0, filename.lastIndexOf(".")) + ".webp";
+        FFmpegBuilder builder = new FFmpegBuilder()
+                .setInput(ffmpegProbeResult)
+                .addOutput(name)
+                .setFormat("webp")
+                .done();
+
+        FFmpegExecutor executable = new FFmpegExecutor(ffmpeg, ffprobe);
+        FFmpegJob ffmpegjob = executable.createJob(builder);
+        ffmpegjob.run();
+        return name;
     }
 
 }

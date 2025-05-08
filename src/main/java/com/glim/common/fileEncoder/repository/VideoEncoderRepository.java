@@ -43,17 +43,17 @@ public class VideoEncoderRepository {
             FFmpegProbeResult ffmpegProbeResult = ffprobe.probe(path + saveFileName);
             files.add(new File(convertVideo(ffmpegProbeResult, saveFileName)));
             String thumbnailName = getThumbnail(ffmpegProbeResult, saveFileName);
-            files.add(imageEncoderRepository.convertToWebp(thumbnailName,new File(path + thumbnailName)));
+            files.add( new File(imageEncoderRepository.convertToWebp(thumbnailName)));
         }
         return files;
     }
 
     public String convertVideo(FFmpegProbeResult probeResult, String saveFileName) {
         FFmpegStream file = probeResult.getStreams().get(0);
-        String filename = saveFileName.substring(0, saveFileName.lastIndexOf(".")) + "_encoded.mp4";
+        String filename = path + saveFileName.substring(0, saveFileName.lastIndexOf(".")) + "_encoded.mp4";
         FFmpegBuilder builder = new FFmpegBuilder()
                 .setInput(probeResult)
-                .addOutput(path + filename.replace("/","\\"))
+                .addOutput(filename)
                 .setAudioCodec("aac")
                 .setAudioBitRate(128000)
                 .setAudioChannels(2)
@@ -74,10 +74,10 @@ public class VideoEncoderRepository {
 
     private String getThumbnail(FFmpegProbeResult probeResult, String saveFileName) {
         FFmpegStream file = probeResult.getStreams().get(0);
-        String filename = saveFileName.substring(0, saveFileName.lastIndexOf(".")) + "_thumbnail.jpg";
+        String filename = path + saveFileName.substring(0, saveFileName.lastIndexOf(".")) + "_thumbnail.jpg";
         FFmpegBuilder builder = new FFmpegBuilder()
                 .setInput(probeResult)
-                .addOutput(path + filename.replace("/","\\"))
+                .addOutput(filename)
                 .addExtraArgs("-ss","00:00:00")
                 .addExtraArgs("-vframes","1")
                 .setVideoResolution(file.width, file.height)
