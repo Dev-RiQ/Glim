@@ -2,8 +2,6 @@ package com.glim.borad.dto.request;
 
 import com.glim.borad.domain.Boards;
 import lombok.*;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor

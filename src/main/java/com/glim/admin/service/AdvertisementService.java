@@ -3,7 +3,6 @@ package com.glim.admin.service;
 import com.glim.admin.domain.Advertisement;
 import com.glim.admin.domain.AdvertisementStatus;
 import com.glim.admin.repository.AdvertisementRepository;
-import com.glim.borad.domain.Boards;
 import com.glim.common.exception.CustomException;
 import com.glim.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +38,8 @@ public class AdvertisementService {
     public Advertisement approve(Long id) {
         Advertisement advertisement = findById(id);
         advertisement.setStatus(AdvertisementStatus.APPROVED);
-        advertisement.setRejectionReason(""); // 승인 시 거절 사유는 비워줍니다
-        return advertisementRepository.save(advertisement);
+        advertisement.setRejectionReason("");
+        return advertisement;
     }
 
     @Transactional
@@ -48,10 +47,10 @@ public class AdvertisementService {
         Advertisement advertisement = findById(id);
         advertisement.setStatus(AdvertisementStatus.REJECTED);
         advertisement.setRejectionReason("");
-        return advertisementRepository.save(advertisement);
+        return advertisement;
     }
-
     @Transactional
+
     public void delete(Long id) {
         advertisementRepository.deleteById(id);
     }

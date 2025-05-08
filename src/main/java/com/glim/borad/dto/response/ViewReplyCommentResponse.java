@@ -4,7 +4,6 @@ import com.glim.borad.domain.BoardComments;
 import com.glim.common.utils.CountUtil;
 import com.glim.common.utils.DateTimeUtil;
 import com.glim.user.dto.response.ViewBoardUserResponse;
-import com.glim.user.repository.UserRepository;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

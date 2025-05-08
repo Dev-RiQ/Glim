@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BoardSaveRepository extends JpaRepository<BoardSaves, Long> {
-    void deleteByBoardIdAndUserId(Long boardId, Long userId);
-
     List<BoardSaves> findByUserId(Long userId);
 
     BoardSaves findByBoardIdAndUserId(Long boardId, Long userId);

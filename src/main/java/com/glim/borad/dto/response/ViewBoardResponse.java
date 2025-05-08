@@ -1,16 +1,10 @@
 package com.glim.borad.dto.response;
 
-import com.glim.borad.domain.Bgms;
 import com.glim.borad.domain.BoardType;
 import com.glim.borad.domain.Boards;
-import com.glim.borad.domain.Option;
-import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.utils.CountUtil;
 import com.glim.common.utils.DateTimeUtil;
-import com.glim.user.domain.User;
-import com.glim.user.dto.response.UserResponse;
 import com.glim.user.dto.response.ViewBoardUserResponse;
-import com.glim.user.repository.UserRepository;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
