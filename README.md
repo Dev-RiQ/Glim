@@ -32,7 +32,7 @@ Glim 서비스는 SNS 플랫폼으로 가입된 회원들과 일상과 관심사
 
 | ![Image](https://github.com/user-attachments/assets/bc566795-c232-42eb-b9eb-3233e7aea9f5) | ![Image](https://github.com/user-attachments/assets/169a79fa-18a6-419e-9ad3-f84631e110e1) | ![Image](https://github.com/user-attachments/assets/9e808007-534f-413d-9b2e-ae965cf596b4) |
 |:-:|:-:|:-:|
-| **Nakyeong Kim**<br>🟣 *Member*<br>• User<br>• JWT<br>• SMS VERIFICATION<br>• Ranking•  | **Wongyu Lee**<br>🟣 *Leader*<br>• All Interaction<br>• Notification<br>• Chat<br>• React | **Jongseok Han**<br>🟣 *Member*<br>• Board<br>• Story<br>• Admin<br>• Pay |
+| **Nakyeong Kim**<br>🟣 *Member*<br>• User<br>• JWT<br>• SMS VERIFICATION<br>• Ranking  | **Wongyu Lee**<br>🟣 *Leader*<br>• All Interaction<br>• Notification<br>• Chat<br>• React | **Jongseok Han**<br>🟣 *Member*<br>• Board<br>• Story<br>• Admin<br>• Pay |
 
 ---
 
