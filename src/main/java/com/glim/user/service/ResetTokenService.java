@@ -22,7 +22,7 @@ public class ResetTokenService {
 
         ResetToken resetToken = ResetToken.builder()
                 .token(token)
-                .username(username)
+                .userId(username)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -31,7 +31,7 @@ public class ResetTokenService {
     }
 
     public Optional<String> getUsernameByToken(String token) {
-        return tokenRepository.findById(token).map(ResetToken::getUsername);
+        return tokenRepository.findById(token).map(ResetToken::getUserId);
     }
     @Transactional
     public void deleteToken(String token) {

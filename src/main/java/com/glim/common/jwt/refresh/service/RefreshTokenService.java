@@ -21,6 +21,14 @@ public class RefreshTokenService {
 
     // refreshToken 생성 및 만료일 지정 , db에 저장
     public RefreshToken createRefreshToken(Long userId) {
+
+        Optional<RefreshToken> existingTokenOpt = refreshTokenRepository.findByUserId(userId);
+
+        if(existingTokenOpt.isPresent()) {
+            RefreshToken existingToken = existingTokenOpt.get();
+            return existingToken;
+        }
+
         String token = UUID.randomUUID().toString();
         Instant expiry = Instant.now().plusMillis(refreshTokenDurationMs);
 

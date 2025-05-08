@@ -3,12 +3,8 @@ package com.glim.user.controller;
 
 import com.glim.common.awsS3.service.AwsS3Util;
 import com.glim.common.security.dto.SecurityUserDto;
-import com.glim.common.security.oauth.OAuthAttributes;
-import com.glim.common.security.service.CustomUserService;
 import com.glim.common.security.util.SecurityUtil;
 import com.glim.common.statusResponse.StatusResponseDTO;
-import com.glim.stories.service.StoryService;
-import com.glim.tag.service.ViewTagService;
 import com.glim.user.domain.User;
 import com.glim.user.dto.request.*;
 import com.glim.user.dto.response.*;

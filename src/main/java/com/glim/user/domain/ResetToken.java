@@ -1,6 +1,7 @@
 
 package com.glim.user.domain;
 
+import jakarta.persistence.Column;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -18,7 +19,8 @@ public class ResetToken {
     @Id
     private String token;
 
-    private String username;
+    @Column(name = "_id")
+    private String userId;
 
     private LocalDateTime createdAt;
 }
