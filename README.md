@@ -1,5 +1,4 @@
-![Image](https://github.com/user-attachments/assets/c1c4dc68-a77b-49ce-8619-e0ee4f8f8e79)
-
+![Image](https://github.com/user-attachments/assets/a6ce8fd1-a279-4271-b5e2-bc6c3dfbdc81)
 
 
 # <img style="width:40px;" src="https://github.com/user-attachments/assets/3b8eaa31-214a-4608-bdbf-a3c6ef35ebe1"/> Glim (2025.04.15 ~ 2025.05.09 — 25days)
