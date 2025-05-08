@@ -12,7 +12,7 @@ Glim 서비스는 SNS 플랫폼으로 가입된 회원들과 일상과 관심사
 
 ---
 
-## ⭐ Main Feature
+##  Main Feature
 1.  **게시글**: 이미지와 내용을 함께 업로드 (추억의 장소, 함께한 사람들, 태그, BGM 설정 가능)
 2.  **Shorts**: 짧은 영상과 내용을 함께 업로드 (장소, 사람, 태그 포함)
 3.  **스토리**: 24시간 동안 공유되는 순간, 이후 마이페이지에서 확인 가능
@@ -26,6 +26,12 @@ Glim 서비스는 SNS 플랫폼으로 가입된 회원들과 일상과 관심사
 ## 💻 Team (3인)
 <a href="https://github.com/WOWOW0wOw"><img src="https://img.shields.io/badge/WOWOW0wOw-181717?style=for-the-badge&logo=github&logoColor=white"></a>
 <a href="https://github.com/skrudKim"><img src="https://img.shields.io/badge/skrudKim-181717?style=for-the-badge&logo=github&logoColor=white"></a>
+<a href="https://github.com/Dev-RiQ"><img src="https://img.shields.io/badge/DevRiQ-181717?style=for-the-badge&logo=github&logoColor=white"></a>
+## 👥 Team Members
+
+| ![Image](https://github.com/user-attachments/assets/bc566795-c232-42eb-b9eb-3233e7aea9f5) | ![Image](https://github.com/user-attachments/assets/169a79fa-18a6-419e-9ad3-f84631e110e1) | ![Image](https://github.com/user-attachments/assets/9e808007-534f-413d-9b2e-ae965cf596b4) |
+|:-:|:-:|:-:|
+| **Nakyeong Kim**<br>🟣 *Member*<br>• User<br>• JWT<br>• SMS VERIFICATION<br>• Ranking | **Wongyu Lee**<br>🟣 *Leader*<br>• All Interaction<br>• Notification<br>• Chat<br>• React | **Jongseok Han**<br>🟣 *Member*<br>• Board<br>• Story<br>• Admin<br>• Pay |
 
 ---
 
@@ -47,12 +53,17 @@ Glim 서비스는 SNS 플랫폼으로 가입된 회원들과 일상과 관심사
 
 ## 🔗 Links
 
-- 📄 **API Docs**   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![API 문서](https://img.shields.io/badge/API_문서-바로가기-6C33A3?style=for-the-badge&logo=notion&logoColor=white)](https://greenyeonmi.notion.site/Glim-API-1e0e74df681080ce8c96c67df0d17b80?pvs=4)
+ 📄 **API Docs**
+
+ 
+👉  [![API Docs](https://img.shields.io/badge/API_Docs-바로가기-8C65D0?style=for-the-badge&logo=notion&logoColor=white)](https://greenyeonmi.notion.site/Glim-API-1e0e74df681080ce8c96c67df0d17b80?pvs=4)
 
 ##
 
 
-- 💻 **Glim React (Front-End)**  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Glim React](https://img.shields.io/badge/Glim_React-Front--End-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://github.com/Dev-RiQ/Glim_React)
+ 💻 **Glim React (Front-End)**
+
+👉  [![Glim React](https://img.shields.io/badge/Glim_React-Front--End-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://github.com/Dev-RiQ/Glim_React)
 
 ---
 
